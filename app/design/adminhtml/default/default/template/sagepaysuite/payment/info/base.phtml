@@ -1,0 +1,176 @@
+<?php
+/**
+ * @see Ebizmarts_SagePaySuite_Block_Info_SagePayDirectPro
+ */
+
+ $sagepay = new Varien_Object;
+
+ $tokenCard = $this->getTokenCard();
+ $orderId = $this->getInfo()->getOrder()->getId();
+
+ if(is_object($this->getInfo()->getOrder()) && !is_null($this->getInfo()->getOrder()->getSagepayInfo())){
+ 	$sagepay = $this->getInfo()->getOrder()->getSagepayInfo();
+ }
+
+ $fraud = $this->helper('sagepaysuite/paymentinfo')->getFraudInfo($orderId);
+
+
+ if($this->getInfo()->getCcLast4()){
+ 	$sagepay->setCardType($this->getInfo()->getCcType())
+ 	->setLastFourDigits($this->getInfo()->getCcLast4());
+ }else if(is_null($sagepay->getCardType()) && ($sagepay = $this->getTokenCard())){
+ 	$sagepay->setLastFourDigits($sagepay->getLastFour());
+ }
+
+ $reg = Mage::registry('sageserverpost');
+ if(!is_null($reg)){
+ 	$sagepay->setCardType($reg->getData('CardType'))
+ 	->setLastFourDigits($reg->getData('Last4Digits'));
+ }
+
+ if(!$sagepay->getLastFourDigits() && is_object($this->getInfo()->getOrder())){
+ 	$sagepay = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
+                ->loadByParent($this->getInfo()->getOrder()->getId());
+ }
+
+ $stopped = ($sagepay->getVoided() || $sagepay->getAborted() || $sagepay->getCanceled()) ? true : false;
+
+ $states = $this->helper('sagepaysuite')->getTxStates();
+?>
+
+<img src="<?php echo $this->getSkinUrl('sagepaysuite/images/sagepay-section-heading.png'); ?>" />
+
+<p>
+<?php echo $this->getMethod()->getTitle() ?>
+    <br />
+<?php echo $this->__('%s Transaction placed in %s mode.', strtoupper($sagepay->getTxType()), strtoupper($sagepay->getMode())); ?>
+</p>
+
+<table>
+	<tr>
+		<td><?php echo $this->__('CC Type:'); ?></td>
+		<td><?php echo $this->getCcTypeName($sagepay->getCardType()); ?></td>
+	</tr>
+
+	<?php if($sagepay->getLastFourDigits()): ?>
+	<tr>
+		<td><?php echo $this->__('CC Number:'); ?></td>
+		<td>**********<?php echo $sagepay->getLastFourDigits(); ?></td>
+	</tr>
+	<?php endif; ?>
+
+	<?php if($sagepay->getCardExpiryDate()): ?>
+	<tr>
+		<td><?php echo $this->__('CC Exp. Date:'); ?></td>
+		<td><?php echo $sagepay->getCardExpiryDate(); ?></td>
+	</tr>
+	<?php endif; ?>
+
+<?php if($tokenCard->getId() && !$this->getOnMemo() && !$this->getOnInvoice()): ?>
+	<tr>
+		<td><?php echo $this->__('Token:'); ?></td>
+		<td><?php echo $tokenCard->getToken(); ?></td>
+	</tr>
+<?php endif; ?>
+</table>
+
+<?php if(Mage::getSingleton('core/translate')->getTranslateInline() === true && $this->getIsSecureMode() != true && !Mage::app()->getRequest()->isXmlHttpRequest()): ?>
+
+<?php if($sagepay->getParentTrnId()): ?>
+<ul class="messages">
+	<li class="notice-msg">
+		<?php echo $this->__('This transaction is child of %s', $this->getParentOrderLink($sagepay)) ?>
+	</li>
+</ul>
+<?php endif; ?>
+
+<?php if(!$this->getOnMemo() && !$this->getOnInvoice()): ?>
+<ul style="border:1px solid #ccc;margin-bottom:10px;padding:10px;">
+
+	<?php if($sagepay->getTxStateId()): ?>
+		<li><?php echo $this->__('<strong>Transaction state</strong>: <i><u>%s</u></i>', $states["stateid_{$sagepay->getTxStateId()}"]); ?></li>
+	<?php endif; ?>
+
+	<?php if($stopped): ?>
+		<li><strong class="rd-ntce"><?php echo $this->getStoppedLabel($sagepay); ?></strong></li>
+	<?php endif; ?>
+
+    <li><strong><?php echo $this->__('Vendor TX Code'); ?></strong>: <?php echo $sagepay->getVendorTxCode(); ?></li>
+    <li><strong><?php echo $this->__('VPSTxId'); ?></strong>: <?php echo $this->detailLink($sagepay->getVpsTxId()); ?></li>
+    <?php
+    	$td_status = $sagepay->getThreedSecureStatus();
+    	if(!is_null($td_status)): ?>
+    <li><strong><?php echo $this->__('3D Status'); ?></strong>: <span class="shield-flag threed-<?php echo strtolower(trim($td_status)); ?>"><?php echo $td_status; ?></span></li>
+    <?php endif; ?>
+</ul>
+
+<ul id="card-checks">
+	<?php if($sagepay->getAddressResult()): ?>
+    	<li><?php echo $this->__('Address Verification Result: <span class="shield-flag %s">%s</span>', $this->cs($sagepay->getAddressResult()), $sagepay->getAddressResult()); ?></li>
+    <?php endif; ?>
+    <?php if($sagepay->getPostcodeResult()): ?>
+    	<li><?php echo $this->__('Postcode Verification Result: <span class="shield-flag %s">%s</span>', $this->cs($sagepay->getPostcodeResult()), $sagepay->getPostcodeResult()); ?></li>
+    <?php endif; ?>
+    <?php if($sagepay->getCv2result()): ?>
+    	<li><?php echo $this->__('CV2 Verification Result: <span class="shield-flag %s">%s</span>', $this->cs($sagepay->getCv2result()), $sagepay->getCv2result()); ?></li>
+    <?php endif; ?>
+    <?php if($sagepay->getAvscv2()): ?>
+    	<li><?php echo $this->__('AVS and CV2 Verification Result: <span class="shield-flag %s">%s</span>', $this->cs($sagepay->getAvscv2()), $sagepay->getAvscv2()); ?></li>
+    <?php endif; ?>
+</ul>
+
+<!-- ReD Fraud Response -->    
+<?php if($sagepay->getRedFraudResponse()): ?>
+    <p style="margin-top:10px;margin-bottom:10px;"><img src="<?php echo $this->getSkinUrl('sagepaysuite/images/ReD.png'); ?>" /> <strong><?php echo $sagepay->getRedFraudResponse(); ?></strong></p>
+<?php endif; ?>
+<!-- ReD Fraud Response -->
+
+<?php if($fraud->getThirdmanScore() || $fraud->getThirdmanAction()): $color = ($fraud->getThirdmanAction()=='OK') ? 'green':'red'; ?>
+<div id="t3m-score" style="border:1px solid orange;margin-bottom:5px;padding:5px;">
+    <h3><?php echo $this->__('The 3rd Man Results'); ?></h3>
+    <p><?php echo $this->__('Score: %s', $fraud->getThirdmanScore()); ?><br />
+    <?php echo $this->__('Action: <strong style="%s">%s</strong>', 'color:'.$color, $fraud->getThirdmanAction()); ?></p>
+
+    <!-- 3rdMan Breakdown -->
+    	<?php if( $fraud->getThirdmanId() && ($bdown = $this->getThirdmanBreakdown($fraud->getThirdmanId())) ): ?>
+    	<a href="" onclick="$('thirdman-breakdown').toggle();return false;"><?php echo $this->__('3rd Man breakdown'); ?></a>
+    	<ul id="thirdman-breakdown" style="display:none">
+    	<?php foreach($bdown->t3mresults->rule as $rule): ?>
+    		<li><strong><?php echo (string)$rule->description; ?></strong>, <?php echo (string)$rule->score; ?></li>
+    	<?php endforeach; ?>
+    	</ul>
+    	<?php endif; ?>
+    <!-- 3rdMan Breakdown -->
+</div>
+<?php endif; if(!$fraud->getThirdmanScore()): ?>
+<div id="t3m-button">
+    <p>
+        <button onclick="setLocation('<?php echo $this->helper('adminhtml')->getUrl('sagepayreporting/adminhtml_sagepayreporting_fraud/fraudCheck', array('order_id'=>$orderId, '_secure' => true)); ?>');" type="button">
+            <span><?php echo $this->__('Check 3rd Man'); ?></span>
+        </button>
+    </p>
+</div>
+<?php endif; ?>
+
+	<?php echo $this->getChildHtml(); ?>
+
+<?php else: ?>
+
+<?php endif; ?>
+
+<script type="text/javascript">
+    document.observe("dom:loaded", function() {
+    	$$('a.trn-detail-modal').each(function(el){
+			var cont = new Element('div',{className: 'lcontainer'});
+	        new Control.Modal(el.id,{
+						     className: 'modal',
+						     iframe: true,
+						     insertRemoteContentAt: cont,
+						     height: '800',
+						     width: '1100',
+						     fade: true
+				 }).container.insert(cont);
+    	});
+    });
+</script>
+<?php endif; ?>

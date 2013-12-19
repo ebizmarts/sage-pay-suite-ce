@@ -1,0 +1,43 @@
+<?php
+/**
+ * @see Ebizmarts_SagePaySuite_Block_Adminhtml_System_Config_Fieldset_Hint
+ */
+?>
+<div class="sagepay-payment-notice">
+	<img src="http://ebizmarts.com/extension-logo.php?<?php echo $this->getPxParams(); ?>" />
+    <h4>
+        <?php echo $this->__('<strong style="color:#EA7601;">Sage Pay Suite Community Edition v%s by</strong> <a target="_blank" href="http://ebizmarts.com"><strong>ebizmarts</strong></a>', $this->getSagePaySuiteVersion())?>
+    </h4>
+    <p>
+        <?php echo $this->__('<a target="_blank" href="%s"><strong>ebizmarts</strong></a>  is a <strong>Sage Pay</strong> Approved Partner <a target="_blank" href="%s">Get a Sage Pay Account Now!</a>', 'http://ebizmarts.com', 'https://support.sagepay.com/apply/default.aspx?partnerID=01bf51f9-0dcd-49dd-a07a-3b1f918c77d7'); ?>
+    </p>
+    <p>
+        <?php echo $this->__("<a target=\"_blank\" href=\"%s\">Subscribe to our newsletter</a>", "http://store.ebizmarts.com/subscribe-to-our-newsletter"); ?>
+    </p>
+</div>
+
+<?php if(!$this->isWebSessionConfigValid()): ?>
+<div id="messages">
+    <ul class="messages">
+        <li class="error-msg">
+            <ul>
+                <li><span><?php echo $this->__('The module will not be able to receive payments unless you match <i>System > Configuration > GENERAL > Web > Session Validation Settings</i> with <a href="%s" target="_blank">this image</a>', "http://bit.ly/YLr4PG"); ?></span></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<?php endif; ?>
+
+<?php
+	$notloaded = null;
+	foreach($this->getCheckExtensions() as $_ext):
+?>
+
+<?php if(!extension_loaded($_ext)): ?>
+		<?php $notloaded .= '<li class="error-msg">PHP extension <strong>"' . $_ext . '"</strong> is missing on your server.</li>'; ?>
+<?php endif; ?>
+<?php endforeach; ?>
+
+<?php if(!is_null($notloaded)): ?>
+	<ul id="not-loaded-exts" class="messages"><?php echo $notloaded; ?></ul>
+<?php endif; ?>

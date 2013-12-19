@@ -1,0 +1,115 @@
+<div class="content-header skip-header">
+    <table cellspacing="0">
+        <tbody>
+            <tr>
+                <td style="width:50%;">
+                    <h3 class="icon-head head-charts"><?php echo $this->__('Sage Pay Dashboard'); ?></h3>
+                </td>
+                <td class="form-buttons"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<?php echo $this->getChildHtml('reporting.switcher'); ?>
+
+<div id="date-chooser-report">
+    <h2><?php echo $this->getOnlyDate($this->startDate), ' - ', $this->getOnlyDate($this->endDate); ?></h2>
+    <label for="daystoshow"><?php echo $this->__('Show:'); ?></label>
+    <?php echo $this->getDateRangeSelect(); ?>
+</div>
+
+<?php
+//Errors
+if (isset($this->_errors[0]) OR (count($this->_arrayTransactions) === 0)):
+?>
+
+<?php if(isset($this->_errors[0])): ?>
+<div id="messages">
+    <ul class="messages">
+        <li class="error-msg">
+            <ul>
+                <li><span><?php echo $this->__('An error occurred: %s', $this->_errors[0]); ?></span></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<?php else: ?>
+<div id="messages">
+    <ul class="messages">
+        <li class="error-msg">
+            <ul>
+                <li><span><?php echo $this->__('No data found.'); ?></span></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<?php endif; ?>
+
+<?php
+
+else:
+
+//Transaction Summary Graphs
+echo "<script>" . $this->getGraphJson() . "</script>";
+echo "<script>var currencies = \$H(" . Zend_Json::encode($this->getCurrencies()) . ");</script>";
+echo "<script>" . $this->getTotals() . "</script>";
+
+?>
+
+<div id="spDashboardWidgetTransactionSumContainer" class="spDashboardWidgetContainer">
+    <h2><?php echo $this->__('Transaction Summary'); ?></h2>
+    <div id="spDashboardWidgetTransactionSumReadyContainer" class="spDashboardReadyContainer">
+        <div id="totalsPie"></div>
+    </div>
+    <div id="spDashboardWidgetTransactionSumLoaderContainer" class="spDashboardLoaderContainer" style="display:none;">
+        <img title="loading..." alt="loading..." src="<?php echo $this->getSkinUrl('sagepaysuite/images/dashboard/loaderSPDashboard.gif') ?>" />
+    </div>
+</div>
+
+<div id="spDashboardWidgetTransactionsByDayContainer" class="spDashboardWidgetContainer">
+    <div id="spDashboardWidgetTransactionsByDayReadyContainer" class="spDashboardReadyContainer">
+        <h2><?php echo $this->__('Success Transactions'); ?></h2>
+        <div class="clear"></div>        
+        <p id="current-amount">&nbsp;</p>
+
+        <ul id="transactions_graph" class="subsection_tabs">  
+            <?php foreach ($this->getCurrencies() as $code => $value): ?>
+                <li class="tab"><a href="#spDashboardWidgetTransactionsByDayGraphsContainer<?php echo $code; ?>"><?php echo $this->getTabLabel($code, $value); ?></a></li>
+            <?php endforeach; ?>
+        </ul>        
+        
+        <?php foreach ($this->getCurrencies() as $code => $value): ?>
+            <div id="spDashboardWidgetTransactionsByDayGraphsContainer<?php echo $code; ?>"></div>
+        <?php endforeach; ?>
+
+    </div>
+    <div id="spDashboardWidgetTransactionsByDayLoaderContainer" class="spDashboardLoaderContainer" style="display:none;">
+        <img title="loading..." alt="loading..." src="<?php echo $this->getSkinUrl('sagepaysuite/images/dashboard/loaderSPDashboard.gif') ?>" />
+    </div>
+</div>
+
+<div id="spDashboardWidgetBatchContainer" class="spDashboardWidgetContainer">
+    <div id="spDashboardWidgetFraudSummaryReadyContainer" class="spDashboardReadyContainer">
+        <h2><?php echo $this->__('Bank Settlements'); ?></h2>
+        <div id="batchData">
+            <ul>
+            <?php foreach($this->getSettlements() as $settId => $sett): ?>                
+                <li>
+                    <?php echo $this->getBankLogo($settId, $sett['label']); ?>
+                    <br />
+                    <?php foreach($sett as $currency => $amount): ?>     
+                        <?php if($currency == 'label' || !$amount){ continue; } ?>
+                        <?php echo $this->getTabLabel($currency, $amount); ?><br />
+                    <?php endforeach; ?>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
+    <div id="spDashboardWidgetFraudSummaryContainer" class="spDashboardLoaderContainer" style="display:none;">
+        <img title="loading..." alt="loading..." src="<?php echo $this->getSkinUrl('sagepaysuite/images/dashboard/loaderSPDashboard.gif') ?>" />
+    </div>
+</div>
+
+<?php endif; ?>

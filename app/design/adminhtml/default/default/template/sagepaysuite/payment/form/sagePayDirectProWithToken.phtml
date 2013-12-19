@@ -1,0 +1,318 @@
+<?php
+	$_code = $this->getMethodCode();
+	$tokenCards = $this->getTokenCards();
+	$cTokens = ($tokenCards->getSize()>0 && $this->canUseToken());
+	$sageStyle = ($cTokens ? ' style="display:none;"' : '');
+    $_directMode = Mage::getStoreConfig('payment/sagepaydirectpro/mode');
+?>
+<script type="text/javascript">
+    var RDATE = <?php echo rand(1,10); ?>;
+
+    addValidationClass = function(obj){
+        if(obj.hasClassName('validation-passed')){
+            obj.removeClassName('validation-passed');
+        }
+        obj.addClassName('validate-issue-number');
+    }
+    changecsvclass = function(obj) {
+        var ccTypeContainer = $('sagepaydirectpro_cc_type');
+        var ccCVNContainer = $('sagepaydirectpro_cc_cid');
+
+        fillSagePayTestData();
+
+        if(ccTypeContainer)
+        {
+            if(ccTypeContainer.value == 'LASER' && ccCVNContainer.hasClassName('required-entry'))
+            {
+                if(ccCVNContainer) {
+                    ccCVNContainer.removeClassName('required-entry');
+                }
+            }
+            if(ccTypeContainer.value != 'LASER' && !ccCVNContainer.hasClassName('required-entry'))
+            {
+                if(ccCVNContainer) {
+                    ccCVNContainer.addClassName('required-entry');
+                }
+            }
+        }
+    }
+
+    Validation.addAllThese([
+        ['validate-ccsgpdp-number', 'Please enter a valid credit card number.', function(v, elm) {
+                // remove non-numerics
+
+           var ccTypeContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_number')) + '_cc_type');
+                if (ccTypeContainer && typeof Validation.creditCartTypes.get(ccTypeContainer.value) != 'undefined'
+                        && Validation.creditCartTypes.get(ccTypeContainer.value)[2] == false) {
+                    if (!Validation.get('IsEmpty').test(v) && Validation.get('validate-digits').test(v)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                if (ccTypeContainer.value == 'OT' ||  ccTypeContainer.value == 'UKE' || ccTypeContainer.value == 'DELTA' || ccTypeContainer.value == 'MAESTRO' || ccTypeContainer.value == 'SOLO' || ccTypeContainer.value == 'SWITCH' || ccTypeContainer.value == 'LASER' || ccTypeContainer.value == 'JCB' || ccTypeContainer.value == 'DC') {
+                     return true;
+                }
+
+                return validateCreditCard(v);
+            }],
+        ['validate-ccsgpdp-cvn', 'Please enter a valid credit card verification number.', function(v, elm) {
+                var ccTypeContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_cid')) + '_cc_type');
+                var ccCVNContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_cid')) + '_cc_cid');
+                if(ccTypeContainer)
+                {
+                    if(ccTypeContainer.value == 'LASER' && ccCVNContainer.hasClassName('required-entry'))
+                    {
+                        if(ccCVNContainer) {
+                            ccCVNContainer.removeClassName('required-entry');
+                        }
+                    }
+                    if(ccTypeContainer.value != 'LASER' && !ccCVNContainer.hasClassName('required-entry'))
+                    {
+                        if(ccCVNContainer) {
+                            ccCVNContainer.addClassName('required-entry');
+                        }
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+                if (!ccTypeContainer && ccTypeContainer.value != 'LASER') {
+                    return true;
+                }
+                var ccType = ccTypeContainer.value;
+
+                switch (ccType) {
+                    case 'VISA' :
+                    case 'MC' :
+                        re = new RegExp('^[0-9]{3}$');
+                        break;
+                    case 'AMEX' :
+                        re = new RegExp('^[0-9]{4}$');
+                        break;
+                    case 'MAESTRO':
+                    case 'SOLO':
+                    case 'SWITCH':
+                        re = new RegExp('^([0-9]{1}|^[0-9]{2}|^[0-9]{3})?$');
+                        break;
+                    default:
+                        re = new RegExp('^([0-9]{3}|[0-9]{4})?$');
+                        break;
+                }
+
+                if (v.match(re) || ccType == 'LASER') {
+                    return true;
+                }
+
+                return false;
+            }],
+            ['validate-ccsgpdp-type', 'Credit card number doesn\'t match credit card type', function(v, elm) {
+                    // remove credit card number delimiters such as "-" and space
+                    elm.value = removeDelimiters(elm.value);
+                    v         = removeDelimiters(v);
+
+                    var ccTypeContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_number')) + '_cc_type');
+                    if (!ccTypeContainer) {
+                        return true;
+                    }
+                    var ccType = ccTypeContainer.value;
+
+                    // Other card type or switch or solo card
+                    if (ccType == 'OT' ||  ccType == 'UKE' || ccType == 'DELTA' || ccType == 'MAESTRO' || ccType == 'SOLO' || ccType == 'SWITCH' || ccType == 'LASER' || ccType == 'JCB' || ccType == 'DC') {
+                        return true;
+                    }
+                    // Credit card type detecting regexp
+                    var ccTypeRegExp = {
+                        'VISA': new RegExp('^4[0-9]{12}([0-9]{3})?$'),
+                        'MC': new RegExp('^5[1-5][0-9]{14}$'),
+                        'AMEX': new RegExp('^3[47][0-9]{13}$')
+                    };
+
+                    // Matched credit card type
+                    var ccMatchedType = '';
+                    $H(ccTypeRegExp).each(function (pair) {
+                        if (v.match(pair.value)) {
+                            ccMatchedType = pair.key;
+                            throw $break;
+                        }
+                    });
+
+                    if(ccMatchedType != ccType) {
+                        return false;
+                    }
+
+                    return true;
+                }],
+         ['validate-ccsgpdp-type-select', 'Card type doesn\'t match credit card number', function(v, elm) {
+                var ccNumberContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_type')) + '_cc_number');
+                return Validation.get('validate-ccsgpdp-type').test(ccNumberContainer.value, ccNumberContainer);
+            }],
+         ['validate-issue-number', '<?php echo $this->__('Issue Number must have at least two characters'); ?>', function(v, elm) {
+
+                if(v.length > 0 && !(v.match(new RegExp('^([0-9]{1}|[0-9]{2})$')))){
+                    return false;
+                }
+
+                return true;
+            }]
+    ]);
+</script>
+<div id="payment_form_<?php echo $_code ?>" style="display:none;">
+
+<?php echo $this->getChildHtml(); ?>
+<ul class="form-list paymentsage">
+
+	<?php if($tokenCards->getSize() > 0): ?>
+    <li<?php echo $sageStyle; ?>>
+    	<a class="usexist" href="" onclick="toggleNewCard(1); return false;"><?php echo $this->__('Use Token'); ?></a>
+    </li>
+    <?php endif; ?>
+
+    <li<?php echo $sageStyle; ?>>
+        <label for="<?php echo $_code ?>_cc_owner"><span class="required">*</span><?php echo $this->__('Name on Card') ?></label>
+        <div class="input-box">
+            <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry" id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]" value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" />
+        </div>
+    </li>
+    <li<?php echo $sageStyle; ?>>
+        <label for="<?php echo $_code ?>_cc_type"><span class="required">*</span><?php echo $this->__('Credit Card Type') ?></label>
+        <div class="input-box">
+            <select id="<?php echo $_code ?>_cc_type" name="payment[cc_type]" onchange="changecsvclass(this);" class="required-entry validate-ccsgpdp-type-select">
+                <option value=""><?php echo $this->__('--Please Select--')?></option>
+            <?php $_ccType = $this->getInfoData('cc_type') ?>
+            <?php foreach ($this->getCcAvailableTypes() as $_typeCode => $_typeName): ?>
+                <option value="<?php echo $_typeCode ?>"<?php if($_typeCode==$_ccType): ?> selected="selected"<?php endif ?>><?php echo $_typeName ?></option>
+            <?php endforeach ?>
+            </select>
+        </div>
+    </li>
+    <li<?php echo $sageStyle; ?>>
+        <label for="<?php echo $_code ?>_cc_number"><span class="required">*</span><?php echo $this->__('Credit Card Number') ?></label>
+        <div class="input-box">
+            <input autocomplete="off" type="text" id="<?php echo $_code ?>_cc_number" name="payment[cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-ccsgpdp-number validate-ccsgpdp-type" value="" />
+        </div>
+    </li>
+    <li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_type_exp_div">
+        <label for="<?php echo $_code ?>_expiration"><span class="required">*</span><?php echo $this->__('Expiration Date') ?></label>
+        <div class="input-box">
+                <select id="<?php echo $_code ?>_expiration" name="payment[cc_exp_month]" class="month validate-cc-exp required-entry">
+                <?php $_ccExpMonth = $this->getInfoData('cc_exp_month') ?>
+                <?php foreach ($this->getCcMonths() as $k=>$v): ?>
+                    <option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                <?php endforeach ?>
+                </select>
+                <?php $_ccExpYear = $this->getInfoData('cc_exp_year') ?>
+                <select id="<?php echo $_code ?>_expiration_yr" name="payment[cc_exp_year]" class="year required-entry">
+                <?php foreach ($this->getCcYears() as $k=>$v): ?>
+                    <option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                <?php endforeach ?>
+                </select>
+        </div>
+    </li>
+
+    <li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_type_cvv_div">
+        <label for="<?php echo $_code ?>_cc_cid"><span class="required">*</span><?php echo $this->__('Card Verification Number') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <input autocomplete="off" type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv validate-ccsgpdp-cvn" id="<?php echo $_code ?>_cc_cid" name="payment[cc_cid]" value="" />
+            </div>
+        </div>
+    </li>
+    <?php if ($this->hasSsCardType()): ?>
+    <li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_type_ss_div">
+    <ul<?php echo $sageStyle; ?> class="inner-form">
+        <li class="form-alt"><label for="<?php echo $_code ?>_cc_issue"><span class="required">*</span><?php echo $this->__('Switch/Solo Only') ?></label></li>
+        <li>
+            <label for="<?php echo $_code ?>_cc_issue"><?php echo $this->__('Issue Number') ?>:</label>
+            <div class="input-box">
+                <input type="text" title="<?php echo $this->__('Issue Number') ?>" class="input-text validate-cc-ukss cvv" id="<?php echo $_code ?>_cc_issue" name="payment[cc_ss_issue]" value="" />
+            </div>
+        </li>
+
+        <li>
+            <label for="<?php echo $_code ?>_start_month"><?php echo $this->__('Start Date') ?>:</label>
+            <div class="input-box">
+                    <select id="<?php echo $_code ?>_start_month" name="payment[cc_ss_start_month]" class="validate-cc-ukss month">
+                    <?php foreach ($this->getCcMonths() as $k=>$v): ?>
+                        <option value="<?php echo $k?$k:'' ?>"<?php if($k==$this->getInfoData('cc_ss_start_month')): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                    <?php endforeach ?>
+                    </select>
+                    <select id="<?php echo $_code ?>_start_year" name="payment[cc_ss_start_year]" class="validate-cc-ukss year">
+                    <?php foreach ($this->getSsStartYears() as $k=>$v): ?>
+                        <option value="<?php echo $k?$k:'' ?>"<?php if($k==$this->getInfoData('cc_ss_start_year')): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                    <?php endforeach ?>
+                    </select>
+            </div>
+        </li>
+
+        <li class="adv-container">&nbsp;</li>
+   </ul>
+    <script type="text/javascript">
+	var SSChecked<?php echo $_code ?> = function() {
+            var elm = $('<?php echo $_code ?>_cc_type');
+
+			if(elm.value=='' || ($$('ul#payment_form_sagepaydirectpro li.tokencard-radio input[type="radio"]:enabled').length > 0)){
+        		return;
+        	}
+            if (['SOLO','SWITCH'].indexOf(elm.value) != -1) {
+                $('<?php echo $_code ?>_cc_type_ss_div').show();
+            } else {
+                $('<?php echo $_code ?>_cc_type_ss_div').hide();
+            }
+    };
+
+    Event.observe($('<?php echo $_code ?>_cc_type'), 'change', SSChecked<?php echo $_code ?>);
+    SSChecked<?php echo $_code ?>();
+
+    Validation.addAllThese([
+        ['validate-cc-ukss', 'Please enter issue number or start date for switch/solo card type.', function(v,elm) {
+                  var endposition;
+
+                  if (elm.id.match(/(.)+_cc_issue$/)) {
+                      endposition = elm.id.indexOf('_cc_issue');
+                  } else if (elm.id.match(/(.)+_start_month$/)) {
+                      endposition = elm.id.indexOf('_start_month');
+                  } else {
+                      endposition = elm.id.indexOf('_start_year');
+                  }
+
+                  var prefix = elm.id.substr(0,endposition);
+
+                  var ccTypeContainer = $(prefix + '_cc_type');
+
+                  if (!ccTypeContainer) {
+                        return true;
+                  }
+                  var ccType = ccTypeContainer.value;
+
+                  if(ccType!='SS'){
+                      return true;
+                  }
+
+                  $(prefix + '_cc_issue').advaiceContainer
+                    = $(prefix + '_start_month').advaiceContainer
+                    = $(prefix + '_start_year').advaiceContainer
+                    = $(prefix + '_cc_type_ss_div').down('ul li.adv-container');
+
+                  var ccIssue   =  $(prefix + '_cc_issue').value;
+                  var ccSMonth  =  $(prefix + '_start_month').value;
+                  var ccSYear   =  $(prefix + '_start_year').value;
+
+                  if((!ccIssue && !ccSMonth && !ccSYear) ||
+                     (!ccIssue && !ccSMonth && ccSYear)  ||
+                     (!ccIssue && ccSMonth && !ccSYear)
+                  ){
+                      return false;
+                  }
+
+                  return true;
+
+        }]
+    ]);
+    </script>
+</li>
+<?php endif; ?>
+</ul>
+</div>

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category    Ebizmarts
+ * @package     Ebizmarts_SagePaySuite
+ */
+-->
+<config>
+    <api>
+        <resources>
+            <sage_pay_transaction translate="title" module="sagepaysuite">
+                <model>sagepaysuite/api</model>
+                <title>Sage Pay Transactions API</title>
+                <acl>sagepay/transaction</acl>
+                <methods>
+                    <list translate="title" module="sagepaysuite">
+                        <title>Retrieve list of transactions by filters</title>
+                        <method>items</method>
+                        <acl>sagepay/transaction/items</acl>
+                    </list>
+                    <info translate="title" module="sagepaysuite">
+                        <title>Retrieve transaction information for given VpsTxId</title>
+                        <method>info</method>
+                        <acl>sagepay/transaction/info</acl>
+                    </info>
+                </methods>
+                <faults module="sagepaysuite">
+                    <not_exists>
+                        <code>100</code>
+                        <message>Requested transaction does not exist.</message>
+                    </not_exists>
+                    <filters_invalid>
+                        <code>101</code>
+                        <message>Invalid filters given. Details in error message.</message>
+                    </filters_invalid>
+                    <data_invalid>
+                        <code>102</code>
+                        <message>Invalid data given. Details in error message.</message>
+                    </data_invalid>
+                </faults>
+            </sage_pay_transaction>
+            <sage_pay_reporting translate="title" module="sagepayreporting">
+                <model>sagepayreporting/api</model>
+                <title>Sage Pay Reporting API</title>
+                <acl>sagepay/reporting</acl>
+                <methods>
+                    <info translate="title" module="sagepayreporting">
+                        <title>Retrieve transaction information for given VpsTxId from Reporting API</title>
+                        <method>info</method>
+                        <acl>sagepay/reporting/info</acl>
+                    </info>
+                    <fraud_detail translate="title" module="sagepayreporting">
+                        <title>Retrieve fraud information for given VpsTxId from Reporting API</title>
+                        <method>fraud_detail</method>
+                        <acl>sagepay/reporting/fraud_detail</acl>
+                    </fraud_detail>
+                </methods>
+                <faults module="sagepayreporting">
+                    <not_exists>
+                        <code>100</code>
+                        <message>Requested transaction not exists.</message>
+                    </not_exists>                   
+                    <filters_invalid>
+                        <code>101</code>
+                        <message>Invalid filters given. Details in error message.</message>
+                    </filters_invalid>
+                    <api_error>
+                        <code>102</code>
+                        <message>Reporting API error.</message>
+                    </api_error>                    
+                </faults>
+            </sage_pay_reporting>            
+        </resources>
+        <resources_alias>
+            <sage_pay>sage_pay_transaction</sage_pay>
+        </resources_alias>
+        <acl>
+            <resources>
+                <sagepay translate="title" module="sagepaysuite">
+                    <title>Sage Pay</title>
+                    <sort_order>69</sort_order>
+                    <transaction translate="title" module="sagepaysuite">
+                        <title>Transactions</title>                        
+                        <items translate="title" module="sagepaysuite">
+                            <title>Retrieve list of transactions by filters</title>
+                        </items>
+                        <info translate="title" module="sagepaysuite">
+                            <title>Retrieve transaction information for given VpsTxId</title>
+                        </info>                        
+                    </transaction>
+                    <reporting translate="title" module="sagepayreporting">
+                        <title><![CDATA[Reporting & Admin API]]></title>                        
+                        <info translate="title" module="sagepayreporting">
+                            <title>Retrieve transaction information for given VpsTxId</title>
+                        </info>
+                        <fraud_detail translate="title" module="sagepayreporting">
+                            <title>Retrieve fraud information for given VpsTxId</title>
+                        </fraud_detail>                        
+                    </reporting>
+                </sagepay>
+            </resources>
+        </acl>
+    </api>
+</config>

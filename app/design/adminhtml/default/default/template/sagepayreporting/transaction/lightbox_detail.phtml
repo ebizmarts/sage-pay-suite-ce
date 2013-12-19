@@ -1,0 +1,12 @@
+<a id="more-trn-detail" href="<?php echo $this->helper('adminhtml')->getUrl('sagepayreporting/adminhtml_sagepayreporting/transactionDetailModal/', array('vendortxcode'=>$this->getParentBlock()->getInfo()->getOrder()->getSagepayInfo()->getVendorTxCode())); ?>"><?php echo $this->__('View Complete Detail'); ?></a>
+<script type="text/javascript">
+    document.observe("dom:loaded", function() {
+        new Control.Modal('more-trn-detail',{
+					     className: 'modal',
+					     iframe: true,
+					     height: '600',
+					     width: '600',
+					     fade: true
+			 })
+    });
+</script>

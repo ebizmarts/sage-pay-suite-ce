@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $this->getLang() ?>" lang="<?php echo $this->getLang() ?>">
+<head>
+<?php echo $this->getChildHtml('head') ?>
+</head>
+  <?php
+		$leftcontent = $this->getChildHtml('left');
+  ?>
+<body id="html-body"<?php echo $this->getBodyClass()?' class="'.$this->getBodyClass().'"':'' ?>>
+		<div class="middle" id="anchor-content">
+        <div id="page:main-container">
+          <div id="messages"><?php echo $this->getMessagesBlock()->getGroupedHtml() ?></div>
+          <div<?php if($leftcontent): ?> class="columns"<?php endif; ?>>
+          	<?php if($leftcontent): ?>
+          	<div class="side-col" id="page:left"><?php echo $leftcontent ?></div>
+          	<?php endif; ?>
+          	<div<?php if($leftcontent): ?> class="main-col"<?php endif; ?> id="content"><?php echo $this->getChildHtml('content') ?></div>
+          </div>
+         </div>
+         </div>
+</body>
+</html>

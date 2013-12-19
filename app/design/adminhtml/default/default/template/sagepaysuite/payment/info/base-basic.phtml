@@ -1,0 +1,56 @@
+<?php
+/**
+ * @see Ebizmarts_SagePaySuite_Block_Info_SagePayDirectPro
+ */
+
+ $tokenCard = $this->getTokenCard();
+ $orderId = $this->getInfo()->getOrder()->getId();
+ $sagepay = $this->getInfo()->getOrder()->getSagepayInfo();
+ $fraud = $this->helper('sagepaysuite/paymentinfo')->getFraudInfo($orderId);
+ $_code = $this->getMethod()->getCode();
+
+ if(!is_object($sagepay)){
+	$sagepay = new Varien_Object;
+ }
+
+ $reg = Mage::registry('sageserverpost');
+ if(!is_null($reg)){
+ 	$sagepay->setCardType($reg->getData('CardType'))
+ 	->setLastFourDigits($reg->getData('Last4Digits'));
+ }
+
+ if(!$sagepay->getLastFourDigits() && ($_code == 'sagepayserver' || $_code == 'sagepayserver_moto' || $_code == 'sagepaydirectpro_moto') && is_object($this->getInfo()->getOrder())){
+ 	$sagepay = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
+                ->loadByParent($this->getInfo()->getOrder()->getId());
+ }
+?>
+<img src="<?php echo $this->getSkinUrl('sagepaysuite/images/sagepay-section-heading.png'); ?>" />
+<p>
+<?php echo $this->getMethod()->getTitle() ?>
+</p>
+
+<table>
+	<tr>
+		<td><?php echo $this->__('CC Type:'); ?></td>
+		<td><?php echo $this->getCcTypeName($sagepay->getCardType()); ?></td>
+	</tr>
+
+	<?php if($sagepay->getLastFourDigits()): ?>
+	<tr>
+		<td><?php echo $this->__('CC Number:'); ?></td>
+		<td>**********<?php echo $sagepay->getLastFourDigits(); ?></td>
+	</tr>
+	<?php endif; ?>
+
+	<?php if($sagepay->getCardExpiryDate()): ?>
+	<tr>
+		<td><?php echo $this->__('CC Exp. Date:'); ?></td>
+		<td><?php echo $sagepay->getCardExpiryDate(); ?></td>
+	</tr>
+	<?php endif; ?>
+
+</table>
+
+<?php if(Mage::getSingleton('core/translate')->getTranslateInline() === true): ?>
+	<?php echo $this->getChildHtml(); ?>
+<?php endif; ?>

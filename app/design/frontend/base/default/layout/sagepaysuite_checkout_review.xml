@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+	<checkout_onepage_review>
+		<reference name="root">
+			<action method="setTemplate">
+				<template>sagepaysuite/checkout/review/info.phtml</template>
+			</action>
+		</reference>
+	</checkout_onepage_review>
+
+</layout>

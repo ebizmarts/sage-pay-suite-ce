@@ -1,0 +1,83 @@
+<?php
+    /* @var $this Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Threedstatus */
+    $statusXml = $this->get3dStatus();
+?>
+<div class="content-header">
+    <table cellspacing="0">
+        <tr>
+            <td><h3 class="head-dashboard"><?php echo $this->__('3D Secure Administration') ?></h3></td>
+        </tr>
+    </table>
+</div>
+
+<?php echo $this->getChildHtml('reporting.switcher'); ?>
+
+<?php if(is_string($statusXml)): ?>
+
+
+	<div id="messages">
+            <ul class="messages">
+                <li class="error-msg">
+                    <ul>
+                        <li><span><?php echo $this->__('An error occurred: %s', $statusXml); ?></span></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+	<?php
+		else:
+			$status = $this->__((string)$statusXml->status);
+			$statusRules = (string)$statusXml->rules;
+			$statusChange = ($status  == 'ON' ? $this->__('Turn OFF') : $this->__('Turn ON'));
+	?>
+
+	<h3><?php echo $this->__('3D Secure checking is <code class="%s">%s</code>', strtolower($status), $status); ?>&nbsp;&nbsp;<a title="<?php echo $this->__('Click here to %s 3D checking', $statusChange); ?>" id="threeds-status-toggle" href="<?php echo $this->getUrl('*/*/threedtoggle', array('st'=>$status, '_current'=>true)); ?>"><?php echo $statusChange; ?></a></h3>
+	<h4><?php echo $this->__('3D Secure checking rules are <code class="%s">%s</code>', strtolower($statusRules), $statusRules); ?></h4>
+
+	<?php if($statusRules === 'ON'): $rules = $this->get3dRules(); ?>
+		<?php if(!is_string($rules) && get_class($rules) == 'SimpleXMLElement'): ?>
+
+			<div class="grid np">
+			<table cellspacing="0" style="border:0;" id="threed_rules_table">
+			    <col />
+			    <col />
+			    <col />
+			    <col />
+			    <col />
+			    <col />
+			    <col />
+		        <thead>
+	                <tr class="headings">
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Start value'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('End value'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Perform checks'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Accept card not in scheme'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Accept issuer not in scheme'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Accept 3D AUTH failure'); ?></span></th>
+	                	<th class="no-link last"><span class="nobr"><?php echo $this->__('Accept MPI failure'); ?></span></th>
+	                </tr>
+		        </thead>
+			    <tbody>
+			    <?php foreach($rules->rules->rule as $_index=>$_item): ?>
+			        <tr>
+			            <td><?php echo $_item->startvalue; ?></td>
+			            <td><?php echo $_item->endvalue; ?></td>
+			            <td><?php echo $_item->perform3dauth; ?></td>
+			            <td><?php echo $_item->allownon3dcards; ?></td>
+			            <td><?php echo $_item->allownon3dissuers; ?></td>
+			            <td><?php echo $_item->allow3dfailures; ?></td>
+			            <td><?php echo $_item->allowmpiauths; ?></td>
+			        </tr>
+			    <?php endforeach; ?>
+			    </tbody>
+			</table>
+			<script type="text/javascript">
+				Event.observe(window, 'load', function(){decorateTable('threed_rules_table')});
+			</script>
+			</div>
+
+		<?php endif; ?>
+	<?php endif; ?>
+
+<?php endif; ?>

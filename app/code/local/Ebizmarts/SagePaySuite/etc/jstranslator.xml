@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<jstranslator>
+    <error-sagepay translate="message" module="sagepaysuite">
+        <message>An error occurred with Sage Pay</message>
+    </error-sagepay>
+</jstranslator>

@@ -1,0 +1,36 @@
+<?php
+	$_code = $this->getMethodCode();
+	$tokenCards = $this->getTokenCards();
+	$cTokens = ($tokenCards->getSize()>0 && $this->canUseToken());
+	$sageStyle = ($cTokens ? ' style="display:none;"' : '');
+?>
+<div id="payment_form_<?php echo $_code ?>" style="display:none;">
+
+	<?php echo $this->getChildHtml('token.cards.li'); ?>
+
+	<ul class="form-list paymentsage">
+
+	    <?php if($this->canUseToken()): ?>
+	        <li<?php if($tokenCards->getSize()==0 || $cTokens): echo ' style="display:none;"'; endif; ?>>
+	        	<a class="usexist" href="" onclick="toggleNewCard(1); return false;"><?php echo $this->__('Saved Credit Cards'); ?></a>
+	        </li>
+	    <?php endif; ?>
+
+	    <li id="serversecure"<?php echo $sageStyle; ?>>
+	        <span>
+	            <?php
+	            	$_secImage = '<img src="' . $this->getSkinUrl('sagepaysuite/images/secured-by-sage-pay.png') . '" />';
+	            	echo preg_replace('/{{secured_logo}}/', $_secImage, Mage::getStoreConfig('payment/sagepayserver/selected_description'));
+	            ?>
+	        </span>
+	    </li>
+
+	<?php if($this->canUseToken()): ?>
+		<li<?php echo $sageStyle; ?>>
+			<label for="remembertoken-<?php echo $_code; ?>"><?php echo $this->__('Do you wish to have your credit card details remembered for faster checkout next time?'); ?></label>&nbsp;
+			<input checked="checked" type="checkbox" name="payment[remembertoken]" value="1" id="remembertoken-<?php echo $_code; ?>" />
+		</li>
+	<?php endif; ?>
+
+	</ul>
+</div>

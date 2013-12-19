@@ -1,0 +1,14 @@
+<?php
+	$_code = $this->getMethodCode();
+?>
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none">
+
+    <li>
+        <span>
+            <?php
+            	$_secImage = '<img src="' . $this->getSkinUrl('sagepaysuite/images/secured-by-sage-pay.png') . '" />';
+            	echo preg_replace('/{{secured_logo}}/', $_secImage, Mage::getStoreConfig('payment/sagepayform/selected_description'));
+            ?>
+        </span>
+    </li>
+</ul>

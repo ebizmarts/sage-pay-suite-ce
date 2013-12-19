@@ -1,0 +1,189 @@
+<div class="close-modal-container">
+	<button class="close-modal" type="button" onclick="closeModalWindow();return false;"><span><?php echo $this->__('Close Window'); ?></span></button>
+</div>
+<div class="entry-edit">
+    <?php $_transacion = $this->getTransactionDetail(); if ($_transacion) :?>
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Details') ?></h4>
+        </div>
+        <div class="fieldset fieldset-wide sagepaytrndetail">
+            <table cellspacing="0" class="form-list">
+                <tbody>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Vendor TX Code'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getVendortxcode(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('VPS Transaction ID'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getVpstxid(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Transaction Type'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getTransactiontype(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('System Status'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getStatus(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Description'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getDescription(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Amount'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getAmount(); ?> (<?php echo $_transacion->getCurrency(); ?>)</p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Started'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getStarted(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Completed'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getCompleted(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Security key'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getSecuritykey(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Client IP'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getClientip(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('IP Location'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getIplocation(); ?></p></td>
+                    </tr>
+
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Gift aid'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getGiftaid(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Payment System'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getPaymentsystem(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Payment System Details'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getPaymentsystemdetails(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Auth Processor'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getAuthprocessor(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Merchant Number'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getMerchantnumber(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Account Type'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getAccounttype(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Billing Address'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getBillingaddress(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Billing Postcode'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getbillingpostcode(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Delivery Address'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getDeliveryaddress(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Delivery Postcode'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getDeliverypostcode(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('System Used'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getSystemused(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Customer Email'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getCustomeremail(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Aborted'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getAborted(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Refunded'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getRefunded(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Repeated'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getRepeated(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Basket'); ?></p></td>
+                        <td class="value"><p><?php echo $this->helper('sagepayreporting')->formatBasket($_transacion->getBasket()); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Apply Avscv2'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getApplyavscv2(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Apply 3dsecure'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getApply3dsecure(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Attempt'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getAttempt(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Cardholder'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getCardholder(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Contact Number'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getContactNumber(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Card Address'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getCardaddress(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Card Postcode'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getCardpostcode(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Start Date'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getStartdate(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Expiry Date'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getExpirydate(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Last 4 Digits'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getLast4digits(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('The 3rd Man Results'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getThreedresultn(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Eci'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getEci(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Cavv'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getCavv(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Thirdman Score'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getT3mscore(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Thirdman Action'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getT3maction(); ?></p></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><p><?php echo $this->__('Thirdman Id'); ?></p></td>
+                        <td class="value"><p><?php echo $_transacion->getT3mid(); ?></p></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>

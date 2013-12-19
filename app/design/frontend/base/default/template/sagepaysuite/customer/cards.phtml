@@ -1,0 +1,64 @@
+<?php
+	$cards = $this->getCustomerCards();
+?>
+<div class="page-title sagecardh1">
+    <h1><?php echo $this->helper('sagepaysuite')->__('Sage Pay - Saved Credit Cards') ?></h1>
+    <img id="sageTokenCardLoading" title="<?php echo $this->helper('sagepaysuite')->__('Loading...'); ?>" alt="<?php echo $this->helper('sagepaysuite')->__('Loading...'); ?>" src="<?php echo $this->getSkinUrl('sagepaysuite/images/loading.gif'); ?>" style="display:none;" />
+</div>
+
+<?php echo $this->getMessagesBlock()->getGroupedHtml(); ?>
+
+<?php /*if($cards->getSize()):*/ ?>
+<table class="data-table" id="my-sagepaycards-table">
+    <thead>
+        <tr>
+            <th><?php echo $this->helper('sagepaysuite')->__('Type') ?></th>
+            <th><?php echo $this->helper('sagepaysuite')->__('Number') ?></th>
+            <th><?php echo $this->helper('sagepaysuite')->__('Exp. Date') ?></th>
+            <th><?php echo $this->helper('sagepaysuite')->__('Default') ?></th>
+            <th><?php echo $this->helper('sagepaysuite')->__('Actions') ?></th>
+        </tr>
+    </thead>
+    <tbody>
+
+    <?php if($cards->getSize()===0): ?>
+        <tr>
+            <td id="no-tokencards-tr" colspan="5" class="a-center"><p><?php echo $this->helper('sagepaysuite')->__('You have no cards yet.') ?></p></td>
+        </tr>
+    <?php endif; ?>
+
+    <?php
+    	foreach ($cards as $_card):
+    		$_defCard = (int)$_card->getIsDefault() === 1;
+    ?>
+        <tr>
+            <td>
+            	<?php echo $_card->getLabel(); ?>
+            </td>
+            <td>
+            	<?php echo $_card->getCcNumber(); ?>
+            </td>
+            <td>
+            	<?php echo $_card->getExpireDate(); ?>
+            </td>
+            <td class="a-center">
+            	<input<?php if($_defCard === false): ?> onclick="tokenSetDefault(this);"<?php endif; ?> type="radio" name="tokencard_def" value="<?php echo $_card->getId(); ?>"<?php if($_defCard === true): ?> checked="checked"<?php endif; ?> />
+            </td>
+            <td>
+            	<a onclick="if(confirm('<?php echo $this->helper('sagepaysuite')->__('Are you sure?'); ?>')){removeCard(this); return false; }else{return false;}" href="<?php echo $this->getUrl('sgps/card/delete', array('card'=>$_card->getId())) ?>"><?php echo $this->helper('sagepaysuite')->__('Delete') ?></a>
+            </td>
+        </tr>
+    <?php endforeach ?>
+    </tbody>
+</table>
+<script type="text/javascript">
+	decorateTable('my-sagepaycards-table');
+</script>
+
+<a id="link-regcard" href="<?php echo $this->getUrl('sgps/card/register'); ?>" onclick="registerCard(this.href); return false;"><?php echo $this->helper('sagepaysuite')->__('Add new'); ?></a>
+
+<div class="clear"></div>
+
+<?php /*else:*/ ?>
+    <!--<p><?php echo $this->helper('sagepaysuite')->__('You have no cards yet.') ?></p>-->
+<?php /*endif*/ ?>

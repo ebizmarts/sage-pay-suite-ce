@@ -1,0 +1,51 @@
+<?php echo $this->getChildHtml('reporting.switcher'); ?>
+
+<?php
+    $ips = $this->getValidIPs();
+?>
+
+<?php if(is_object($ips) AND get_class($ips) == 'SimpleXMLElement'): ?>
+<div class="entry-edit-head">
+    <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('IPs on Whitelist'); ?></h4>
+</div>
+<div class="grid np">
+	<table cellspacing="0" style="border:0;" id="whitelisted_ip_table">
+	    <col />
+	    <col />
+	    <col />
+        <thead>
+            <tr class="headings">
+            	<th class="no-link"><span class="nobr"><?php echo $this->__('Address'); ?></span></th>
+            	<th class="no-link"><span class="nobr"><?php echo $this->__('Mask'); ?></span></th>
+            	<th class="no-link last"><span class="nobr"><?php echo $this->__('Note'); ?></span></th>
+            </tr>
+        </thead>
+	    <tbody>
+	    <?php foreach($ips->ipaddresses->ipaddress as $_index=>$_item): ?>
+	        <tr>
+	            <td><?php echo $_item->address; ?></td>
+	            <td><?php echo $_item->mask; ?></td>
+	            <td><?php echo $_item->note; ?></td>
+	        </tr>
+	    <?php endforeach; ?>
+	    </tbody>
+	</table>
+	<script type="text/javascript">
+		Event.observe(window, 'load', function(){decorateTable('whitelisted_ip_table')});
+	</script>
+</div>
+
+<?php else: ?>
+
+
+<div id="messages">
+    <ul class="messages">
+        <li class="error-msg">
+            <ul>
+                <li><span><?php echo $this->__('An error occurred: %s', $ips); ?></span></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<?php endif; ?>

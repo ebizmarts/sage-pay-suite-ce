@@ -1,0 +1,235 @@
+div#date-chooser-report {
+    margin-bottom: 5px;
+}
+p#current-amount {
+    color: #eb5e00;    
+    font-size:14px;
+    font-weight: bold;
+    width: 200px;
+    height: 15px;
+}
+
+.head-charts {
+    background-image: url("../images/chart_bar.png");
+}
+
+.spDashboardWidgetContainer
+{
+    float: left;
+    margin: 10px;
+    position: relative;
+    border: 1px solid lightgray;
+    padding: 5px;
+}
+
+.spDashboardWidgetContainer h2
+{
+    float: left;
+    margin: 0;
+}
+
+#spDashboardWidgetBatchContainer
+{
+    width: 170px;
+    padding: 10px;
+}
+
+#spDashboardWidgetBatchContainer ul li
+{
+    margin-bottom: 5px;
+}
+
+#spDashboardWidgetTransactionSumContainer
+{
+    width: 300px;
+}
+
+#spDashboardWidgetTransactionSumDate
+{
+    float: right;
+    margin: 5px 0 0;
+}
+
+#spDashboardWidgetTransactionSumGraphsContainer
+{
+    padding: 40px 0 0;
+}
+
+.spDashboardWidgetTransactionSumInnerContainer
+{
+    margin: 0 0 15px 10px;
+    min-height: 80px;
+    position: relative;
+}
+
+.spDashboardWidgetTransactionSumInnerContainer h3
+{
+    float: left;
+    margin: 0 10px 0 0;
+}
+
+.spDashboardWidgetTransactionSumInnerContainer h4
+{
+    font-size: 2.8em;
+    margin: 0 0 0 15px;
+}
+
+.spDashboardWidgetTransactionSumInnerContainer h5
+{
+    font-size: 1em;
+    float: left;
+    padding: 0 5px 0 0;
+    text-align: right;
+    width: 100px;
+}
+
+.spDashboardWidgetTransactionSumInnerContainer a
+{
+    color: #63A7C3;
+    font-size: 0.9em;
+    font-weight: normal;
+    margin: 0;
+    padding: 3px 0 0;
+    cursor: pointer;
+    float:left;
+    text-decoration: none;
+}
+
+.spDashboardWidgetTransactionSumInnerContainer a:hover
+{
+    text-decoration: underline;
+}
+
+.spDashboardWidgetTransactionSumInnerContainer .endRow
+{
+    width:100%;
+    height: 25px;
+}
+
+#spDashboardWidgetTransactionSum_graph1Bar,
+#spDashboardWidgetTransactionSum_graph2Bar
+{
+    float: left;
+    height: 35px;
+    margin: 5px 15px 0 0;
+    min-width: 1px;
+}
+
+#spDashboardWidgetTransactionSum_graph1Details,
+#spDashboardWidgetTransactionSum_graph2Details
+{
+    height: 0;
+    overflow: hidden;
+}
+
+#spDashboardWidgetTransactionSum_graph1Bar
+{
+    background-color: #91db49;
+}
+
+#spDashboardWidgetTransactionSum_graph2Bar
+{
+    background-color: #ff7777;
+}
+
+.spDashboardWidgetTransactionSum_graph1DetailsBar,
+.spDashboardWidgetTransactionSum_graph2DetailsBar
+{
+    float: left;
+    min-width: 10px;
+    padding: 0 5px;
+    text-align: right;
+}
+
+.spDashboardWidgetTransactionSum_graph1DetailsBar
+{
+    background-color: #91DB49;
+}
+
+.spDashboardWidgetTransactionSum_graph2DetailsBar
+{
+    background-color: #FF7777;
+}
+
+.spDashboardWidgetTransactionSum_graph1DetailsRow
+{
+    min-height: 20px;
+}
+
+#spDashboardWidgetTransactionSumReadyContainer
+{
+    width: 215px;
+    height:235px;
+    margin: 0 auto;
+}
+
+.spDashboardReadyContainer
+{
+}
+
+.spDashboardLoaderContainer
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.bar {
+    fill: steelblue;
+}
+
+.arc path {
+    stroke: #fff;
+}
+
+/*.x.axis path {
+  display: none;
+}*/
+
+#spDashboardWidgetTransactionsByDayGraphsContainer
+{
+    font-size: 9px;
+}
+
+/** TABS **/
+#spDashboardWidgetTransactionsByDayContainer ul.subsection_tabs {
+    border-bottom: 1px solid #CCCCCC;
+    clear: both;
+    height: 20px;
+    list-style: none outside none;
+    margin: 0 0 5px;
+    padding: 0;
+}
+#spDashboardWidgetTransactionsByDayContainer ul.subsection_tabs li.tab {
+    float: left;
+    margin-right: 7px;
+    text-align: center;
+}
+#spDashboardWidgetTransactionsByDayContainer ul.subsection_tabs li.tab a {
+    background-color: #FFFFFF;
+    color: #666666;
+    display: block;
+    height: 20px;
+    padding: 0 6px;
+    width: 80px;    
+    text-decoration: none;    
+}
+#spDashboardWidgetTransactionsByDayContainer ul.subsection_tabs li.tab a:hover {
+    color: #666666;
+}
+#spDashboardWidgetTransactionsByDayContainer ul.subsection_tabs li.tab a.active {
+    background-color: #DDDDDD;
+    font-weight: bold;
+}
+#spDashboardWidgetTransactionsByDayContainer ul.subsection_tabs li.source_code {
+    float: right;
+}

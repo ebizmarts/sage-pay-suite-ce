@@ -1,0 +1,249 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <cms_index_index>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>sagepaysuite/css/sagePaySuite.css</name>
+            </action>
+        </reference>
+        <reference name="right">
+            <block type="sagepaysuite/logo" name="sagepaysuite.right.logo" template="sagepaysuite/logo.phtml"/>
+        </reference>
+    </cms_index_index>
+  <checkout_onepage_index>
+  	<reference name="head">
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/growler/growler.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/sagePaySuite_Checkout.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/growler/growler.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>js</type>
+       	<name>sagepaysuite/direct.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>js</type>
+       	<name>sagepaysuite/common.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/sagePaySuite.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/sagePaySuite_Checkout.js</name>
+      </action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/livepipe.js</name></action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/window.js</name></action>
+  	</reference>
+
+        <reference name="content">
+            <block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+        </reference>
+
+    </checkout_onepage_index>
+
+    <sagepaysuite_card_index translate="label">
+        <label>Customer My Account My Sage Pay Cards</label>
+        <update handle="customer_account"/>
+        <reference name="head">
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/common.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>sagepaysuite/sagePaySuite.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/direct.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>sagepaysuite/css/sagePaySuite.css</name>
+            </action>
+        </reference>
+        <reference name="my.account.wrapper">
+            <block type="sagepaysuite/customer_account_card" name="sagepaycards" template="sagepaysuite/customer/cards.phtml" />
+            <block type="customer/account_dashboard" name="customer.account.link.back" template="customer/account/link/back.phtml"/>
+        </reference>
+    </sagepaysuite_card_index>
+
+	<customer_account>
+	    <reference name="customer_account_navigation">
+	        <action method="addLink" ifconfig="payment/sagepaysuite/token_integration" translate="label" module="sagepaysuite">
+	        	<name>sagepaycards</name>
+	        	<path>sgps/card/</path>
+	        	<label>Sage Pay - Saved Credit Cards</label>
+	        </action>
+	    </reference>
+	</customer_account>
+	<checkout_multishipping_overview>
+	<reference name="head">
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/growler/growler.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/sagePaySuite_Checkout.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/growler/growler.js</name>
+      </action>
+			  <action method="addItem">
+		       	<type>js</type>
+		       	<name>sagepaysuite/direct.js</name>
+		      </action>
+	  <action method="addItem">
+       	<type>js</type>
+       	<name>sagepaysuite/common.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/sagePaySuite.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/sagePaySuite_Checkout.js</name>
+      </action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/livepipe.js</name></action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/window.js</name></action>
+  	</reference>
+  	<reference name="content">
+    	<block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+  	</reference>
+	</checkout_multishipping_overview>
+
+	<checkout_multishipping_billing>
+	<reference name="head">
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/growler/growler.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/sagePaySuite_Checkout.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/growler/growler.js</name>
+      </action>
+			  <action method="addItem">
+		       	<type>js</type>
+		       	<name>sagepaysuite/direct.js</name>
+		      </action>
+	  <action method="addItem">
+       	<type>js</type>
+       	<name>sagepaysuite/common.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/sagePaySuite.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/sagePaySuite_Checkout.js</name>
+      </action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/livepipe.js</name></action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/window.js</name></action>
+  	</reference>
+  	<reference name="content">
+    	<block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+  	</reference>
+	</checkout_multishipping_billing>
+
+    <onepagecheckout_index_index>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>sagepaysuite/css/growler/growler.css</name>
+            </action>
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>sagepaysuite/css/sagePaySuite_Checkout.css</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>sagepaysuite/js/growler/growler.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/direct.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/common.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>sagepaysuite/sagePaySuite.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>sagepaysuite/js/sagePaySuite_Checkout.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/livepipe/livepipe.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/livepipe/window.js</name>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+        </reference>            
+    </onepagecheckout_index_index>
+	
+    <onestepcheckout_index_index>
+	<reference name="head">
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/growler/growler.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_css</type>
+       	<name>sagepaysuite/css/sagePaySuite_Checkout.css</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/growler/growler.js</name>
+      </action>
+			  <action method="addItem">
+		       	<type>js</type>
+		       	<name>sagepaysuite/direct.js</name>
+		      </action>
+	  <action method="addItem">
+       	<type>js</type>
+       	<name>sagepaysuite/common.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/sagePaySuite.js</name>
+      </action>
+	  <action method="addItem">
+       	<type>skin_js</type>
+       	<name>sagepaysuite/js/sagePaySuite_Checkout.js</name>
+      </action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/livepipe.js</name></action>
+	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/window.js</name></action>
+  	</reference>
+  	<reference name="content">
+    	<block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+  	</reference>
+	</onestepcheckout_index_index>
+
+</layout>

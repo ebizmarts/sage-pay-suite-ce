@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <sagepay_dashboard translate="title" module="sagepaysuite">
+            <title>Sage Pay Dashboard</title>
+            <sort_order>15</sort_order>
+            <action>sgpsSecure/adminhtml_dashboard</action>
+        </sagepay_dashboard>
+        <sales>
+            <depends>
+                <module>Ebizmarts_SagePaySuite</module>
+            </depends>
+            <children>
+                <sagepay translate="title" module="sagepaysuite">
+                    <title>Sage Pay</title>
+                    <sort_order>999</sort_order>
+                    <children>
+                        <!--<dashboard translate="title" module="sagepaysuite">
+                            <title>Dashboard</title>
+                            <sort_order>5</sort_order>
+                            <action>sgpsSecure/adminhtml_dashboard</action>
+                        </dashboard>-->
+                        <token_cards translate="title" module="sagepaysuite">
+                            <title>Token Cards</title>
+                            <sort_order>10</sort_order>
+                            <action>sgpsSecure/adminhtml_token</action>
+                        </token_cards>
+                        <deferred_orders translate="title" module="sagepaysuite">
+                            <title>Deferred Orders</title>
+                            <sort_order>20</sort_order>
+                            <action>sgpsSecure/adminhtml_sales_order_deferred</action>
+                        </deferred_orders>
+                        <orphans translate="title" module="sagepaysuite">
+                            <title>Orphan Transactions</title>
+                            <sort_order>30</sort_order>
+                            <action>sgpsSecure/adminhtml_transaction/orphan</action>
+                        </orphans>
+                        <payments translate="title" module="sagepaysuite">
+                            <title>Payment Transactions</title>
+                            <sort_order>40</sort_order>
+                            <action>sgpsSecure/adminhtml_transaction/payments</action>
+                        </payments>
+                        <sagepayreporting translate="title" module="sagepayreporting">
+                            <title><![CDATA[Admin & Access API]]>
+                            </title>
+                            <sort_order>99</sort_order>
+                            <children>
+                                <transaction_detail translate="title" module="sagepayreporting">
+                                    <title>Transaction Detail</title>
+                                    <sort_order>1</sort_order>
+                                    <action>sagepayreporting/adminhtml_sagepayreporting/transactionDetail</action>
+                                </transaction_detail>
+                                <fraud_info_orders translate="title" module="sagepayreporting">
+                                    <title>Fraud Information</title>
+                                    <sort_order>2</sort_order>
+                                    <action>sagepayreporting/adminhtml_sagepayreporting_fraud</action>
+                                </fraud_info_orders>
+                                <add_ip_to_whitelist translate="title" module="sagepayreporting">
+                                    <title>White list IP address</title>
+                                    <sort_order>3</sort_order>
+                                    <action>sagepayreporting/adminhtml_sagepayreporting_whitelistip/whitelistIp</action>
+                                </add_ip_to_whitelist>
+                                <threed_status translate="title" module="sagepayreporting">
+                                    <title><![CDATA[3D Secure Administration]]>
+                                    </title>
+                                    <sort_order>4</sort_order>
+                                    <action>sagepayreporting/adminhtml_sagepayreporting/threedstatus</action>
+                                </threed_status>
+                                <avscv2_status translate="title" module="sagepayreporting">
+                                    <title><![CDATA[AVS/CV2 Administration]]>
+                                    </title>
+                                    <sort_order>5</sort_order>
+                                    <action>sagepayreporting/adminhtml_sagepayreporting/avscvstatus</action>
+                                </avscv2_status>
+                                <showpost translate="title" module="sagepayreporting">
+                                    <title><![CDATA[Perform Show POST]]>
+                                    </title>
+                                    <sort_order>6</sort_order>
+                                    <action>sagepayreporting/adminhtml_sagepayreporting/showpost</action>
+                                </showpost>
+                            </children>
+                        </sagepayreporting>
+                        <logs translate="title" module="sagepaysuite">
+                            <title>Logs</title>
+                            <sort_order>41</sort_order>
+                            <action>sgpsSecure/adminhtml_log</action>
+                        </logs>
+                    </children>
+                </sagepay>
+            </children>
+        </sales>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <sagepaysuite>
+                                        <title>Ebizmarts SagePaySuite</title>
+                                    </sagepaysuite>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                    <sagepay_dashboard translate="title" module="sagepaysuite">
+                        <title>Sage Pay Dashboard</title>
+                    </sagepay_dashboard>
+                    <sales>
+                        <children>
+                            <sagepay>
+                                <title>Sage Pay</title>
+                                <children>
+                                    <!--dashboard translate="title">
+                                        <title>Sage Pay Dashboard</title>
+                                    </dashboard-->
+                                    <token_cards translate="title">
+                                        <title>Sage Pay Token Cards</title>
+                                    </token_cards>
+                                    <deferred_orders translate="title">
+                                        <title>Sage Pay Deferred Oders</title>
+                                    </deferred_orders>
+                                    <orphans translate="title">
+                                        <title>Sage Pay Orphan Transactions</title>
+                                    </orphans>
+                                    <payments translate="title">
+                                        <title>Sage Pay Transactions</title>
+                                    </payments>
+                                    <logs translate="title">
+                                        <title>Magento log browser</title>
+                                    </logs>
+                                    <sagepayreporting translate="title">
+                                        <title><![CDATA[Sage Pay Access & Reports API]]>
+                                        </title>
+                                        <children>
+                                            <transaction_detail translate="title" module="sagepayreporting">
+                                                <title>Transaction Detail</title>
+                                            </transaction_detail>
+                                            <fraud_info_orders translate="title" module="sagepayreporting">
+                                                <title>Fraud Information</title>
+                                            </fraud_info_orders>
+                                            <add_ip_to_whitelist translate="title" module="sagepayreporting">
+                                                <title>White list IP address</title>
+                                            </add_ip_to_whitelist>
+                                            <threed_status translate="title" module="sagepayreporting">
+                                                <title><![CDATA[3D Secure Administration]]>
+                                                </title>
+                                            </threed_status>
+                                            <avscv2_status translate="title" module="sagepayreporting">
+                                                <title><![CDATA[AVS/CV2 Administration]]>
+                                                </title>
+                                            </avscv2_status>
+                                            <showpost translate="title" module="sagepayreporting">
+                                                <title><![CDATA[Show POST]]>
+                                                </title>
+                                            </showpost>
+                                        </children>
+                                    </sagepayreporting>
+                                </children>
+                            </sagepay>
+                        </children>
+                    </sales>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

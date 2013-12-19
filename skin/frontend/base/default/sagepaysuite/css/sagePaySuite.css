@@ -1,0 +1,17 @@
+iframe#iframeRegCard { height:518px; width:100%; border:1px solid #666; }
+
+iframe#sagepaydirectpro-iframe-post { height:500px; width:100%; /*border:1px solid #666;*/ border:none; }
+
+div#direct3d-logos { width:351px;margin:0 auto; margin-top:5px; }
+div#direct3d-logos img { padding-right:10px; }
+
+div.sagecardh1 h1 { display: inline; }
+div.sagecardh1 img { padding-top: 12px; padding-left: 10px; }
+
+select#sagepaytoken_start_yr, select#sagepaytoken_start, select#sagepaytoken_expiration_yr, select#sagepaytoken_expiration { width:125px; }
+select#sagepaytoken_start, select#sagepaytoken_expiration { margin-right: 10px; }
+
+form#frmRegCard input.cvv { width:3em !important; }
+
+.sidebar .sagepaysuite-logo { display:block; margin:10px 0; text-align:center; }
+.sidebar .sagepaysuite-logo a { float:none; }

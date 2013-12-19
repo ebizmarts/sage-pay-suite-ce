@@ -1,0 +1,61 @@
+div#payment_form_sagepaydirectpro ul li label.token, div#payment_form_sagepayserver ul li label.token { float:none; margin-left:7px; }
+
+input#savetokencard { float:left; margin-right:5px; }
+label#lbl_savetokencard { float:none; }
+
+div#direct3d-logos { width:351px;margin:0 auto; padding-top:5px; height:43px; }
+div#direct3d-logos img { padding-right:10px; }
+
+iframe#sage-pay-server-iframe {border:none;height:500px;width:600px;}
+iframe#sagepaysuite-server-incheckout-iframe { border:none;height:840px;width:100%; }
+
+#control_overlay {
+	background-color:#000;
+}
+
+.modal {
+    -webkit-border-radius: 8px 8px 8px 8px;  /* Safari, Chrome (before WebKit version 533) */
+	-moz-border-radius: 8px 8px 8px 8px; /* Firefox up to version 3.6 */
+	background: url(../images/border-bg.png) repeat scroll 0 0 transparent;
+	padding:10px;
+	border:4px;
+}
+
+div.lcontainer { background:#FFF; width:100%; height:100%; overflow:auto; }
+
+label[for="p_method_sagepaydirectpro"], label[for="p_method_sagepayserver"], label[for="p_method_sagepayform"] {
+	padding-bottom:1px;
+	padding-left: 65px;
+	background-repeat:no-repeat;
+	background-image:url(../images/sagepay-section.png);
+}
+
+div.tokencvv { width:43px; display:inline; }
+div.tokencvv label {float:none; margin-right:8px; }
+div.tokencvv input.cvv { margin-right:5px; width:3em !important; }
+
+h5.tdnote {
+    background-color: #008066;
+    color: #FFFFFF;
+    font-weight: normal;
+    margin: 0;
+    padding: 10px;
+    text-align: justify;
+}
+
+div.surcharge-list {
+    border: 1px solid #F18200;
+    margin-left: 23px;
+    margin-top: 5px;
+    padding: 6px;
+    width: 430px;
+}
+
+div.surcharge-list p {
+    font-style: italic;
+}
+
+div.surcharge-list table tr td {
+    padding-right: 4px;
+    padding-bottom: 5px;
+}

@@ -1,0 +1,33 @@
+<?php
+	$tokenCards = $this->helper('sagepaysuite/token')->loadCustomerCards();
+	$cTokens = ($tokenCards->getSize()>0 && $this->getCanUseToken());
+	$c = $this->getPaymentMethodCode();
+
+    if($cTokens > 0):
+    	$defToken = $this->helper('sagepaysuite/token')->getDefaultToken();
+    ?>
+    <div id="tokencards-payment-<?php echo $c; ?>"<?php if($c == 'sagepayserver' or $c == 'sagepayserver_moto'): ?> class="nothide"<?php endif; ?>>
+    <ul class="form-list tokensage">
+    <?php
+    	foreach($tokenCards as $_tcard):
+		$radioId = $c . '_tokencard_' . $_tcard->getId();
+		$isDef = $_tcard->getId() == $defToken->getId();
+	?>
+
+		<li class="tokencard-radio">
+			<input<?php if($isDef): ?> checked="checked"<?php endif; ?> type="radio" id="<?php echo $radioId; ?>" name="payment[sagepay_token_cc_id]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-radio" value="<?php echo $_tcard->getId(); ?>" onclick="switchToken(this);" />
+			<label class="token" for="<?php echo $radioId; ?>"><?php echo $this->__('%s, Exp. %s', $_tcard->getCcNumber(), $_tcard->getExpireDate()); ?></label>
+			<img width="35" src="<?php echo $this->helper('sagepaysuite')->getCcImage($this->helper('sagepaysuite')->getCardLabel($_tcard->getCardType(), false)); ?>" />&nbsp;&nbsp;&nbsp;
+                        
+                        <?php if($c != 'sagepayserver_moto'): ?>
+			<div class="tokencvv"<?php if(!$isDef): ?> style="display:none"<?php endif; ?>>
+		        <label class="required" for="<?php echo $c ?>_token_cvv_<?php echo $_tcard->getId(); ?>"><em>*</em><?php echo $this->__('CV2'); ?></label>
+		        <input<?php if(!$isDef): ?> disabled="disabled"<?php endif; ?> type="text" id="<?php echo $c ?>_token_cvv_<?php echo $_tcard->getId(); ?>" name="payment[token_cvv]" title="<?php echo $this->__('Credit Card CV2') ?>" class="input-text required-entry validate-digits cvv tokencvv" onfocus="tokenRadioCheck('<?php echo $radioId; ?>', this);" />
+	        </div>
+                        <?php endif; ?>
+		</li>
+	<?php endforeach; ?>
+	</ul>
+	</div>
+	<a class="addnew" href="" onclick="toggleNewCard(2); return false;"><?php echo $this->__('No Token'); ?></a>
+<?php endif; ?>

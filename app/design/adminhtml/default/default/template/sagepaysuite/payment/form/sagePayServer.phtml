@@ -1,0 +1,18 @@
+<?php
+    $tokenCards = $this->getTokenCards();
+    $cTokens = ($tokenCards->getSize()>0 && $this->canUseToken());
+    $sageStyle = ($cTokens ? ' style="display:none;"' : '');
+?>
+
+<div id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none">
+    
+    <?php echo $this->getChildHtml(); ?>
+    
+    <ul class="form-list paymentsage">    
+        <?php if($tokenCards->getSize() > 0): ?>
+            <li<?php echo $sageStyle; ?>>
+                <a class="usexist" href="" onclick="toggleNewCard(1); return false;"><?php echo $this->__('Use Token'); ?></a>
+            </li>
+        <?php endif; ?>    
+    </ul>
+</div>

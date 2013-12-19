@@ -1,0 +1,7 @@
+<div id="sgps-log-view-cont">
+	<?php echo $this->getLogFilesSelect(); ?>
+
+	<iframe id="sagepaysuite-log-view" src="<?php echo $this->getTailUrl(); ?>">
+	  <p><?php echo $this->__('Your browser does not support iframes.'); ?></p>
+	</iframe>
+</div>

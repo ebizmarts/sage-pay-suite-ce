@@ -1,0 +1,35 @@
+<?php
+/**
+ * @see Ebizmarts_SagePaySuite_Block_Info_Suite
+ */
+
+ $tokenCard = $this->getTokenCard();
+ $orderId = $this->getInfo()->getOrder()->getId();
+ $sagepay = $this->getInfo()->getOrder()->getSagepayInfo();
+ $_code = $this->getMethod()->getCode();
+
+ if(!is_object($sagepay)){
+	$sagepay = new Varien_Object;
+ }
+
+ if(!$sagepay->getLastFourDigits() && ($_code == 'sagepayserver' || $_code == 'sagepayserver_moto' || $_code == 'sagepaydirectpro_moto') && is_object($this->getInfo()->getOrder())){
+ 	$sagepay = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
+                ->loadByParent($this->getInfo()->getOrder()->getId());
+ }
+?>
+
+<?php echo $this->getMethod()->getTitle() ?>
+
+{{pdf_row_separator}}
+
+<?php echo $this->__('CC Type:'); ?> <?php echo $this->getCcTypeName($sagepay->getCardType(), true); ?>
+
+{{pdf_row_separator}}
+
+<?php echo $this->__('CC Number:'); ?> **********<?php echo $sagepay->getLastFourDigits(); ?>
+
+{{pdf_row_separator}}
+
+<?php if($sagepay->getCardExpiryDate()): ?>
+	<?php echo $this->__('CC Exp. Date:'); ?> <?php echo $sagepay->getCardExpiryDate(); ?>
+<?php endif; ?>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Ebizmarts_SagePayReporting>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Ebizmarts_SagePaySuite />
+            </depends>
+        </Ebizmarts_SagePayReporting>
+    </modules>
+</config> 

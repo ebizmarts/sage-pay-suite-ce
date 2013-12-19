@@ -1,0 +1,598 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Ebizmarts_SagePaySuite>
+            <version>3.0.9</version>
+        </Ebizmarts_SagePaySuite>
+    </modules>
+    <adminhtml>
+        <translate>
+            <modules>
+                <Ebizmarts_SagePaySuite>
+                    <files>
+                        <default>Ebizmarts_SagePaySuite.csv</default>
+                    </files>
+                </Ebizmarts_SagePaySuite>
+            </modules>
+        </translate>
+        <layout>
+            <updates>
+                <sagepaysuite>
+                    <file>sagepaysuite.xml</file>
+                </sagepaysuite>
+            </updates>
+        </layout>
+		<events>
+	      <controller_action_predispatch_adminhtml_dashboard_index>
+	          <observers>
+	              <sagepaysuite_up>
+	                  <type>model</type>
+	                  <class>sagepaysuite/feed_updates</class>
+	                  <method>check</method>
+	              </sagepaysuite_up>
+	          </observers>
+	      </controller_action_predispatch_adminhtml_dashboard_index>
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <order_export_addmassbutton>
+                        <type>model</type>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>updateButton</method>
+                    </order_export_addmassbutton>
+                    <sales_order_grid_transaction_state>
+                        <type>model</type>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>addColumnToSalesOrderGrid</method>
+                    </sales_order_grid_transaction_state>
+                    <sagepay_update_api_add_button>
+                       <type>model</type>
+                       <class>sagepaysuite/observer_sales</class>
+                       <method>addButtonToOrderView</method>
+                    </sagepay_update_api_add_button>
+                </observers>
+            </core_block_abstract_to_html_before>
+	   </events>
+    </adminhtml>
+    <global>
+        <ignoredModules> <!-- To avoid Mage_Log to slow down things -->
+            <entities>
+                <sagepaysuite />
+            </entities>
+        </ignoredModules>
+        <events>
+            <sales_order_place_after>
+                <observers>
+                    <sagepaysuite_set_state>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>orderState</method>
+                    </sagepaysuite_set_state>
+                </observers>
+            </sales_order_place_after>
+            <payment_info_block_prepare_specific_information>
+                <observers>
+                    <sagepaysuite_paymentinfo_block>
+                        <class>sagepaysuite/observer_payment</class>
+                        <method>addInfo</method>
+                    </sagepaysuite_paymentinfo_block>
+                </observers>
+            </payment_info_block_prepare_specific_information>
+            <sales_order_load_after>
+                <observers>
+                    <sagepaysuite_sla>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>loadAfter</method>
+                    </sagepaysuite_sla>
+                </observers>
+            </sales_order_load_after>
+            <sales_order_save_after>
+                <observers>
+                    <sagepaysuite_slafter>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>saveAfter</method>
+                    </sagepaysuite_slafter>
+                </observers>
+            </sales_order_save_after>
+            <sales_order_save_before>
+                <observers>
+                    <sagepaysuite_sla>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>saveBefore</method>
+                    </sagepaysuite_sla>
+                </observers>
+            </sales_order_save_before>
+            <sales_order_payment_cancel>
+                <observers>
+                    <sagepaysuite_payment_cancel>
+                        <class>sagepaysuite/observer_payment</class>
+                        <method>cancel</method>
+                    </sagepaysuite_payment_cancel>
+                </observers>
+            </sales_order_payment_cancel>
+        </events>
+        <fieldsets>
+        	<sales_convert_order_payment>
+                <cc_gift_aid><to_quote_payment>*</to_quote_payment></cc_gift_aid>
+                <remembertoken><to_quote_payment>*</to_quote_payment></remembertoken>
+        	</sales_convert_order_payment>
+            <sales_convert_quote_payment>
+                <sagepay_token_cc_id><to_order_payment>*</to_order_payment></sagepay_token_cc_id>
+                <save_token_cc><to_order_payment>*</to_order_payment></save_token_cc>
+                <cc_gift_aid><to_order_payment>*</to_order_payment></cc_gift_aid>
+                <remembertoken><to_order_payment>*</to_order_payment></remembertoken>
+            </sales_convert_quote_payment>
+        </fieldsets>
+        <tx_states>
+            <stateid_1><![CDATA[Transaction failed registration. Either an INVALID or MALFORMED response was returned.]]></stateid_1>
+            <stateid_2><![CDATA[User on Card Selection page.]]></stateid_2>
+            <stateid_3><![CDATA[User on the Card Details Entry Page.]]></stateid_3>
+            <stateid_4><![CDATA[User on Confirmation Page.]]></stateid_4>
+            <stateid_5><![CDATA[Transaction at 3D-Secure Authentication Stage.]]></stateid_5>
+            <stateid_6><![CDATA[Transaction sent for Authorisation]]></stateid_6>
+            <stateid_7><![CDATA[Vendor Notified of transaction state at their NotificationURL. Awaiting response.]]></stateid_7>
+            <stateid_8><![CDATA[Transaction CANCELLED by Sage Pay after 15 minutes of inactivity.  This is normally because the customer closed their browser.]]></stateid_8>
+            <stateid_9><![CDATA[Transaction completed but Vendor systems returned INVALID or ERROR in response to notification POST. Transaction CANCELLED by the Vendor.]]></stateid_9>
+            <stateid_10><![CDATA[Transaction REJECTED by the Fraud Rules you have in place.]]></stateid_10>
+            <stateid_11><![CDATA[Transaction ABORTED by the Customer on the Payment Pages.]]></stateid_11>
+            <stateid_12><![CDATA[Transaction DECLINED by the bank (NOTAUTHED).]]></stateid_12>
+            <stateid_13><![CDATA[An ERROR occurred at Sage Pay which cancelled this transaction.]]></stateid_13>
+            <stateid_14><![CDATA[Successful DEFERRED transaction, awaiting RELEASE.]]></stateid_14>
+            <stateid_15><![CDATA[Successful AUTHENTICATED transaction, awaiting AUTHORISE.]]></stateid_15>
+            <stateid_16><![CDATA[Successfully authorised transaction.]]></stateid_16>
+            <stateid_17><![CDATA[Transaction Timed Out at Authorisation Stage.]]></stateid_17>
+            <stateid_18><![CDATA[Transaction VOIDed by the Vendor.]]></stateid_18>
+            <stateid_19><![CDATA[Successful DEFERRED transaction ABORTED by the Vendor.]]></stateid_19>
+            <stateid_20><![CDATA[Transaction has been timed out by Sage Pay.]]></stateid_20>
+            <stateid_21><![CDATA[Successfully REGISTERED transaction, awaiting AUTHORISE.]]></stateid_21>
+            <stateid_22><![CDATA[AUTHENTICATED or REGISTERED transaction CANCELLED by the Vendor.]]></stateid_22>
+            <stateid_23><![CDATA[Transaction could not be settled with the bank and has been failed by the Sage Pay systems]]></stateid_23>
+            <stateid_24><![CDATA[PayPal Transaction Registered]]></stateid_24>
+            <stateid_25><![CDATA[Token Registered.]]></stateid_25>
+            <stateid_26><![CDATA[AUTHENTICATE transaction that can no longer be AUTHORISED against.  It has either expired, or been fully authorised.]]></stateid_26>
+            <stateid_27><![CDATA[DEFERRED transaction that expired before it was RELEASEd or ABORTed.]]></stateid_27>
+        </tx_states>
+        <payment>
+            <cc_sgps>
+                <types>
+                    <VISA>
+                        <code>VISA</code>
+                        <name>Visa</name>
+                    </VISA>
+                    <MC>
+                        <code>MC</code>
+                        <name>MasterCard</name>
+                    </MC>
+                    <DELTA>
+                        <code>DELTA</code>
+                        <name>Visa Debit</name>
+                    </DELTA>
+                    <SOLO>
+                        <code>SOLO</code>
+                        <name>Solo</name>
+                    </SOLO>
+                    <MAESTROUK>
+                        <code>SWITCH</code>
+                        <name>Maestro UK</name>
+                    </MAESTROUK>
+                    <MAESTRO>
+                        <code>MAESTRO</code>
+                        <name>Maestro International</name>
+                    </MAESTRO>
+                    <AMEX>
+                        <code>AMEX</code>
+                        <name>American Express</name>
+                    </AMEX>
+                    <UKE>
+                        <code>UKE</code>
+                        <name>Visa Electron</name>
+                    </UKE>
+                    <DINERS>
+                        <code>DC</code>
+                        <name>Diners Club</name>
+                    </DINERS>
+                    <JCB>
+                        <code>JCB</code>
+                        <name>Japan Credit Bureau</name>
+                    </JCB>
+                    <LASER>
+                        <code>LASER</code>
+                        <name>Laser</name>
+                    </LASER>
+                    <PAYPAL>
+                        <code>PAYPAL</code>
+                        <name>PayPal</name>
+                    </PAYPAL>
+                </types>
+            </cc_sgps>
+        </payment>
+        <models>
+            <sagepaysuite>
+                <class>Ebizmarts_SagePaySuite_Model</class>
+            </sagepaysuite>
+            <sagepaysuite2>
+                <class>Ebizmarts_SagePaySuite_Model</class>
+                <resourceModel>sagepaysuite_mysql4</resourceModel>
+            </sagepaysuite2>
+            <sagepaysuite_mysql4>
+                <class>Ebizmarts_SagePaySuite_Model_Mysql4</class>
+                <entities>
+                    <sagepaysuite_session>
+                        <table>sagepaysuite_session</table>
+                    </sagepaysuite_session>
+                    <sagePaySuite_debug>
+                        <table>sagepaysuite_debug</table>
+                    </sagePaySuite_debug>
+                    <sagepaysuite_tokencard>
+                        <table>sagepaysuite_tokencard</table>
+                    </sagepaysuite_tokencard>
+                    <sagepaysuite_transaction>
+                        <table>sagepaysuite_transaction</table>
+                    </sagepaysuite_transaction>
+                    <sagepaysuite_paypaltransaction>
+                        <table>sagepaysuite_paypaltransaction</table>
+                    </sagepaysuite_paypaltransaction>
+                    <sagepaysuite_action>
+                        <table>sagepaysuite_action</table>
+                    </sagepaysuite_action>
+                    <sagepaysuite_fraud>
+                        <table>sagepaysuite_fraud</table>
+                    </sagepaysuite_fraud>
+                </entities>
+            </sagepaysuite_mysql4>
+        </models>
+        <blocks>
+            <sagepaysuite>
+                <class>Ebizmarts_SagePaySuite_Block</class>
+            </sagepaysuite>
+        </blocks>
+        <helpers>
+            <sagepaysuite>
+                <class>Ebizmarts_SagePaySuite_Helper</class>
+            </sagepaysuite>
+
+            <payment>
+                <rewrite>
+                    <data>Ebizmarts_SagePaySuite_Helper_Payment_Data</data>
+                </rewrite>
+            </payment>
+
+        </helpers>
+        <resources>
+            <sagepaysuite_setup>
+                <setup>
+                    <module>Ebizmarts_SagePaySuite</module>
+                    <class>Mage_Eav_Model_Entity_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </sagepaysuite_setup>
+            <sagepaysuite_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </sagepaysuite_write>
+            <sagepaysuite_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </sagepaysuite_read>
+
+            <sagepaysuite2_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </sagepaysuite2_write>
+            <sagepaysuite2_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </sagepaysuite2_read>
+        </resources>
+        <template>
+            <email>
+                <sagepay_timeout_template translate="label" module="sagepaysuite">
+                    <label>SagePayDirectPro Timeout</label>
+                    <file>sagepaysuite/timeout.html</file>
+                    <type>html</type>
+                </sagepay_timeout_template>
+            </email>
+        </template>
+    </global>
+    <default>
+    	<sagepayreporting>
+    		<account>
+	    		<vendor>testebizmarts</vendor>
+    			<enviroment>2</enviroment>
+    		</account>
+    	</sagepayreporting>
+        <sagepaysuite>
+            <notifications>
+                <updates_url><![CDATA[http://store.ebizmarts.com/media/feeds/]]></updates_url>
+                <check_frequency>86400</check_frequency>
+            </notifications>
+        </sagepaysuite>
+        <payment>
+            <sagepaysuite>
+            	<vendor>testebizmarts</vendor>
+                <referrer_id><![CDATA[01bf51f9-0dcd-49dd-a07a-3b1f918c77d7]]></referrer_id>
+                <license_key><![CDATA[[Obtain from Ebizmarts]]]></license_key>
+                <connection_timeout>90</connection_timeout>
+                <max_token_card>6</max_token_card>
+                <logs>0</logs>
+                <profile_request>0</profile_request>
+                <vendor>testebizmarts</vendor>
+                <token_integration><![CDATA[false]]></token_integration>
+                <cms_index_logo>1</cms_index_logo>
+                <sagepay_notifications>1</sagepay_notifications>
+                <orphans_notification>1</orphans_notification>
+                <order_error_save>0</order_error_save>
+                <order_error_save_message><![CDATA[Order saving process halted.]]></order_error_save_message>
+                <timeout_message><![CDATA[A connection error prevented your order from being saved, please retry or email {admin_email} for assistance. Thanks, {store_name}]]></timeout_message>
+                <send_basket>1</send_basket>
+                <basket_format>sage</basket_format>
+                <layout_rewrites_active>0</layout_rewrites_active>
+                <layout_rewrites_updates></layout_rewrites_updates>
+                <layout_rewrites_updates_applyon><![CDATA[checkout_onepage_index,onestepcheckout_index_index,onepagecheckout_index_index]]></layout_rewrites_updates_applyon>
+                <curl_verifypeer>0</curl_verifypeer>
+                <sync_mode>sync</sync_mode>
+                <sagefifty_basket>0</sagefifty_basket>
+            </sagepaysuite>
+            <sagepaydirectpro>
+                <active>0</active>
+                <cctypesSagePayDirectPro>VISA,MC,DELTA,SOLO,SWITCH,UKE</cctypesSagePayDirectPro>
+                <cctypes>VISA,MC,DELTA,SWITCH,MAESTRO,UKE</cctypes>
+                <debug>0</debug>
+                <email_customer>0</email_customer>
+                <login backend_model="adminhtml/system_config_backend_encrypted"/>
+                <model>sagepaysuite/sagePayDirectPro</model>
+                <order_status>pending</order_status>
+                <fail_order_status>pending</fail_order_status>
+                <payment_action>authorize_capture</payment_action>
+                <secure3d>0</secure3d>
+                <mode>test</mode>
+                <title>Credit Card (Sage Pay)</title>
+                <trans_key backend_model="adminhtml/system_config_backend_encrypted"/>
+                <allowspecific>0</allowspecific>
+                <vendor>testebizmarts</vendor>
+                <email_timeout_identity>general</email_timeout_identity>
+                <email_timeout_template>sagepay_timeout_template</email_timeout_template>
+                <connection_timeout>10</connection_timeout>
+                <timeout_orders>0</timeout_orders>
+                <threed_iframe_height>500</threed_iframe_height>
+                <threed_iframe_width>600</threed_iframe_width>
+                <avscv2>0</avscv2>
+            </sagepaydirectpro>
+            <sagepaydirectpro_moto>
+                <active>0</active>
+                <accounttype>M</accounttype>
+                <cctypesSagePayDirectPro>VISA,MC,DELTA,SWITCH,MAESTRO,AMEX,UKE,DINERS,JCB,LASER</cctypesSagePayDirectPro>
+                <cctypes>VISA,MC,DELTA,SWITCH,MAESTRO,AMEX,UKE,DINERS,JCB,LASER</cctypes>
+                <debug>0</debug>
+                <currency>GBP</currency>
+                <email_customer>0</email_customer>
+                <login backend_model="adminhtml/system_config_backend_encrypted"/>
+                <model>sagepaysuite/sagePayDirectProMoto</model>
+                <order_status>pending</order_status>
+                <fail_order_status>pending</fail_order_status>
+                <payment_action>authorize_capture</payment_action>
+                <mode>test</mode>
+                <title>Credit Card (Sage Pay) MOTO</title>
+                <trans_key backend_model="adminhtml/system_config_backend_encrypted"/>
+                <allowspecific>0</allowspecific>
+                <vendor>testebizmarts</vendor>
+                <email_timeout_identity>general</email_timeout_identity>
+                <email_timeout_template>sagepay_timeout_template</email_timeout_template>
+                <connection_timeout>10</connection_timeout>
+                <timeout_orders>0</timeout_orders>
+                <threed_iframe_height>500</threed_iframe_height>
+                <threed_iframe_width>600</threed_iframe_width>
+                <timeout_message>A connection error prevented your order from being saved, please retry or email [admin_email] for assistance. Thanks , [store_name]</timeout_message>
+                <avscv2>0</avscv2>
+                <flag_on_cache>0</flag_on_cache>
+            </sagepaydirectpro_moto>
+            <sagepayserver>
+                <avscv2>0</avscv2>
+                <active>0</active>
+                <debug>0</debug>
+                <model>sagepaysuite/sagePayServer</model>
+                <order_status>pending</order_status>
+                <title>Sage Pay Server</title>
+                <allowspecific>0</allowspecific>
+                <vendor>testebizmarts</vendor>
+                <mode>test</mode>
+                <payment_iframe_position>modal</payment_iframe_position>
+                <iframe_label>Sage Pay Server</iframe_label>
+                <payment_action>payment</payment_action>
+                <purchase_description>Purchase of products ECOMMERCE</purchase_description>
+                <selected_description><![CDATA[Enter your credit card details after Order Review<br />{{secured_logo}}]]></selected_description>
+                <auto_show_iframe>0</auto_show_iframe>
+                <iframe_height>505</iframe_height>
+                <iframe_width>800</iframe_width>
+                <token_iframe_height>550</token_iframe_height>
+                <token_iframe_width>550</token_iframe_width>
+                <template_profile>LOW</template_profile>
+            </sagepayserver>
+            <sagepayserver_moto>
+                <active>0</active>
+                <debug>0</debug>
+                <avscv2>0</avscv2>
+                <model>sagepaysuite/sagePayServerMoto</model>
+                <order_status>pending</order_status>
+                <title>Sage Pay Server MOTO</title>
+                <payment_action>payment</payment_action>
+                <allowspecific>0</allowspecific>
+                <vendor>testebizmarts</vendor>
+                <mode>test</mode>
+                <purchase_description>Purchase of products MOTO</purchase_description>
+                <template_profile>LOW</template_profile>
+            </sagepayserver_moto>
+            <sagepayform>
+            	<active>0</active>
+            	<send_email>1</send_email>
+            	<payment_action>payment</payment_action>
+            	<mode>test</mode>
+            	<title>Sage Pay (FORM)</title>
+            	<order_status>pending</order_status>
+                <selected_description><![CDATA[You will be redirected to the Sage Pay website when you place an order.<br />{{secured_logo}}]]></selected_description>
+                <model>sagepaysuite/sagePayForm</model>
+                <allowspecific>0</allowspecific>
+            </sagepayform>
+            <sagepaypaypal>
+            	<active>0</active>
+            	<payment_action>payment</payment_action>
+            	<title>PayPal via SagePay</title>
+            	<model>sagepaysuite/sagePayPayPal</model>
+            </sagepaypaypal>
+        </payment>
+    </default>
+    <frontend>
+        <translate>
+            <modules>
+                <Ebizmarts_SagePaySuite>
+                    <files>
+                        <default>Ebizmarts_SagePaySuite.csv</default>
+                    </files>
+                </Ebizmarts_SagePaySuite>
+            </modules>
+        </translate>
+        <secure_url>
+            <sagepaysuite>/sgps/</sagepaysuite>
+        </secure_url>
+        <routers>
+            <sagepaysuite>
+                <use>standard</use>
+                <args>
+                    <module>Ebizmarts_SagePaySuite</module>
+                    <frontName>sgps</frontName>
+                </args>
+            </sagepaysuite>
+        </routers>
+        <layout>
+            <updates>
+                <sagepaysuite>
+                    <file>sagepaysuite.xml</file>
+                </sagepaysuite>
+            </updates>
+        </layout>
+        <events>
+            <customer_login>
+                <observers>
+                    <customer_login_sagepay>
+                        <class>sagepaysuite/observer_customer</class>
+                        <method>addRegisterCheckoutTokenCards</method>
+                    </customer_login_sagepay>
+                </observers>
+            </customer_login>
+            <controller_action_predispatch_onestepcheckout_index_index>
+                <observers>
+                    <onepage_sagepay_clear_session>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>controllerOnePageClear</method>
+                    </onepage_sagepay_clear_session>
+                </observers>
+            </controller_action_predispatch_onestepcheckout_index_index>
+            <controller_action_predispatch_checkout_onepage_index>
+                <observers>
+                    <onepage_sagepay_clear_session>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>controllerOnePageClear</method>
+                    </onepage_sagepay_clear_session>
+                </observers>
+            </controller_action_predispatch_checkout_onepage_index>
+            <controller_action_predispatch_checkout_onepage_success>
+                <observers>
+                    <onepage_sagepay_clear_session>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>controllerOnePageSuccess</method>
+                    </onepage_sagepay_clear_session>
+                </observers>
+            </controller_action_predispatch_checkout_onepage_success>
+            <core_layout_update_updates_get_after>
+                <observers>
+                    <sagepaysuite_core_layout_update_updates_get_after>
+                        <type>singleton</type>
+                        <class>sagepaysuite/observer</class>
+                        <method>layoutUpdate</method>
+                    </sagepaysuite_core_layout_update_updates_get_after>
+                </observers>
+            </core_layout_update_updates_get_after>
+            <controller_action_layout_generate_xml_before>
+                <observers>
+                    <sagepaysuite_core_layout_load_before>
+                        <type>singleton</type>
+                        <class>sagepaysuite/observer</class>
+                        <method>layoutRewrite</method>
+                    </sagepaysuite_core_layout_load_before>
+                </observers>
+            </controller_action_layout_generate_xml_before>
+            <sales_convert_quote_to_order>
+                <observers>
+                    <sagepaysuite_sales_convert_quote_to_order>
+                        <type>singleton</type>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>quoteToOrder</method>
+                    </sagepaysuite_sales_convert_quote_to_order>
+                </observers>
+            </sales_convert_quote_to_order>
+            <checkout_type_multishipping_create_orders_single>
+                <observers>
+                    <sagepaysuite_multishipping_create_orders_single>
+                        <class>sagepaysuite/observer_payment</class>
+                        <method>multiShipping</method>
+                    </sagepaysuite_multishipping_create_orders_single>
+                </observers>
+            </checkout_type_multishipping_create_orders_single>
+            <controller_action_predispatch_checkout_multishipping_success>
+                <observers>
+                    <multishipping_sagepay_clear_session>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>controllerMultishippingClear</method>
+                    </multishipping_sagepay_clear_session>
+                </observers>
+            </controller_action_predispatch_checkout_multishipping_success>
+            <controller_action_predispatch_checkout_multishipping_index_index>
+                <observers>
+                    <multishipping_sagepay_clear_session>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>controllerMultishippingClear</method>
+                    </multishipping_sagepay_clear_session>
+                </observers>
+            </controller_action_predispatch_checkout_multishipping_index_index>
+            <controller_action_predispatch>
+                <observers>
+                    <profilerequestpre>
+                        <class>sagepaysuite/observer</class>
+                        <method>profilePre</method>
+                    </profilerequestpre>
+                </observers>
+            </controller_action_predispatch>
+            <controller_action_postdispatch>
+                <observers>
+                    <profilerequestpost>
+                        <class>sagepaysuite/observer</class>
+                        <method>profilePost</method>
+                    </profilerequestpost>
+                </observers>
+            </controller_action_postdispatch>
+        </events>
+    </frontend>
+    <admin>
+        <routers>
+            <sagepaysuite>
+                <use>admin</use>
+                <args>
+                    <module>Ebizmarts_SagePaySuite</module>
+                    <frontName>sgpsSecure</frontName>
+                </args>
+            </sagepaysuite>
+        </routers>
+    </admin>
+    <crontab>
+        <jobs>
+            <sagepaysuite_sync_trndata_fromapi>
+                <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
+                <run><model>sagepaysuite/cron::syncFromApi</model></run>
+            </sagepaysuite_sync_trndata_fromapi>
+        </jobs>
+    </crontab>
+</config>

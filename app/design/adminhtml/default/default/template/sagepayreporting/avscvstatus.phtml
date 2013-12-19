@@ -1,0 +1,78 @@
+<?php
+	$statusXml = $this->getAvsCv2Status();
+?>
+<div class="content-header">
+    <table cellspacing="0">
+        <tr>
+            <td><h3 class="head-dashboard"><?php echo $this->__('AVS/CV2 Administration') ?></h3></td>
+        </tr>
+    </table>
+</div>
+
+<?php echo $this->getChildHtml('reporting.switcher'); ?>
+
+<?php if(is_string($statusXml)): ?>
+	
+	<div id="messages">
+            <ul class="messages">
+                <li class="error-msg">
+                    <ul>
+                        <li><span><?php echo $this->__('An error occurred: %s', $statusXml); ?></span></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+	<?php
+		else:
+			$status = (string)$statusXml->status;
+			$statusRules = (string)$statusXml->rules;
+			$statusChange = ($status  == 'ON' ? $this->__('Turn OFF') : $this->__('Turn ON'));
+	?>
+
+	<h3><?php echo $this->__('AVS/CV2 checking is <code class="%s">%s</code>', strtolower($status), $status); ?>&nbsp;&nbsp;<a title="<?php echo $this->__('Click here to %s AVS/CV2 checking', $statusChange); ?>" id="threeds-status-toggle" href="<?php echo $this->getUrl('*/*/avscvtoggle', array('st'=>$status, '_current'=>true)); ?>"><?php echo $statusChange; ?></a></h3>
+	<h4><?php echo $this->__('AVS/CV2 checking rules are <code class="%s">%s</code>', strtolower($statusRules), $statusRules); ?></h4>
+
+	<?php if($statusRules === 'ON'): $rules = $this->getAvsCv2Rules(); ?>
+		<?php if(!is_string($rules) && get_class($rules) == 'SimpleXMLElement'): ?>
+
+			<div class="grid np">
+			<table cellspacing="0" style="border:0;" id="avs_rules_table">
+			    <col />
+			    <col />
+			    <col />
+			    <col />
+			    <col />
+			    <col />
+		        <thead>
+	                <tr class="headings">
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Start value'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('End value'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Accept no data matches'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Accept address match only'); ?></span></th>
+	                	<th class="no-link"><span class="nobr"><?php echo $this->__('Accept CV2 match only'); ?></span></th>
+	                	<th class="no-link last"><span class="nobr"><?php echo $this->__('Accept data not checked'); ?></span></th>
+	                </tr>
+		        </thead>
+			    <tbody>
+			    <?php foreach($rules->rules->rule as $_index=>$_item): ?>
+			        <tr>
+			            <td><?php echo $_item->startvalue; ?></td>
+			            <td><?php echo $_item->endvalue; ?></td>
+			            <td><?php echo $_item->allownodatamatches; ?></td>
+			            <td><?php echo $_item->allowaddressmatchonly; ?></td>
+			            <td><?php echo $_item->allowsecuritycodematchonly; ?></td>
+			            <td><?php echo $_item->allowdatanotchecked; ?></td>
+			        </tr>
+			    <?php endforeach; ?>
+			    </tbody>
+			</table>
+			<script type="text/javascript">
+				Event.observe(window, 'load', function(){decorateTable('avs_rules_table')});
+			</script>
+			</div>
+
+		<?php endif; ?>
+	<?php endif; ?>
+
+<?php endif; ?>
