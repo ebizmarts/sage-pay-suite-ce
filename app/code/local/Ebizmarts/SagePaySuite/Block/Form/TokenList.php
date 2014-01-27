@@ -8,10 +8,9 @@
  * @author     Ebizmarts <info@ebizmarts.com>
  */
 
-class Ebizmarts_SagePaySuite_Block_Form_TokenList extends Mage_Core_Block_Template
-{
-    protected function _construct()
-    {
+class Ebizmarts_SagePaySuite_Block_Form_TokenList extends Mage_Core_Block_Template {
+
+    protected function _construct() {
         parent::_construct();
         $this->setTemplate('sagepaysuite/payment/form/sagepayTokenList.phtml');
     }
@@ -21,12 +20,17 @@ class Ebizmarts_SagePaySuite_Block_Form_TokenList extends Mage_Core_Block_Templa
      *
      * @return string
      */
-    protected function _toHtml()
-    {
+    protected function _toHtml() {
         if (!$this->getCanUseToken()) {
             return '';
         }
         return parent::_toHtml();
+    }
+
+    public function getAvailableTokenCards($methodCode = null) {
+        $allCards = $this->helper('sagepaysuite/token')->loadCustomerCards($methodCode);
+
+        return $allCards;
     }
 
 }
