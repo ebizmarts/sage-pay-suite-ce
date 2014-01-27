@@ -110,6 +110,65 @@ class Ebizmarts_SagePaySuite_Adminhtml_TransactionController extends Mage_Adminh
         }
     }
 
+    public function editAction() {
+
+        $vendorTxCode  = $this->getRequest()->getParam('id');
+        $transaction   = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')->loadByVendorTxCode($vendorTxCode);
+
+        if (!$transaction->getId()) {
+            $this->_getSession()->addError($this->__('This transaction no longer exists.'));
+            $this->_redirectReferer();
+            return;
+        }
+
+        $this->_title($this->__('Edit Transaction'));
+
+        // Restore previously entered form data from session
+        $data = $this->_getSession()->getUserData(true);
+        if (!empty($data)) {
+            $transaction->setData($data);
+        }
+
+        Mage::register('sagepaysuite_transaction', $transaction);
+
+        $this->loadLayout();
+        $this->_setActiveMenu('sales');
+
+        $this->renderLayout();
+
+    }
+
+    public function saveAction() {
+
+        if($this->getRequest()->isPost()) {
+
+            try {
+                $data = $this->getRequest()->getPost('transaction');
+
+                if(!empty($data)) {
+
+                    $trn = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')->load($data['id']);
+                    if($trn->getId()) {
+                        $trn
+                        ->addData($data)
+                        ->save();
+                    }
+                    $this->_getSession()->addSuccess($this->__('Transaction updated successfully.'));
+                }
+            }catch(Exception $ex) {
+                $this->_getSession()->addSuccess($this->__('There was an error: %s.', $ex->getMessage()));
+            }
+
+            $this->_redirect('*/*/edit/', array('id' => $trn->getVendorTxCode()));
+            return;
+
+        }
+        else {
+            $this->_redirectReferer();
+            return;
+        }
+    }
+
     public function deleteAction() {
 
         if ($this->getRequest()->isPost()) { #Mass action
@@ -199,15 +258,14 @@ class Ebizmarts_SagePaySuite_Adminhtml_TransactionController extends Mage_Adminh
 
 					$trn->delete();
 
-					$this->_getSession()->addSuccess($this->__('Transaction #%s deleted.', $id));
-				}else{
-					$this->_getSession()->addError($this->__('Transaction #%s does not exist.', $id));
-				}
-			}
-
-		}
-		$this->_redirectReferer();
-	}
+                    $this->_getSession()->addSuccess($this->__('Transaction #%s deleted.', $id));
+                } else {
+                    $this->_getSession()->addError($this->__('Transaction #%s does not exist.', $id));
+                }
+            }
+        }
+        $this->_redirectReferer();
+    }
 
     public function paymentsAction() {
         $this->_title($this->__('Sales'))->_title($this->__('Sage Pay Transactions'));
@@ -237,6 +295,18 @@ class Ebizmarts_SagePaySuite_Adminhtml_TransactionController extends Mage_Adminh
         $this->getResponse()->setBody(
                 $this->getLayout()->createBlock('sagepaysuite/adminhtml_transaction_grid')->toHtml()
         );
+    }
+
+    protected function _isAllowed() {
+        switch ($this->getRequest()->getActionName()) {
+            case 'save':
+            case 'edit':
+                $acl = 'sales/sagepay/payments/edit_transaction';
+                break;
+            default:
+                $acl = 'sales/sagepay/payments';
+        }
+        return Mage::getSingleton('admin/session')->isAllowed($acl);
     }
 
 }
