@@ -163,6 +163,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
 
         }
 
+        //Breaks totals
         //$result = $this->getOnepage()->saveBilling($billing_data, $customerAddressId);
 
         if ($helper->differentShippingAvailable()) {
@@ -186,6 +187,22 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
         if (array_key_exists('onestepcheckout_comments', $requestParams)
                 && !empty($requestParams['onestepcheckout_comments'])) {
             $this->getSageSuiteSession()->setOscOrderComments($requestParams['onestepcheckout_comments']);
+        }
+
+        if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback')) {
+            $feedbackValues        = unserialize(Mage::getStoreConfig('onestepcheckout/feedback/feedback_values'));
+            $feedbackValue         = $this->getRequest()->getPost('onestepcheckout-feedback');
+            $feedbackValueFreetext = $this->getRequest()->getPost('onestepcheckout-feedback-freetext');
+            if(!empty($feedbackValue)){
+                if($feedbackValue!='freetext') {
+                    $feedbackValue = $feedbackValues[$feedbackValue]['value'];
+                }
+                else {
+                    $feedbackValue = $feedbackValueFreetext;
+                }
+
+                $this->getSageSuiteSession()->setOscCustomerFeedback(Mage::helper('core')->escapeHtml($feedbackValue));
+            }
         }
 
         //GiftMessage
@@ -271,7 +288,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             $this->getOnepage()->saveShippingMethod($dataM);
         }
 
-        //Mageven_OrderComment
+        //Magemaven_OrderComment
         $orderComment = $this->getRequest()->getPost('ordercomment');
         if (is_array($orderComment) && isset($orderComment['comment'])) {
             $comment = trim($orderComment['comment']);
@@ -279,7 +296,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                 $this->getSageSuiteSession()->setOrderComments($comment);
             }
         }
-        //Mageven_OrderComment
+        //Magemaven_OrderComment
 
 
         if ($paymentMethod == 'sagepayserver') {
