@@ -46,20 +46,16 @@
 		<input type="hidden" name="payment[cc_ss_start_year]" value="<?php echo $this->htmlEscape($this->getInfo()->getCcSsStartYear()); ?>" />
 
 	<?php elseif($this->getInfo()->getTokenCvv() && $this->getInfo()->getSagepayTokenCcId()): ?>
-
 		<input type="hidden" name="payment[token_cvv]" value="<?php echo $this->htmlEscape($this->getInfo()->getTokenCvv()); ?>" />
 		<input type="hidden" name="payment[sagepay_token_cc_id]" value="<?php echo $this->htmlEscape($this->getInfo()->getSagepayTokenCcId()); ?>" />
-
 	<?php elseif($this->getInfo()->getSagepayTokenCcId()): ?>
-
 		<input type="hidden" id="sagepay_server_token_cc_id" name="payment[sagepay_server_token_cc_id]" value="<?php echo $this->htmlEscape($this->getInfo()->getSagepayTokenCcId()); ?>" />
-
 	<?php endif; ?>
-
+                
        <?php if($this->getInfo()->getRemembertoken()): ?>
                 <input id="token-remembertoken" type="hidden" name="payment[remembertoken]" value="<?php echo $this->getInfo()->getRemembertoken(); ?>" />
-       <?php endif; ?>                
-                
+       <?php endif; ?>
+
 <?php endif; ?>
 
 <p><?php echo $this->getMethod()->getTitle(); ?></p>
