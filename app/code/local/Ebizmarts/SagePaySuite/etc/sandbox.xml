@@ -43,7 +43,7 @@
 		<amex>
 			<code>AMEX</code>
 			<ccn>374200000000004</ccn>
-			<cvv>123</cvv>
+			<cvv>1234</cvv>
 		</amex>
 		<jcb>
 			<code>JCB</code>
