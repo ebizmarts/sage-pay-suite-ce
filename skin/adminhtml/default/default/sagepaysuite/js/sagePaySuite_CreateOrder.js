@@ -4,18 +4,22 @@ if(typeof EbizmartsSagePaySuite == 'undefined') {
 EbizmartsSagePaySuite.AdminOrder = Class.create();
 EbizmartsSagePaySuite.AdminOrder.prototype = {
     initialize: function(config){
-        this.config 		= config;
+        this.config 		    = config;
         this.servercode			= 'sagepayserver_moto';
         this.directcode			= 'sagepaydirectpro_moto';
+        this.oldUrl             = '';
 
-        Event.observe(window, 'load', function(){
-            $(editForm.formId).writeAttribute('action', SuiteConfig.getConfig('global', 'adminhtml_save_order_url'));
+        Event.observe(window, 'load', function() {
+            
+            this.oldUrl = $(editForm.formId).readAttribute('action');
+            this.setEditFormAction(SuiteConfig.getConfig('global', 'adminhtml_save_order_url'));
+
             document.body.insert(new Element('a', {
-                'id': 'sagepayserver-dummy-link', 
-                'href': '#', 
+                'id': 'sagepayserver-dummy-link',
+                'href': '#',
                 'style':'display:none'
             }).update('&nbsp;'));
-        });
+        }.bind(this));
 
     },
     evalTransport: function(transport){
@@ -44,13 +48,26 @@ isServerPaymentMethod: function(){
 isDirectPaymentMethod: function(){
     return (this.getPaymentMethod() === this.directcode);
 },
+setEditFormAction: function(myUrl) {
+    $(editForm.formId).writeAttribute('action', myUrl);
+},
 orderSave: function() {
 
     //We only need to show iframe for SERVER
     if(!this.isServerPaymentMethod()) {
+
+        if(this.isDirectPaymentMethod()) {
+            this.setEditFormAction(SuiteConfig.getConfig('global', 'adminhtml_save_order_url'));
+        }
+        else {
+            this.setEditFormAction(this.oldUrl);
+        }
+        
         order.submit();
         return;
     }
+    
+    this.setEditFormAction(SuiteConfig.getConfig('global', 'adminhtml_save_order_url'));
 
     //Validate form when SERVER protocol is used
     if(window.editForm.validator && window.editForm.validate()) {
