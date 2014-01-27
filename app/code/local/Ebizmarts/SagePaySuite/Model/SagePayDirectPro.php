@@ -16,16 +16,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
     /**
      * Availability options
      */
-    protected $_isGateway               = true;
-    protected $_canAuthorize            = true;
-    protected $_canCapture              = true;
-    protected $_canCapturePartial       = true;
-    protected $_canRefund               = false;
+    protected $_isGateway = true;
+    protected $_canAuthorize = true;
+    protected $_canCapture = true;
+    protected $_canCapturePartial = true;
+    protected $_canRefund = false;
     protected $_canRefundInvoicePartial = false;
-    protected $_canVoid                 = false;
-    protected $_canUseInternal          = false;
-    protected $_canUseCheckout          = true;
-    protected $_canUseForMultishipping  = true;
+    protected $_canVoid = false;
+    protected $_canUseInternal = false;
+    protected $_canUseCheckout = true;
+    protected $_canUseForMultishipping = true;
 
     public function registerToken($payment) {
         if (true === $this->getTokenModel()->isEnabled()) {
@@ -109,6 +109,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
          * Token Transaction
          */
         if (true === $this->_tokenPresent()) {
+
             $_info = new Varien_Object(array('payment' => $payment));
             $result = $this->getTokenModel()->tokenTransaction($_info);
 
@@ -321,9 +322,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $this->getSageSuiteSession()->setInvoicePayment(true);
             }
 
-            $quote = Mage::getSingleton('checkout/type_onepage')->getQuote();
+            $onePage = Mage::getSingleton('checkout/type_onepage');
+            $quote   = $onePage->getQuote();
             $quote->collectTotals();
-            Mage::getSingleton('checkout/type_onepage')->saveOrder();
+
+            Mage::helper('sagepaysuite')->ignoreAddressValidation($quote);
+
+            $onePage->saveOrder();
 
             $_transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                     ->loadByVendorTxCode($this->getSageSuiteSession()->getLastVendorTxCode())
@@ -347,14 +352,14 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             //Saving TOKEN after 3D response.
             if ($result->getData('Token')) {
                 $tokenData = array(
-                    'Token' => $result->getData('Token'),
-                    'Status' => $result->getData('Status'),
-                    'Vendor' => $_transaction->getVendorname(),
-                    'CardType' => $_transaction->getCardType(),
-                    'ExpiryDate' => $result->getData('ExpiryDate'),
+                    'Token'        => $result->getData('Token'),
+                    'Status'       => $result->getData('Status'),
+                    'Vendor'       => $_transaction->getVendorname(),
+                    'CardType'     => $_transaction->getCardType(),
+                    'ExpiryDate'   => $result->getData('ExpiryDate'),
                     'StatusDetail' => $result->getData('StatusDetail'),
-                    'Protocol' => 'direct',
-                    'CardNumber' => $_transaction->getLastFourDigits(),
+                    'Protocol'     => 'direct',
+                    'CardNumber'   => $_transaction->getLastFourDigits(),
                 );
                 Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
             }
@@ -444,7 +449,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             return $this->registerToken($payment);
         }
 
-        $_rs = $this->directRegisterTransaction($payment, $amount);
+        $_rs  = $this->directRegisterTransaction($payment, $amount);
         $_req = $payment->getSagePayResult()->getRequest();
         $_res = $payment->getSagePayResult();
 
@@ -886,15 +891,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     //Saving TOKEN.
                     if (!$callback3D && $result->getData('Token')) {
                         $tokenData = array(
-                            'Token' => $result->getData('Token'),
-                            'Status' => $result->getData('Status'),
-                            'Vendor' => $request->getData('Vendor'),
-                            'CardType' => $request->getData('CardType'),
-                            'ExpiryDate' => $request->getData('ExpiryDate'),
+                            'Token'        => $result->getData('Token'),
+                            'Status'       => $result->getData('Status'),
+                            'Vendor'       => $request->getData('Vendor'),
+                            'CardType'     => $request->getData('CardType'),
+                            'ExpiryDate'   => $request->getData('ExpiryDate'),
                             'StatusDetail' => $result->getData('StatusDetail'),
-                            'Protocol' => 'direct',
-                            'CardNumber' => $request->getData('CardNumber'),
+                            'Protocol'     => 'direct',
+                            'CardNumber'   => $request->getData('CardNumber'),
                         );
+
                         Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
                     }
 
