@@ -45,6 +45,11 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Paymentransaction_Grid extends Mage
     }
 
     public function getRowUrl($row) {
+
+        if(Mage::getSingleton('admin/session')->isAllowed('sales/sagepay/payments/edit_transaction')) {
+            return $this->getUrl('*/*/edit', array('id' => $row->getVendorTxCode()));
+        }
+
         return false;
     }
 
