@@ -9,8 +9,10 @@
  */
 class Ebizmarts_SagePaySuite_Block_Form_SagePayToken extends Mage_Payment_Block_Form_Cc {
 
-    public function getTokenCards() {
-        return $this->helper('sagepaysuite/token')->loadCustomerCards();
+    public function getTokenCards($methodCode = null) {
+        $allCards = $this->helper('sagepaysuite/token')->loadCustomerCards($methodCode);
+
+        return $allCards;
     }
 
     public function canUseToken() {
