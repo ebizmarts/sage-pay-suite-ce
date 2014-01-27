@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Ebizmarts_SagePayReporting>
-			<version>0.1.1</version>
+			<version>0.1.2</version>
 		</Ebizmarts_SagePayReporting>
 	</modules>
 	<frontend>
@@ -30,7 +30,7 @@
                     </files>
                 </Ebizmarts_SagePayReporting>
             </modules>
-        </translate>                
+        </translate>
 	</frontend>
 	<admin>
 		<routers>
@@ -52,7 +52,7 @@
                     </files>
                 </Ebizmarts_SagePayReporting>
             </modules>
-        </translate>            
+        </translate>
 		<layout>
 			<updates>
 				<sagepayreporting>
