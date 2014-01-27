@@ -68,7 +68,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
             'width' => '80px',
             'index' => 'status_detail'
         ));
-        
+
         $this->addColumn('tx_state_id', array(
             'header'=> Mage::helper('sagepaysuite')->__('System Status'),
             'width' => '80px',
@@ -115,6 +115,18 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
                 'type'      => 'action',
                 'getter'     => 'getVendorTxCode',
                 'actions'   => array(
+                    /*array(
+                        'caption' => Mage::helper('sagepaysuite')->__('View Detail'),
+                        'url'     => array('base'=>'sagepayreporting/adminhtml_sagepayreporting/transactionDetailModal'),
+                        'field'   => 'vendortxcode',
+                        'popup'   => '1',
+                        'modal'   => '1',
+                    ),*/
+                    array(
+                        'caption' => Mage::helper('sagepaysuite')->__('Edit'),
+                        'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/edit'),
+                        'field'   => 'id',
+                    ),
                     array(
                         'caption' => Mage::helper('sagepaysuite')->__('Recover [beta]'),
                         'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/recover'),
