@@ -120,13 +120,18 @@
                                         <title>Sage Pay Token Cards</title>
                                     </token_cards>
                                     <deferred_orders translate="title">
-                                        <title>Sage Pay Deferred Oders</title>
+                                        <title>Sage Pay Deferred Orders</title>
                                     </deferred_orders>
                                     <orphans translate="title">
                                         <title>Sage Pay Orphan Transactions</title>
                                     </orphans>
                                     <payments translate="title">
                                         <title>Sage Pay Transactions</title>
+                                        <children>
+                                            <edit_transaction translate="title" module="sagepaysuite">
+                                                <title>Edit Transaction</title>
+                                            </edit_transaction>
+                                        </children>
                                     </payments>
                                     <logs translate="title">
                                         <title>Magento log browser</title>
