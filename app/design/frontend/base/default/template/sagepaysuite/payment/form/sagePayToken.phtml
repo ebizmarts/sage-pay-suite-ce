@@ -3,7 +3,7 @@
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
 	<?php
-		foreach($this->getTokenCards() as $_tcard):
+		foreach($this->getTokenCards($_code) as $_tcard):
 		$radioId = $_code . '_tokencard_' . $_tcard->getId();
 	?>
 		<li>
