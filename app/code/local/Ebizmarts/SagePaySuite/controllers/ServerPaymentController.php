@@ -61,8 +61,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 $resultData['error'] = false;
             }
         } catch (Exception $e) {
-            $resultData['response_status'] = 'ERROR';
+            $resultData['response_status']        = 'ERROR';
             $resultData['response_status_detail'] = $e->getMessage();
+            Mage::dispatchEvent('sagepay_payment_failed', array('quote' => Mage::getSingleton('sagepaysuite/api_payment')->getQuote(), 'message' => $e->getMessage()));
         }
 
         if (isset($redirectUrl)) {
@@ -102,16 +103,21 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         $url = Mage :: getUrl('sgps/ServerPayment/abortredirect', array(
                     '_secure' => true,
                     '_current' => true,
+                    '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                    'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
                 ));
 
         return $url;
     }
 
     protected function _getSuccessRedirectUrl() {
+
         $url = Mage :: getUrl('sgps/ServerPayment/success', array(
-                    '_secure' => true,
+                    '_secure'  => true,
                     '_current' => true,
-                ));
+                    '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                    'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+        ));
 
         return $url;
     }
@@ -120,6 +126,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         $url = Mage :: getUrl('sgps/ServerPayment/failure', array(
                     '_secure' => true,
                     '_current' => true,
+                    '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                    'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
                 ));
 
         return $url;
@@ -161,6 +169,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         Sage_Log::log($message);
         Sage_Log::log($this->getRequest()->getPost());
         Sage_log::log($this->_getSagePayServerSession()->getData());
+
+        Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $message));
 
         $this->getResponse()->setHeader('Content-type', 'text/plain');
         $this->getResponse()->setBody($response);
@@ -218,7 +228,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         Sage_Log::log($_POST, null, 'SagePaySuite_POST_Requests.log');
 
         $request = $this->getRequest();
-        $dbtrn = $this->_trn();
+        $dbtrn   = $this->_trn();
 
         $dbtrn->addData(Mage::helper('sagepaysuite')->arrayKeysToUnderscore($_POST))
                 ->setPostcodeResult($this->getRequest()->getPost('PostCodeResult'))
@@ -255,6 +265,25 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
             $this->_returnOk();
             return;
         }
+
+        //Check cart health on callback.
+        if(Mage::helper('sagepaysuite/checkout')->cartExpire($this->getOnepage()->getQuote())) {
+
+            try {
+
+                Mage::helper('sagepaysuite')->voidTransaction($dbtrn->getVendorTxCode(), 'sagepayserver');
+
+                Sage_Log::log("Transaction " . $dbtrn->getVendorTxCode() . " cancelled, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_POST_Requests.log');
+
+            }catch(Exception $ex) {
+                Sage_Log::log("Transaction " . $dbtrn->getVendorTxCode() . " could not be cancelled and order was not created, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_POST_Requests.log');
+            }
+
+            $this->_returnInvalid('Your order could not be completed, please try again. Thanks.');
+            return;
+
+        }
+        //Check cart health on callback.
 
         $sagePayServerSession = $this->_getSagePayServerSession();
 
@@ -437,6 +466,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                                 ->save();
                         Mage::logException($e);
                         Mage::log($e->getMessage());
+
+                        Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $e->getMessage()));
                     }
                 }
                 else {
@@ -549,6 +580,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
             Mage::log($e->getMessage());
             Mage::logException($e);
+
+            Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $e->getMessage()));
 
             $this->getOnepage()->getQuote()->save();
 
