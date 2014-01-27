@@ -79,6 +79,11 @@ class Ebizmarts_SagePaySuite_Model_Feed_Updates {
             return $this;
         }
         
+        //For when the module is not enabled.
+        if(!is_object(Mage::getModel('adminnotification/inbox'))) {
+            return $this;
+        }
+        
         if (false === Mage::getStoreConfigFlag('payment/' . $this->_key . '/sagepay_notifications')) {
             return $this;
         }
