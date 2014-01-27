@@ -34,6 +34,11 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
     public function persistCard(array $info) {
         $sessId = $this->getSessionCustomerId();
 
+        //Register checkout
+        if(is_string($sessId)) {
+            $sessId = null;
+        }
+
         $save = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')
                 ->setToken($info['Token'])
                 ->setStatus($info['Status'])
@@ -43,6 +48,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
                 ->setStatusDetail($info['StatusDetail'])
                 ->setProtocol($info['Protocol'])
                 ->setCustomerId($sessId)
+                ->setStoreId(Mage::app()->getStore()->getId())
                 ->setLastFour(substr($info['CardNumber'], -4));
 
         /*if (is_string($sessId)) {
@@ -86,14 +92,21 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
         return $this->_postRemove($token, $protocol);
     }
 
+    /**
+     * Process a card transaction using a token.
+     *
+     * @param  Varien_Object $info
+     * @return array
+     */
     public function tokenTransaction(Varien_Object $info) {
-        $sessT = $this->getSageSuiteSession()->getLastSavedTokenccid();
+
+        $sessT       = $this->getSageSuiteSession()->getLastSavedTokenccid();
         $tokenLoadId = (!is_null($sessT) ? $sessT : $info->getPayment()->getSagepayTokenCcId());
 
         $_t = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->load($tokenLoadId);
 
         $_t->setIsDefault(1)
-                ->save();
+           ->save();
 
         $isGuest = Mage::getSingleton('checkout/type_onepage')->getCheckoutMethod() == Mage_Checkout_Model_Type_Onepage::METHOD_GUEST;
 
@@ -101,16 +114,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
             $isGuest = FALSE;
         }
 
-        $postData = array();
-        $postData += $this->_getGeneralTrnData($info->getPayment())->getData();
-        $postData['vendortxcode'] = substr($postData['vendor_tx_code'], 0, 40);
-        $postData['txtype'] = $info->getPayment()->getTransactionType();
+        $postData                   = array();
+        $postData                   += $this->_getGeneralTrnData($info->getPayment(), $info->getParameters())->getData();
+        $postData['vendortxcode']   = substr($postData['vendor_tx_code'], 0, 40);
+        $postData['txtype']         = $info->getPayment()->getTransactionType();
         $postData['InternalTxtype'] = $postData['txtype'];
-        $postData['token'] = $_t->getToken();
-        $postData['storetoken'] = ($isGuest ? '0' : '1');
-        $postData['description'] = '.';
-        $postData['CV2'] = $this->getSageSuiteSession()->getTokenCvv();
-        $postData['vendor'] = $this->getConfigData('vendor');
+        $postData['token']          = $_t->getToken();
+        $postData['storetoken']     = ($isGuest ? '0' : '1');
+        $postData['description']    = '.';
+        $postData['CV2']            = $this->getSageSuiteSession()->getTokenCvv();
+        $postData['vendor']         = $this->getConfigData('vendor');
 
         if (array_key_exists('integration', $postData) && strtolower($postData['integration']) == 'server') {
             $postData['Profile'] = 'LOW';
@@ -138,7 +151,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
 
         $urlPost = $this->getTokenUrl('post', (isset($postData['Integration']) ? $postData['Integration'] : 'direct'));
 
-        $rs = $this->requestPost($urlPost, $postData);
+        $rs            = $this->requestPost($urlPost, $postData);
         $rs['request'] = new Varien_Object($postData);
 
         $objRs = new Varien_Object($rs);
@@ -155,10 +168,10 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
             return array('Status' => 'ERROR', 'StatusDetail' => Mage::helper('sagepaysuite')->__('You can\'t add more tokens. Please contact the administrator.'));
         }
 
-        $postData = array();
+        $postData                = array();
         $postData['VPSProtocol'] = $this->getVpsProtocolVersion();
-        $postData['TxType'] = 'TOKEN';
-        $postData['Vendor'] = $this->getConfigData('vendor');
+        $postData['TxType']      = 'TOKEN';
+        $postData['Vendor']      = $this->getConfigData('vendor');
 
         if ($this->_getQuote()->hasItems()) {//Checkout
             if ((string) $this->getConfigData('trncurrency') == 'store') {
@@ -166,23 +179,22 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
             } else {
                 $postData['Currency'] = $this->_getQuote()->getBaseCurrencyCode();
             }
-        } else {//Customer account
+        }
+        else {//Customer account
             $postData['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
         }
 
-        $postData['VendortxCode'] = $this->getNewTxCode();
+        $postData['VendortxCode']    = $this->getNewTxCode();
         $postData['NotificationURL'] = $this->_getNotificationUrl();
 
         if (array_key_exists('CardType', $data)) { #DIRECT
             $urlPost = $this->getTokenUrl('register', 'direct');
             $postData += $data;
-        } else { #SERVER
+        }
+        else { #SERVER
             $urlPost = $this->getTokenUrl('register', 'server');
             $postData['Profile'] = 'LOW';
         }
-
-        //Sage_Log::log($urlPost);
-        //Sage_Log::log($postData);
 
         $result = $this->requestPost($urlPost, $postData);
 
