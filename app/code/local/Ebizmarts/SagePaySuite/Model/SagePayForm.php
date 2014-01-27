@@ -87,7 +87,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
         $data['VendorTxCode'] = $this->_getTrnVendorTxCode();
 
         if ((string) $this->getConfigData('trncurrency') == 'store') {
-            $data['Amount'] = $this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode());
+            $data['Amount']   = $this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode());
             $data['Currency'] = $quoteObj->getQuoteCurrencyCode();
         } else if ((string) $this->getConfigData('trncurrency') == 'switcher') {
             $data['Amount']   = $this->formatAmount($quoteObj->getGrandTotal(), Mage::app()->getStore()->getCurrentCurrencyCode());
@@ -209,6 +209,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
             }
         }
 
+        Sage_Log::log("User-Agent: " . Mage::helper('core/http')->getHttpUserAgent(false), null, 'SagePaySuite_REQUEST.log');
+        Sage_Log::log(Mage::helper('sagepaysuite')->getUserAgent(), null, 'SagePaySuite_REQUEST.log');
         Sage_Log::log($data, null, 'SagePaySuite_REQUEST.log');
 
         Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
@@ -223,6 +225,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
                 ->setTrndate($this->getDate())
                 ->setTrnAmount($data['Amount'])
                 ->save();
+
+        Mage::getSingleton('sagepaysuite/session')->setLastVendorTxCode($data['VendorTxCode']);
 
         //** add PKCS5 padding to the text to be encypted
         $pkcs5Data = $this->addPKCS5Padding($dataToSend);
