@@ -814,12 +814,6 @@ Control.Overlay = {
             height: document.body.clientHeight + 'px'
         });
     }
-    //positionOverlay: function(){
-    //    Control.Overlay.container.setStyle({
-    //        width: document.body.clientWidth + 'px',
-    //        height: document.body.clientHeight + 'px'
-    //    });
-    //}
 };
 Object.Event.extend(Control.Overlay);
 
