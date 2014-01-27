@@ -1,7 +1,7 @@
 <?php
-	$tokenCards = $this->helper('sagepaysuite/token')->loadCustomerCards();
-	$cTokens = ($tokenCards->getSize()>0 && $this->getCanUseToken());
-	$c = $this->getPaymentMethodCode();
+	$c          = $this->getPaymentMethodCode();
+	$tokenCards = $this->helper('sagepaysuite/token')->loadCustomerCards($c);
+	$cTokens    = ($tokenCards->getSize()>0 && $this->getCanUseToken());
 
     if($cTokens > 0):
     	$defToken = $this->helper('sagepaysuite/token')->getDefaultToken();
@@ -18,7 +18,7 @@
 			<input<?php if($isDef): ?> checked="checked"<?php endif; ?> type="radio" id="<?php echo $radioId; ?>" name="payment[sagepay_token_cc_id]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-radio" value="<?php echo $_tcard->getId(); ?>" onclick="switchToken(this);" />
 			<label class="token" for="<?php echo $radioId; ?>"><?php echo $this->__('%s, Exp. %s', $_tcard->getCcNumber(), $_tcard->getExpireDate()); ?></label>
 			<img width="35" src="<?php echo $this->helper('sagepaysuite')->getCcImage($this->helper('sagepaysuite')->getCardLabel($_tcard->getCardType(), false)); ?>" />&nbsp;&nbsp;&nbsp;
-                        
+
                         <?php if($c != 'sagepayserver_moto'): ?>
 			<div class="tokencvv"<?php if(!$isDef): ?> style="display:none"<?php endif; ?>>
 		        <label class="required" for="<?php echo $c ?>_token_cvv_<?php echo $_tcard->getId(); ?>"><em>*</em><?php echo $this->__('CV2'); ?></label>
