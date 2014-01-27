@@ -81,6 +81,14 @@
 			</action>
 		</reference>
 	</sagepaysuite_adminhtml_transaction_orphan>
+	<sagepaysuite_adminhtml_transaction_edit>
+        <reference name="left">
+            <block type="sagepaysuite/adminhtml_transaction_edit_tabs" name="adminhtml.sagepay.transaction.edit.tabs"/>
+        </reference>
+        <reference name="content">
+            <block type="sagepaysuite/adminhtml_transaction_edit" name="adminhtml.sagepay.transaction.edit"/>
+        </reference>
+	</sagepaysuite_adminhtml_transaction_edit>
 	<sagepaysuite_adminhtml_log_index>
 		<reference name="head">
 			<action method="addItem">
