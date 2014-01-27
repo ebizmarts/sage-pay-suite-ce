@@ -11,14 +11,14 @@ class Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Transaction_Collection ex
     public function getOrphans()
     {
         $this->getSelect()->where('isnull(main_table.order_id)')
-        ->where('isnull(main_table.voided)');
+        /*->where('isnull(main_table.voided)')*/;
         return $this;
     }
 
     public function existOrphans()
     {
         $this->getSelect()->where('isnull(main_table.order_id)')
-        ->where('isnull(main_table.voided)')
+        /*->where('isnull(main_table.voided)')*/
         ->limit(1);
         return $this;
     }
