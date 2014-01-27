@@ -66,7 +66,7 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                     $path = Mage::getBaseDir('media') . DS;
                     $uploader->save($path, $_FILES['filename']['name']);
                 } catch (Exception $e) {
-                    
+
                 }
 
                 //this way the name is saved in DB
@@ -209,14 +209,25 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 Mage::register('reporting_store_id', $paramStore);
             }
 
+            //Try search by VendorTxCode
             $id = $this->getRequest()->getParam('vendortxcode');
             $response = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionDetails(urldecode($id), null);
             if ($response->getErrorcode() == '0000') {
                 Mage::register('sagepay_detail', $response);
-            } else {
-                $this->_getSession()->addError($response->getError());
             }
-        } else {
+            else {
+                //Try search by VpsTxId
+                $response = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionDetails(null, urldecode($id));
+                if ($response->getErrorcode() == '0000') {
+                    Mage::register('sagepay_detail', $response);
+                }
+                else {
+                    $this->_getSession()->addError($response->getError());
+                }
+
+            }
+        }
+        else {
             Mage::register('sagepay_detail', null);
         }
 
@@ -229,9 +240,9 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
     public function transactionDetailModalAction() {
         if ($this->getRequest()->getParam('vendortxcode') || $this->getRequest()->getParam('vpstxid')) {
             $id = $this->getRequest()->getParam('vendortxcode') ? $this->getRequest()->getParam('vendortxcode') : $this->getRequest()->getParam('vpstxid');
-            
+
             try {
-                
+
                 if ($this->getRequest()->getParam('vpstxid')) {
                     $response = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionDetails(null, urldecode($id));
                     Mage::register('sagepay_related_transactions', Mage::getModel('sagepayreporting/sagepayreporting')->getRelatedTransactions(urldecode($id)));
@@ -240,7 +251,7 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                     Mage::register('sagepay_related_transactions', new Varien_Object);
                     $response = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionDetails($id, null);
                 }
-                
+
             } catch(Exception $exc) {
                 //$this->_getSession()->addError($exc->getMessage());
                 $response = new Varien_Object;
