@@ -116,7 +116,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
 
         }
 
-        if ($this->_getIsAdmin()) {
+        if (($this->getCode() == 'sagepayserver_moto') && $this->_getIsAdmin()) {
 
             if(isset($this->_postPayment['sagepay_token_cc_id'])) {
                 $this->getSageSuiteSession()->setLastSavedTokenccid($this->_postPayment['sagepay_token_cc_id']);
@@ -156,8 +156,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
 
         //Only collect totals for frontend orders, if you do for moto orders, it breaks for example discounts application.
         if(!$this->_getIsAdmin()) {
-            //@TODO: Dont collect totals if Amasty_Promo is present
-            $quoteObj->setTotalsCollectedFlag(false)->collectTotals();
+            //@TODO: Dont collect totals if Amasty_Promo or Qian_Bxgy is present
+            //$quoteObj->setTotalsCollectedFlag(false)->collectTotals();
         }
 
         //$amount = $this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode());
@@ -168,8 +168,10 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
          */
         $this->_tokenPresent();
         if (true === $this->_tokenPresent()) {
+
             $payment->setIntegra('server');
-            $_info = new Varien_Object(array('payment' => $payment));
+
+            $_info = new Varien_Object(array('payment' => $payment, 'parameters' => $params));
             $result = $this->getTokenModel()->tokenTransaction($_info);
 
             if ($result['Status'] != 'OK') {
@@ -177,7 +179,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
             }
 
             $requestObject = $result['request'];
-            $vendorTxCode = $requestObject->getData('VendorTxCode');
+            $vendorTxCode  = $requestObject->getData('VendorTxCode');
 
             $this->getSageSuiteSession()->setLastVendorTxCode($vendorTxCode);
 
@@ -211,7 +213,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
          * Token Transaction
          */
 
-        $request = $this->_buildRequest($params);
+        $request  = $this->_buildRequest($params);
         $response = $this->_postRequest($request);
 
         $this->getSageSuiteSession()->setLastVendorTxCode($request->getData('VendorTxCode'));
@@ -479,6 +481,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
             Mage::logException($e);
 
             $result->setResponseStatus('ERROR')->setResponseStatusDetail($e->getMessage());
+
+            Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getQuote(), 'message' => $e->getMessage()));
+
             return $result;
         }
 
@@ -489,11 +494,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
             if (empty($r) || $r['Status'] == 'FAIL') {
                 $msg = Mage::helper('sagepaysuite')->__('Sage Pay is not available at this time. Please try again later.');
                 $result->setResponseStatus('ERROR')->setResponseStatusDetail($msg);
+                Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getQuote(), 'message' => $msg));
                 return $result;
             }
 
             if ($this->_isInvalid($r['Status'])) {
                 $result->setResponseStatus($r['Status'])->setResponseStatusDetail(Mage::helper('sagepaysuite')->__($r['StatusDetail']));
+                Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getQuote(), 'message' => $r['StatusDetail']));
             }
             else {
 
@@ -537,6 +544,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
             Mage::logException($e);
+
+            Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getQuote(), 'message' => $e->getMessage()));
 
             $result->setResponseStatus('ERROR')->setResponseStatusDetail($e->getMessage());
             return $result;
