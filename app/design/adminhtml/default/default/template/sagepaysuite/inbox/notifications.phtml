@@ -1,6 +1,6 @@
 <?php
 
-    $canShow = (bool)Mage::getStoreConfigFlag('payment/sagepaysuite/orphans_notification') && Mage::getSingleton('admin/session')->isAllowed('sales/sagepay/orhpans');
+    $canShow = (bool)Mage::getStoreConfigFlag('payment/sagepaysuite/orphans_notification') && Mage::getSingleton('admin/session')->isAllowed('sales/sagepay/orphans');
 
     if(true === $canShow):
 
