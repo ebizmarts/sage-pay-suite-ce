@@ -14,6 +14,30 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
     }
 
     /**
+     * Save Magemaven Order Comments
+     * @param  $observer
+     * @return Ebizmarts_SagePaySuite_Model_Observer_Checkout
+     */
+    public function saveMagemavenOrderComment($observer) {
+
+        //Magemaven_OrderComment
+        $comment = $this->getSession()->getOrderComments(true);
+        if($comment) {
+
+            $order = $observer->getEvent()->getOrder();
+
+            if(is_object($order)) {
+                $order->setCustomerComment($comment);
+                $order->setCustomerNoteNotify(true);
+                $order->setCustomerNote($comment);
+            }
+        }
+        //Magemaven_OrderComment
+
+        return $this;
+    }
+
+    /**
      * Clear SagePaySuite session when loading onepage checkout
      */
     public function controllerOnePageClear($o) {
@@ -58,7 +82,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
 
         $this->_getTransactionsModel()->addApiDetails($orderId);
 
-
         /**
          * Delete session tokencards if any
          */
@@ -94,4 +117,23 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $this->getSession()->clear();
     }
 
+    public function sendPaymentFailedEmail($observer) {
+        //Check if enabled in config.
+        if(0 === (int)Mage::getStoreConfig('payment/sagepaysuite/send_payment_failed_emails')) {
+            return $this;
+        }
+
+        $quote   = $observer->getEvent()->getQuote();
+        $message = $observer->getEvent()->getMessage();
+
+        try {
+
+            Mage::helper('sagepaysuite/checkout')->sendPaymentFailedEmail($quote, $message);
+
+        } catch(Exception $ex) {
+            Sage_Log::logException($ex);
+        }
+
+        return $this;
+    }
 }
