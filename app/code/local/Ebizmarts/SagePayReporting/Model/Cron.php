@@ -2,37 +2,25 @@
 
 class Ebizmarts_SagePayReporting_Model_Cron {
 
+	/**
+	 * Retrieve fraud score (3rd man) for transactions that do not have score.
+	 * @param  $cron Cron object
+	 * @return Ebizmarts_SagePayReporting_Model_Cron
+	 */
 	public function getThirdmanScores($cron) {
 
-		$tblName = Mage::getSingleton('core/resource')->getTableName('sagepayreporting_fraud');
-		$sagepayOrders = Mage::getResourceModel('sales/order_grid_collection');
+		$fraudTblName = Mage::getSingleton('core/resource')->getTableName('sagepayreporting_fraud');
+		$transactions = Mage::getResourceModel('sagepaysuite2/sagepaysuite_transaction_collection');
+		$transactions->addFieldToSelect(array('order_id', 'vendor_tx_code', 'vps_tx_id'));
 
-		$sagepayOrders->addAttributeToSelect('entity_id');
+		$transactions
+		->getSelect()
+		->where("`main_table`.`order_id` IS NOT NULL AND (`main_table`.`order_id` NOT IN (SELECT `order_id` FROM ". $fraudTblName ."))")
+		->order("main_table.created_at DESC")
+		->limit(15);
 
-		$sagepayOrders->getSelect()
-		->joinLeft(array (
-			'pmnt' => $sagepayOrders->getTable('sales/order_payment'
-		)),
-		'main_table.entity_id = pmnt.parent_id', array())
-		->joinLeft(array (
-			'sls' => $sagepayOrders->getTable('sales/order')
-		),
-		'main_table.entity_id = sls.entity_id', array())
-		->where("(pmnt.method = 'sagepaydirectpro' OR pmnt.method = 'sagepayserver' OR pmnt.method = 'sagepayserver_moto' OR pmnt.method = 'sagepaydirectpro_moto' OR pmnt.method = 'sagepayform' OR pmnt.method = 'sagepaypaypal') AND (main_table.entity_id NOT IN (SELECT order_id FROM ". $tblName ."))")
-		->limit(10);
-
-		$now = strtotime("now");
-
-		foreach ($sagepayOrders as $_order) {
-
-			$_order = Mage::getModel('sales/order')->load($_order->getId());
-
-                        if(is_object($_order->getSagepayInfo())) {
-                            $dbtrn = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')->loadByVendorTxCode($_order->getSagepayInfo()->getVendorTxCode());
-                            //Get up to date transaction data from API
-                            $dbtrn->updateFromApi();
-                        }
-
+		foreach($transactions as $_trn) {
+			$_trn->updateFromApi();
 		}
 
 	}
