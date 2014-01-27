@@ -270,7 +270,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
 
     public function creatingAdminOrder() {
         $controllerName = Mage::app()->getRequest()->getControllerName();
-        return ($controllerName == 'sales_order_create' || $controllerName == 'adminhtml_sales_order_create' || $controllerName == 'sales_order_edit');
+        return ($controllerName == 'sales_order_create' || $controllerName == 'adminhtml_sales_order_create' || $controllerName == 'sales_order_edit' || $controllerName == 'orderspro_order_edit');
     }
 
     public function getIndicator() {
@@ -291,8 +291,8 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         $conf ['global']= array_intersect_key($_store->getConfig('payment/sagepaysuite'), array_flip(array('debug', 'max_token_card')));
         $conf ['global']['onepage_progress_url'] = $_url->getUrl('checkout/onepage/progress', array('_secure' => true));
         $conf ['global']['onepage_success_url'] = $_url->getUrl('checkout/onepage/success', array('_secure' => true));
-        $conf ['global']['valid'] = (int)Mage::helper('sagepaysuite')->F91B2E37D34E5DC4FFC59C324BDC1157C();
-        $conf ['global']['token_enabled'] = (int)Mage::getModel('sagepaysuite/sagePayToken')->isEnabled();
+        $conf ['global']['valid'] = (int) Mage::helper('sagepaysuite')->F91B2E37D34E5DC4FFC59C324BDC1157C();
+        $conf ['global']['token_enabled'] = (int) Mage::getModel('sagepaysuite/sagePayToken')->isEnabled();
         $conf ['global']['sgps_saveorder_url'] = Mage::getModel('core/url')->addSessionParam()->getUrl('sgps/payment/onepageSaveOrder', array('_secure' => true));
         $conf ['global']['cart_url'] = Mage::getModel('core/url')->getUrl('checkout/cart', array('_secure' => true));
         $conf ['global']['osc_loading_image'] = '<img src="' . $_d->getSkinUrl('images/opc-ajax-loader.gif') . '" />&nbsp;&nbsp;' . $this->__('Please wait, processing your order...');
@@ -631,6 +631,21 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         }
 
         return $this->_states;
+    }
+
+    /**
+     * Make sure addresses will be saved without validation errors
+     */
+    public function ignoreAddressValidation($quote) {
+
+        $ignoreAddressValidation = (int)Mage::getStoreConfig('payment/sagepaysuite/ignore_address_validation');
+
+        if(1 === $ignoreAddressValidation) {
+            $quote->getBillingAddress()->setShouldIgnoreValidation(true);
+            if (!$quote->getIsVirtual()) {
+                $quote->getShippingAddress()->setShouldIgnoreValidation(true);
+            }
+        }
     }
 
 }
