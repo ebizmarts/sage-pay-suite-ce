@@ -4,6 +4,10 @@
         <Ebizmarts_SagePaySuite>
             <active>true</active>
             <codePool>local</codePool>
+            <depends>
+                <Mage_Sales />
+                <Mage_Tax />
+            </depends>
         </Ebizmarts_SagePaySuite>
     </modules>
 </config>
