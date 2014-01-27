@@ -52,6 +52,9 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
 
                 $op = Mage :: getSingleton('checkout/type_onepage');
                 $op->getQuote()->collectTotals();
+
+                Mage::helper('sagepaysuite')->ignoreAddressValidation($op->getQuote());
+
                 $op->saveOrder();
 
                 $resultData = array(
@@ -64,6 +67,9 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
             Sage_Log :: logException($e);
             $resultData['response_status'] = 'ERROR';
             $resultData['response_status_detail'] = $e->getMessage();
+
+            Mage::dispatchEvent('sagepay_payment_failed', array('quote' => Mage::getSingleton('checkout/type_onepage')->getQuote(), 'message' => $e->getMessage()));
+
         }
 
         return $this->getResponse()->setBody(Zend_Json :: encode($resultData));
@@ -132,12 +138,13 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
         $vendorTxCode = $this->getRequest()->getParam('v');
         $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                 ->loadByVendorTxCode($vendorTxCode);
+
         $emede = $transaction->getMd();
         $pares = $this->getRequest()->getPost('PaRes');
 
         $transaction->setPares($pares)
-                ->save();        
-        
+                    ->save();
+
         header('Content-type: text/html; charset=utf-8');
 
         $image = Mage :: helper('sagepaysuite')->getIndicator();
@@ -150,7 +157,19 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
         ob_flush();*/
 
         $error = false;
+        $quote = Mage::getSingleton('checkout/type_onepage')->getQuote();
+
         try {
+
+            //Check cart health on callback.
+            if(Mage::helper('sagepaysuite/checkout')->cartExpire($quote)) {
+
+                Sage_Log::log("Transaction " . $transaction->getVendorTxCode() . " not completed, cart was modified while customer on 3D payment pages.", Zend_Log::CRIT, 'SagePaySuite_REQUEST.log');
+
+                Mage::throwException($this->__('Your order could not be completed, please try again. Thanks.'));
+
+            }
+            //Check cart health on callback.
 
             if ($pares && $emede) {
                 Mage::getModel('sagepaysuite/sagePayDirectPro')->saveOrderAfter3dSecure($pares, $emede);
@@ -158,6 +177,9 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
                 /*flush();
                 ob_flush();*/
             } else {
+
+                Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $quote, 'message' => $this->__("3D callback error.")));
+
                 Mage::throwException($this->__("Invalid request."));
             }
         } catch (Exception $e) {
@@ -171,13 +193,19 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
                     ->setMd(null);
 
             Sage_Log::logException($e);
+            Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $quote, 'message' => $e->getMessage()));
 
             $error = true;
             $message = $e->getMessage();
 
             echo '<script type="text/javascript">
-					window.parent.restoreOscLoad();
-					window.parent.notifyThreedError("' . $message . '");
+                    if((typeof window.parent.restoreOscLoad) != "undefined"){
+                    window.parent.restoreOscLoad();
+                    window.parent.notifyThreedError("' . $message . '");
+                    }
+                    else {
+                        alert("' . $message . '");
+                    }
                 </script>
 				</body>
 			  </html>';
@@ -188,7 +216,7 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
         if (!$error) {
             Mage::getSingleton('checkout/type_onepage')->getQuote()->save();
 
-            $successUrl = Mage :: getUrl('checkout/onepage/success', array('_secure' => true));
+            $successUrl = Mage::getUrl('checkout/onepage/success', array('_secure' => true));
 
             echo '<script type="text/javascript">
 					(parent.location == window.location)? window.location.href="' . $successUrl . '" : window.parent.setLocation("' . $successUrl . '");
