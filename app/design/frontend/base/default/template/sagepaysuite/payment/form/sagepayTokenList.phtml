@@ -1,7 +1,7 @@
 <?php
-	$tokenCards = $this->helper('sagepaysuite/token')->loadCustomerCards();
-	$cTokens = ($tokenCards->getSize()>0 && $this->getCanUseToken());
-	$c = $this->getPaymentMethodCode();
+	$c          = $this->getPaymentMethodCode();
+	$tokenCards = $this->getAvailableTokenCards($c);
+	$cTokens    = ($tokenCards->getSize()>0 && $this->getCanUseToken());
     if($cTokens > 0):
     	$defToken = $this->helper('sagepaysuite/token')->getDefaultToken();
     ?>
@@ -23,7 +23,7 @@
 		        <input<?php if(!$isDef): ?> disabled="disabled"<?php endif; ?> type="text" id="<?php echo $c ?>_token_cvv_<?php echo $_tcard->getId(); ?>" name="payment[token_cvv]" title="<?php echo $this->__('Credit Card CV2') ?>" class="input-text required-entry validate-digits cvv tokencvv" onfocus="tokenRadioCheck('<?php echo $radioId; ?>', this);" />
 	        </div>
 	        <?php endif; ?>
-                
+
 		<a class="oncheckout" href="<?php echo $this->getUrl('sgps/card/delete/', array('card'=>$_tcard->getId(), '_secure' => true)); ?>" onclick="if(confirm('<?php echo $this->__("Are you sure?"); ?>')){removeCard(this); return false; }else{return false;}"><?php echo $this->__('Delete'); ?></a>
 		</li>
 	<?php endforeach; ?>
