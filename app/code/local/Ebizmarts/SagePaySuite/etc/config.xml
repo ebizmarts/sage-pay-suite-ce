@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.9</version>
+            <version>3.0.17</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -60,6 +60,14 @@
             </entities>
         </ignoredModules>
         <events>
+            <sagepay_payment_failed>
+                <observers>
+                    <sagepaysuite_send_failed_email>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>sendPaymentFailedEmail</method>
+                    </sagepaysuite_send_failed_email>
+                </observers>
+            </sagepay_payment_failed>
             <sales_order_place_after>
                 <observers>
                     <sagepaysuite_set_state>
@@ -336,6 +344,8 @@
                 <curl_verifypeer>0</curl_verifypeer>
                 <sync_mode>sync</sync_mode>
                 <sagefifty_basket>0</sagefifty_basket>
+                <ignore_address_validation>1</ignore_address_validation>
+                <send_payment_failed_emails>1</send_payment_failed_emails>
             </sagepaysuite>
             <sagepaydirectpro>
                 <active>0</active>
@@ -442,6 +452,7 @@
             	<payment_action>payment</payment_action>
             	<title>PayPal via SagePay</title>
             	<model>sagepaysuite/sagePayPayPal</model>
+                <frontend_behaviour>checkout</frontend_behaviour>
             </sagepaypaypal>
         </payment>
     </default>
@@ -574,6 +585,22 @@
                     </profilerequestpost>
                 </observers>
             </controller_action_postdispatch>
+            <checkout_type_onepage_save_order>
+                <observers>
+                    <suite_save_mageven_order_comments>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>saveMagemavenOrderComment</method>
+                    </suite_save_mageven_order_comments>
+                </observers>
+            </checkout_type_onepage_save_order>
+            <checkout_type_multishipping_create_orders_single>
+                <observers>
+                    <suite_save_mageven_order_comments>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>saveMagemavenOrderComment</method>
+                    </suite_save_mageven_order_comments>
+                </observers>
+            </checkout_type_multishipping_create_orders_single>
         </events>
     </frontend>
     <admin>
@@ -596,3 +623,4 @@
         </jobs>
     </crontab>
 </config>
+
