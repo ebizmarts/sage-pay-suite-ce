@@ -26,4 +26,16 @@ class Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Tokencard_Collection exte
         return $this;
     }
 
+    /**
+     * Filter collection by vendorname.
+     *
+     * @param Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Tokencard_Collection
+     */
+    public function addVendorFilter($vendorname) {
+
+      $this->getSelect()->where("`main_table`.`vendor` IS NULL OR `main_table`.`vendor` = '". $vendorname ."'");
+
+      return $this;
+    }
+
 }
