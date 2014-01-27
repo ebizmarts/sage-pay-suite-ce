@@ -1,8 +1,8 @@
 <?php
-	$_code = $this->getMethodCode();
-	$tokenCards = $this->getTokenCards();
-	$cTokens = ($tokenCards->getSize()>0 && $this->canUseToken());
-	$sageStyle = ($cTokens ? ' style="display:none;"' : '');
+    $_code       = $this->getMethodCode();
+    $tokenCards  = $this->getTokenCards($_code);
+    $cTokens     = ($tokenCards->getSize()>0 && $this->canUseToken());
+    $sageStyle   = ($cTokens ? ' style="display:none;"' : '');
     $_directMode = Mage::getStoreConfig('payment/sagepaydirectpro/mode');
 ?>
 <script type="text/javascript">
