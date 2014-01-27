@@ -83,13 +83,15 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
             $this->_initCheckout();
 
             $resultData = array();
-            $resultData['success'] = true;
-            $resultData['error'] = false;
+            $resultData['success']  = true;
+            $resultData['error']    = false;
             $resultData['redirect'] = Mage::getUrl('sgps/formPayment/go', array('_secure' => true));
 
         } catch (Exception $e) {
-            $resultData['response_status'] = 'ERROR';
+            $resultData['response_status']        = 'ERROR';
             $resultData['response_status_detail'] = $e->getMessage();
+
+            Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->_getQuote(), 'message' => $e->getMessage()));
         }
 
         return $this->getResponse()->setBody(Zend_Json::encode($resultData));
@@ -147,6 +149,28 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
 
             $trn->save();
 
+            //Check cart health on callback.
+            if(Mage::helper('sagepaysuite/checkout')->cartExpire($this->getOnepage()->getQuote())) {
+
+                try {
+
+                    Mage::helper('sagepaysuite')->voidTransaction($trn->getVendorTxCode(), 'sagepayform');
+
+                    Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " cancelled, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
+
+                    Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed, please try again. Thanks.'));
+
+                }catch(Exception $ex) {
+                    Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " could not be cancelled and order was not created, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
+                    Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed but we could not cancel the payment, please contact us and mention this transaction reference number: %s. Thanks.', $db['vendor_tx_code']));
+                }
+
+                $this->_redirect('checkout/cart');
+                return;
+
+            }
+            //Check cart health on callback.
+
             Mage::register('sageserverpost', new Varien_Object($token));
 
 			Mage::getSingleton('sagepaysuite/session')->setInvoicePayment(true);
@@ -160,6 +184,8 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
                         ->save();
 
                 Sage_Log::logException($e);
+
+                Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $e->getMessage()));
             }
 
             Mage::helper('sagepaysuite/checkout')->deleteQuote();
