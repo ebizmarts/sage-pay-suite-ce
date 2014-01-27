@@ -40,16 +40,41 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Sales_Order_Grid_Renderer_State ext
                 $title = $this->__("Fraud: %s. Score is: %s", $fraud->getThirdmanAction(), $fraud->getThirdmanScore());
                 $result .= '&nbsp;&nbsp;<img src="' . $this->_fraudIcon($fraud->getThirdmanScore()) . '" title="' . $title . '" />';
             }
+
+            //ReD
+            $red = (string)$transaction->getRedFraudResponse();
+            if(!empty($red)) {
+                $redTitle = $this->__("ReD Status: %s.", $red);
+                $result .= '&nbsp;&nbsp;<img src="' . $this->_redFraudIcon($fraud->getThirdmanScore()) . '" title="' . $redTitle . '" />';
+            }
+
         }
 
         return $result;
     }
 
+    protected function _redFraudIcon($status) {
+        switch (strtoupper($status)) {
+            case 'ACCEPT':
+                return $this->_shield("check");
+                break;
+            case 'DENY':
+                return $this->_shield("cross");
+                break;
+            case 'CHALLENGE':
+                return $this->_shield("zebra");
+                break;
+            case 'NOTCHECKED':
+                return $this->_shield("outline");
+                break;
+        }
+    }
+
     protected function _fraudIcon($score) {
 
-        if ($score <= 30) {
+        if ($score < 30) {
             $type = "check";
-        } else if ($score > 30 && $score <= 49) {
+        } else if ($score >= 30 && $score <= 49) {
             $type = "zebra";
         } else {
             $type = "cross";
@@ -73,13 +98,13 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Sales_Order_Grid_Renderer_State ext
             case 19:
             case 20:
             case 22:
-            case 23:            
+            case 23:
             case 27:
                 $type = "cross";
                 break;
             case 14:
             case 15:
-            case 16:            
+            case 16:
             case 26:
                 $type = "check";
                 break;
