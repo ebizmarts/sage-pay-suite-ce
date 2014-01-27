@@ -28,12 +28,12 @@ class Ebizmarts_SagePaySuite_Helper_Token extends Mage_Core_Helper_Abstract {
         return Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->getDefaultCard();
     }
 
-    public function loadCustomerCards() {                
-        
+    public function loadCustomerCards($methodCode = null) {
+
         $this->_tokenCards = new Varien_Object;
-        
+
         if (!$this->_tokenCards->getSize()) {
-            
+
             $_id = Mage::getModel('sagepaysuite/api_payment')->getCustomerQuoteId();
 
             if(is_numeric($_id)) {
@@ -43,10 +43,35 @@ class Ebizmarts_SagePaySuite_Helper_Token extends Mage_Core_Helper_Abstract {
             }
             $this->_tokenCards = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->getCollection()
                     ->setOrder('id', 'DESC')
-                    ->addCustomerFilter($_id)
-                    ->load();
+                    ->addCustomerFilter($_id);
+
+            if(!is_null($methodCode)) {
+                $method = new Varien_Object;
+
+                switch ($methodCode) {
+                    case 'sagepayserver':
+                        $method = Mage::getModel('sagepaysuite/sagePayServer');
+                        break;
+                    case 'sagepayserver_moto':
+                        $method = Mage::getModel('sagepaysuite/sagePayServerMoto');
+                        break;
+                    case 'sagepaydirectpro':
+                        $method = Mage::getModel('sagepaysuite/sagePayDirectPro');
+                        break;
+                    case 'sagepaydirectpro_moto':
+                        $method = Mage::getModel('sagepaysuite/sagePayDirectProMoto');
+                        break;
+                    default:
+                        break;
+                }
+
+                $this->_tokenCards->addVendorFilter($method->getConfigData('vendor'));
+            }
+
+            $this->_tokenCards->load();
+
         }
-        
+
         return $this->_tokenCards;
     }
 
