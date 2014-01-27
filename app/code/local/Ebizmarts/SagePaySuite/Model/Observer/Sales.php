@@ -174,14 +174,10 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
             $order->setOnestepcheckoutCustomercomment($this->getSession()->getOscOrderComments());
         }
 
-        //Mageven_OrderComment
-        $comment = $this->getSession()->getOrderComments(true);
-        if($comment) {
-            $order->setCustomerComment($comment);
-            $order->setCustomerNoteNotify(true);
-            $order->setCustomerNote($comment);
+        $feedbackValue = $this->getSession()->getOscCustomerFeedback();
+        if($feedbackValue) {
+            $order->setOnestepcheckoutCustomerfeedback($feedbackValue);
         }
-        //Mageven_OrderComment
 
         if ($payment->getMethod() != 'sagepaydirectpro' && $payment->getMethod() != 'sagepayserver') {
             return $o;
