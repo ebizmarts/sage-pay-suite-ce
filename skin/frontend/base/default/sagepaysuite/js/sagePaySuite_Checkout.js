@@ -73,7 +73,7 @@ EbizmartsSagePaySuite.Checkout = Class.create();
 EbizmartsSagePaySuite.Checkout.prototype = {
 
     initialize: function(config){
-        this.config 		= config;
+        this.config 		    = config;
         this.servercode			= 'sagepayserver';
         this.directcode			= 'sagepaydirectpro';
         this.paypalcode			= 'sagepaypaypal';
