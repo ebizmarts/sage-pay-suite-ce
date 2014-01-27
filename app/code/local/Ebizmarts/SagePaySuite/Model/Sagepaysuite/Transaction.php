@@ -9,6 +9,21 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
     protected $_order;
 	protected $_paypal_trn = null;
 
+    /**
+     * Prefix of model events names
+     *
+     * @var string
+     */
+    protected $_eventPrefix = 'sagepaysuite_transaction';
+
+    /**
+     * Parameter name in event
+     *
+     * In observe method you can use $observer->getEvent()->getObject() in this case
+     *
+     * @var string
+     */
+    protected $_eventObject = 'transaction';
 
     /**
      * Initialize resource model
@@ -84,8 +99,13 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
 
                 if((string)$details->getErrorcode() === '0000') {
 
+                        if(((int)$details->getTxstateid()) === 16) {
+                            $this->setStatus('OK');
+                        }
+
                         $this
                         ->setVpsTxId($details->getVpstxid())
+                        ->setBatchId($details->getBatchid())
                         ->setSecurityKey($details->getSecuritykey())
                         ->setCustomerCcHolderName($details->getCardholder())
                         ->setAddressResult($details->getAddressresult())
@@ -97,6 +117,10 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
                         ->setTxStateId($details->getTxstateid())
                         ->setEci($details->getEci())
                         ->setPaymentSystemDetails($details->getPaymentsystemdetails())
+                        ->setReleased(($details->getReleased() ? 1 : 0))
+                        ->setAborted(($details->getAborted() ? 1 : 0))
+                        ->setSurchargeAmount($details->getSurcharge())
+                        ->setVoided((((int)$details->getTxstateid() == 18) ? 1 : 0))
                         ->save();
 
                         //Update Fraud Score
@@ -106,7 +130,7 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
                         }
 
                 }
-                else{
+                else {
 					$this->setApiError((string)$details->getError());
 				}
 
