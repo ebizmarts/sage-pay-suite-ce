@@ -17,7 +17,7 @@ class Ebizmarts_SagePayReporting_Model_Api extends Ebizmarts_SagePaySuite_Model_
     public function info($vpsTxId) {
 
         $transaction = Mage::getModel('sagepayreporting/sagepayreporting')
-        				->getTransactionDetails(null, $vpsTxId);		
+        				->getTransactionDetails(null, $vpsTxId);
 
 		$result = array();
 
@@ -26,7 +26,7 @@ class Ebizmarts_SagePayReporting_Model_Api extends Ebizmarts_SagePaySuite_Model_
 		}else{
 			foreach($transaction->getData() as $key => $data) {
 				$result [$key]= (string)$data;
-			}			
+			}
 		}
 
         return $result;
@@ -40,15 +40,15 @@ class Ebizmarts_SagePayReporting_Model_Api extends Ebizmarts_SagePaySuite_Model_
      */
     public function fraud_detail($vpsTxId) {
 
-        $transaction = $this->info($vpsTxId);		
-        
+        $transaction = $this->info($vpsTxId);
+
         $breakdown = Mage::getModel('sagepayreporting/sagepayreporting');
         try {
         	$thirdmanId = $transaction['t3mid'];
 			$breakdown->getT3MDetail($thirdmanId);
         }catch(Exception $e){
         	$this->_fault('api_error', $e->getMessage());
-       	}    	
+       	}
 
 		$result = array();
 
