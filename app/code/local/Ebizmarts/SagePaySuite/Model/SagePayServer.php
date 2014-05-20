@@ -300,7 +300,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
         $confParam = (isset($adminParams['order']['send_confirmation'])) ? '&e=' . (int) $adminParams['order']['send_confirmation'] : '';
 
         if (isset($adminParams['order']['account']['email'])) {
-            $confParam .= '&l=' . $adminParams['order']['account']['email'];
+            $confParam .= '&l=' . urlencode($adminParams['order']['account']['email']);
         }
 
         if (isset($adminParams['order']['account']['group_id'])) {
@@ -404,6 +404,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
                 $data['Basket'] = $basket;
             }
         }
+
+        $data['Language'] = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
         $data['Website'] = Mage::app()->getStore()->getWebsite()->getName();
 
