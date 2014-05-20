@@ -201,6 +201,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
             }
         }
 
+        ksort($data);
+
         Sage_Log::log("User-Agent: " . Mage::helper('core/http')->getHttpUserAgent(false), null, 'SagePaySuite_REQUEST.log');
         Sage_Log::log(Mage::helper('sagepaysuite')->getUserAgent(), null, 'SagePaySuite_REQUEST.log');
         Sage_Log::log($data, null, 'SagePaySuite_REQUEST.log');
