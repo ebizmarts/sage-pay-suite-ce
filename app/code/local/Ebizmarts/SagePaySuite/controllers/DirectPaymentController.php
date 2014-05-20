@@ -137,7 +137,7 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
 
         $vendorTxCode = $this->getRequest()->getParam('v');
         $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                ->loadByVendorTxCode($vendorTxCode);
+                        ->loadByVendorTxCode($vendorTxCode);
 
         $emede = $transaction->getMd();
         $pares = $this->getRequest()->getPost('PaRes');
@@ -153,34 +153,32 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
 					<div style="background-image:url(' . $image . '); background-position: center center;background-repeat: no-repeat;height: 400px;">&nbsp;</div>';
         echo $this->__('<small>%s</small>', "Processing order, please stand by...  ");
 
-        /*flush();
-        ob_flush();*/
-
         $error = false;
         $quote = Mage::getSingleton('checkout/type_onepage')->getQuote();
 
         try {
 
             //Check cart health on callback.
-            if(Mage::helper('sagepaysuite/checkout')->cartExpire($quote)) {
+            if(1 === (int)Mage::getStoreConfig('payment/sagepaysuite/verify_cart_consistency')) {
+                if(Mage::helper('sagepaysuite/checkout')->cartExpire($quote)) {
 
-                Sage_Log::log("Transaction " . $transaction->getVendorTxCode() . " not completed, cart was modified while customer on 3D payment pages.", Zend_Log::CRIT, 'SagePaySuite_REQUEST.log');
+                    Sage_Log::log("Transaction " . $transaction->getVendorTxCode() . " not completed, cart was modified while customer on 3D payment pages.", Zend_Log::CRIT, 'SagePaySuite_REQUEST.log');
 
-                Mage::throwException($this->__('Your order could not be completed, please try again. Thanks.'));
+                    Mage::throwException($this->__('Your order could not be completed, please try again. Thanks.'));
 
+                }
             }
             //Check cart health on callback.
 
             if ($pares && $emede) {
                 Mage::getModel('sagepaysuite/sagePayDirectPro')->saveOrderAfter3dSecure($pares, $emede);
                 echo $this->__('<small>%s</small>', "Done. Redirecting...");
-                /*flush();
-                ob_flush();*/
-            } else {
+            }
+            else {
 
                 Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $quote, 'message' => $this->__("3D callback error.")));
 
-                Mage::throwException($this->__("Invalid request."));
+                Mage::throwException($this->__("Invalid request. PARes and MD are empty."));
             }
         } catch (Exception $e) {
 
@@ -198,7 +196,13 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
             $error = true;
             $message = $e->getMessage();
 
-            echo '<script type="text/javascript">
+            $layout = Mage::getModel('sagepaysuite/sagePayDirectPro')->getConfigData('threed_layout');
+            if($layout == 'redirect') {
+                Mage::getSingleton('checkout/session')->addError($message);
+                echo '<script type="text/javascript">window.location.href="' . Mage::getUrl('checkout/cart') . '"</script>';
+            }
+            else {
+                echo '<script type="text/javascript">
                     if((typeof window.parent.restoreOscLoad) != "undefined"){
                     window.parent.restoreOscLoad();
                     window.parent.notifyThreedError("' . $message . '");
@@ -206,11 +210,11 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
                     else {
                         alert("' . $message . '");
                     }
-                </script>
-				</body>
-			  </html>';
-            /*flush();
-            ob_flush();*/
+                </script>';
+            }
+
+            echo '</body></html>';
+
         }
 
         if (!$error) {
@@ -222,8 +226,6 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
 					(parent.location == window.location)? window.location.href="' . $successUrl . '" : window.parent.setLocation("' . $successUrl . '");
 				  </script>
 				  </body></html>';
-            /*flush();
-            ob_flush();*/
         }
     }
 
