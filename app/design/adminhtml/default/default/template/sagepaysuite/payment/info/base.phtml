@@ -97,6 +97,9 @@
 
     <li><strong><?php echo $this->__('Vendor TX Code'); ?></strong>: <?php echo $sagepay->getVendorTxCode(); ?></li>
     <li><strong><?php echo $this->__('VPSTxId'); ?></strong>: <?php echo $this->detailLink($sagepay->getVpsTxId()); ?></li>
+    <?php if($sagepay->getBankAuthCode()): ?>
+    <li><strong><?php echo $this->__('Bank Auth. Code'); ?></strong>: <?php echo $sagepay->getBankAuthCode(); ?></li>
+    <?php endif; ?>
     <?php
     	$td_status = $sagepay->getThreedSecureStatus();
     	if(!is_null($td_status)): ?>
