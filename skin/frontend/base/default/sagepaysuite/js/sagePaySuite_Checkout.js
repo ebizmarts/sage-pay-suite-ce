@@ -1,3 +1,6 @@
+;(function() {
+// application code
+})();
 notifyThreedError = function(msg){
     Control.Window.windows.each(function(w){
         if(w.container.visible()){
@@ -50,7 +53,7 @@ restoreOscLoad = function() {
 
     window._sagepayprocessingorder = false;
 
-    var loading_osc = $$('div.onestepcheckout-place-order-loading');
+    var loading_osc = $$('.onestepcheckout-place-order-loading');
     if(loading_osc.length){
         $('onestepcheckout-place-order').removeClassName('grey').addClassName('orange');
         $('onestepcheckout-place-order').removeAttribute('disabled');
@@ -195,6 +198,8 @@ getPaymentMethod: function(){
 
     var form = null;
 
+    //Fix this when using IE patch
+
     if($('multishipping-billing-form')){
         form = $('multishipping-billing-form');
     }else if(this.getConfig('osc')){
@@ -232,13 +237,13 @@ isDirectPaymentMethod: function(){
     return (this.getPaymentMethod() === this.directcode);
 },
 isSagePay: function(){
-    var isSagePay = false;
+    var isSagePayMethod = false;
     if( (this.getPaymentMethod() === this.formcode) || (this.getPaymentMethod() === this.directcode) ||
         (this.getPaymentMethod() === this.servercode) || (this.getPaymentMethod() === this.paypalcode) ) {
-        isSagePay = true;
+        isSagePayMethod = true;
     }
 
-    return isSagePay;
+    return isSagePayMethod;
 },
 growlError: function(msg){
     alert(msg);
@@ -577,6 +582,8 @@ reviewSave: function(transport){
                 });
             wm.container.down().insert(this.getServerSecuredImage());
             wm.open();
+            //scroll to top
+            scroll(0,0);
 
         }else if(wtype == 'incheckout') {
 
@@ -618,85 +625,93 @@ reviewSave: function(transport){
 
     }else if(this.isDirectPaymentMethod() && (typeof response.response_status != 'undefined') && response.response_status == 'threed'){
 
-        $('sagepaydirectpro-dummy-link').writeAttribute('href', response.redirect);
+        var threedLayout = SuiteConfig.getConfig('direct','threed_layout');
 
-        var lcontdtd = new Element('div',{
-            className: 'lcontainer'
-        });
-        var dtd = new Control.Modal('sagepaydirectpro-dummy-link',{
-            className: 'modal sagepaymodal',
-            closeOnClick: false,
-            insertRemoteContentAt: lcontdtd,
-            iframe: true,
-            height: SuiteConfig.getConfig('direct','threed_iframe_height'),
-            width: SuiteConfig.getConfig('direct','threed_iframe_width'),
-            fade: true,
-            afterOpen: function(){
-
-                if(true === Prototype.Browser.IE){
-                    var ie_version = parseFloat(navigator.appVersion.split("MSIE")[1]);
-                    if(ie_version<8){
-                        return;
-                    }
-                }
-
-                try{
-                    var daiv = this.container;
-
-                    if($$('.sagepaymodal').length > 1){
-                        $$('.sagepaymodal').each(function(elem){
-                            if(elem.visible()){
-                                daiv = elem;
-                                throw $break;
-                            }
-                        });
-                    }
-
-                    if(!this._mobile) {
-                        daiv.down().down('iframe').insert({
-                            before:new Element('div', {
-                                'id':'sage-pay-direct-ddada',
-                                'style':'background:#FFF'
-                            }).update(
-                                SuiteConfig.getConfig('direct','threed_after').toString() + SuiteConfig.getConfig('direct','threed_before').toString())
-                            });
-                    }
-
-                }catch(er){}
-
-                if(false === Prototype.Browser.IE) {
-                    if(!this._mobile) {
-                        daiv.down().down('iframe').setStyle({
-                            'height':(parseInt(daiv.down().getHeight())-60)+'px'
-                            });
-                        daiv.setStyle({
-                            'height':(parseInt(daiv.down().getHeight())+57)+'px'
-                            });
-                    }
-                }
-                else {
-                    daiv.down().down('iframe').setStyle({
-                        'height':(parseInt(daiv.down().getHeight())+116)+'px'
-                        });
-                }
-
-            },
-            afterClose: function(){
-                if($('sage-pay-direct-ddada')){
-                    $('sage-pay-direct-ddada').remove();
-                }
-                $('sagepaydirectpro-dummy-link').writeAttribute('href', '');
-            }
-        });
-
-        if(this._mobile) {
-            var offset_left = (Position.deltaX + Math.floor((document.viewport.getDimensions().width - parseInt(dtd.container.getDimensions().width)) / 2));
-            var ye          = (dtd.container.getDimensions().width <= document.viewport.getDimensions().width) ? ((offset_left != null && offset_left > 0) ? offset_left : 0) : 0;
-            dtd.options.position = [ye,0];
+        if(threedLayout == 'redirect') {
+            setLocation(response.redirect);
         }
+        else {
 
-        dtd.container.insert(lcontdtd);
-        dtd.open();
+            $('sagepaydirectpro-dummy-link').writeAttribute('href', response.redirect);
+
+            var lcontdtd = new Element('div',{
+                className: 'lcontainer'
+            });
+            var dtd = new Control.Modal('sagepaydirectpro-dummy-link',{
+                className: 'modal sagepaymodal',
+                closeOnClick: false,
+                insertRemoteContentAt: lcontdtd,
+                iframe: true,
+                height: SuiteConfig.getConfig('direct','threed_iframe_height'),
+                width: SuiteConfig.getConfig('direct','threed_iframe_width'),
+                fade: true,
+                afterOpen: function(){
+
+                    if(true === Prototype.Browser.IE){
+                        var ie_version = parseFloat(navigator.appVersion.split("MSIE")[1]);
+                        if(ie_version<8){
+                            return;
+                        }
+                    }
+
+                    try{
+                        var daiv = this.container;
+
+                        if($$('.sagepaymodal').length > 1){
+                            $$('.sagepaymodal').each(function(elem){
+                                if(elem.visible()){
+                                    daiv = elem;
+                                    throw $break;
+                                }
+                            });
+                        }
+
+                        if(!this._mobile) {
+                            daiv.down().down('iframe').insert({
+                                before:new Element('div', {
+                                    'id':'sage-pay-direct-ddada',
+                                    'style':'background:#FFF'
+                                }).update(
+                                        SuiteConfig.getConfig('direct','threed_after').toString() + SuiteConfig.getConfig('direct','threed_before').toString())
+                            });
+                        }
+
+                    }catch(er){}
+
+                    if(false === Prototype.Browser.IE) {
+                        if(!this._mobile) {
+                            daiv.down().down('iframe').setStyle({
+                                'height':(parseInt(daiv.down().getHeight())-60)+'px'
+                            });
+                            daiv.setStyle({
+                                'height':(parseInt(daiv.down().getHeight())+57)+'px'
+                            });
+                        }
+                    }
+                    else {
+                        daiv.down().down('iframe').setStyle({
+                            'height':(parseInt(daiv.down().getHeight())+116)+'px'
+                        });
+                    }
+
+                },
+                afterClose: function(){
+                    if($('sage-pay-direct-ddada')){
+                        $('sage-pay-direct-ddada').remove();
+                    }
+                    $('sagepaydirectpro-dummy-link').writeAttribute('href', '');
+                }
+            });
+
+            if(this._mobile) {
+                var offset_left = (Position.deltaX + Math.floor((document.viewport.getDimensions().width - parseInt(dtd.container.getDimensions().width)) / 2));
+                var ye          = (dtd.container.getDimensions().width <= document.viewport.getDimensions().width) ? ((offset_left != null && offset_left > 0) ? offset_left : 0) : 0;
+                dtd.options.position = [ye,0];
+            }
+
+            dtd.container.insert(lcontdtd);
+            dtd.open();
+        }
 
     }else if(this.isDirectPaymentMethod()){
         new Ajax.Request(SuiteConfig.getConfig('direct','sgps_registertrn_url'),{
