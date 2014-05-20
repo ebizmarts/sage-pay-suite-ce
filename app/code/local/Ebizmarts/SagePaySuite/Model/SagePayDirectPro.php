@@ -92,6 +92,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     ->save();
 
             Mage::throwException($_res['StatusDetail']);
+
         }
 
         Sage_Log::log($_res);
@@ -387,6 +388,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     ->setStatusDetail($result->getResponseStatusDetail())
                     ->setVpsTxId($result->getVpsTxId())
                     ->setSecurityKey($result->getSecurityKey())
+                    ->setPares(null)//Resetting data so we dont get "5036 : transaction not found" error for repeated calls to sagepay on 3d callback.
+                    ->setMd(null)//Resetting data so we dont get "5036 : transaction not found" error for repeated calls to sagepay on 3d callback.
+                    ->setPareq(null)
                     ->save();
 
             if ($result->getResponseStatusDetail()) {
@@ -610,7 +614,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 ->setVendor(($payment->getRequestVendor() ? $payment->getRequestVendor() : $this->getConfigData('vendor')))
                 ->setVendorTxCode($vendorTxCode)
                 ->setDescription($this->ss(($payment->getCcOwner() ? $payment->getCcOwner() : '.'), 100))
-                ->setClientIPAddress($this->getClientIp());
+                ->setClientIPAddress($this->getClientIp()); //@TODO: Support IPv6 addresses.
 
         $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote());
         if(!empty($basket)) {
@@ -1123,7 +1127,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
      * @return array
      */
     public function getConfigSafeFields() {
-        return array('active', 'mode', 'title', 'useccv', 'threed_iframe_height', 'threed_iframe_width');
+        return array('active', 'mode', 'title', 'useccv', 'threed_iframe_height', 'threed_iframe_width', 'threed_layout');
     }
 
 }
