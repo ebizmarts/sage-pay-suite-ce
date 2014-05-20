@@ -324,7 +324,7 @@
             	<vendor>testebizmarts</vendor>
                 <referrer_id><![CDATA[01bf51f9-0dcd-49dd-a07a-3b1f918c77d7]]></referrer_id>
                 <license_key><![CDATA[[Obtain from Ebizmarts]]]></license_key>
-                <connection_timeout>90</connection_timeout>
+                <connection_timeout>30</connection_timeout>
                 <max_token_card>6</max_token_card>
                 <logs>0</logs>
                 <profile_request>0</profile_request>
@@ -345,7 +345,8 @@
                 <sync_mode>sync</sync_mode>
                 <sagefifty_basket>0</sagefifty_basket>
                 <ignore_address_validation>1</ignore_address_validation>
-                <send_payment_failed_emails>1</send_payment_failed_emails>
+                <send_payment_failed_emails>0</send_payment_failed_emails>
+                <verify_cart_consistency>0</verify_cart_consistency>
             </sagepaysuite>
             <sagepaydirectpro>
                 <active>0</active>
@@ -370,6 +371,7 @@
                 <timeout_orders>0</timeout_orders>
                 <threed_iframe_height>500</threed_iframe_height>
                 <threed_iframe_width>600</threed_iframe_width>
+                <threed_layout>modal</threed_layout>
                 <avscv2>0</avscv2>
             </sagepaydirectpro>
             <sagepaydirectpro_moto>
