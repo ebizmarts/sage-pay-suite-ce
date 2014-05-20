@@ -150,24 +150,25 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
             $trn->save();
 
             //Check cart health on callback.
-            if(Mage::helper('sagepaysuite/checkout')->cartExpire($this->getOnepage()->getQuote())) {
+            if(1 === (int)Mage::getStoreConfig('payment/sagepaysuite/verify_cart_consistency')) {
+                if(Mage::helper('sagepaysuite/checkout')->cartExpire($this->getOnepage()->getQuote())) {
 
-                try {
+                    try {
 
-                    Mage::helper('sagepaysuite')->voidTransaction($trn->getVendorTxCode(), 'sagepayform');
+                        Mage::helper('sagepaysuite')->voidTransaction($trn->getVendorTxCode(), 'sagepayform');
 
-                    Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " cancelled, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
+                        Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " cancelled, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
 
-                    Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed, please try again. Thanks.'));
+                        Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed, please try again. Thanks.'));
 
-                }catch(Exception $ex) {
-                    Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " could not be cancelled and order was not created, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
-                    Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed but we could not cancel the payment, please contact us and mention this transaction reference number: %s. Thanks.', $db['vendor_tx_code']));
+                    }catch(Exception $ex) {
+                        Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " could not be cancelled and order was not created, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
+                        Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed but we could not cancel the payment, please contact us and mention this transaction reference number: %s. Thanks.', $db['vendor_tx_code']));
+                    }
+
+                    $this->_redirect('checkout/cart');
+                    return;
                 }
-
-                $this->_redirect('checkout/cart');
-                return;
-
             }
             //Check cart health on callback.
 
