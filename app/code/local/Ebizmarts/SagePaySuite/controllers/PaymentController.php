@@ -221,6 +221,42 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
         Mage::dispatchEvent('checkout_controller_onepage_save_shipping_method', array('request' => $this->getRequest(), 'quote' => $this->getOnepage()->getQuote()));
     }
 
+    public function _IWD_OPCSaveBilling(){
+
+        $billing_data = $this->getRequest()->getPost('billing', array());
+
+        if(!$this->getOnepage()->getQuote()->getBillingAddress()->getTelephone() || $this->getOnepage()->getQuote()->getBillingAddress()->getTelephone() == ""){
+            $this->getOnepage()->getQuote()->getBillingAddress()->setTelephone($billing_data['telephone']);
+        }
+
+        if(!$this->getOnepage()->getQuote()->getShippingAddress()->getTelephone() || $this->getOnepage()->getQuote()->getShippingAddress()->getTelephone() == ""){
+            $this->getOnepage()->getQuote()->getShippingAddress()->setTelephone($billing_data['telephone']);
+        }
+
+        if(!$this->getOnepage()->getQuote()->getShippingAddress()->getCity() || $this->getOnepage()->getQuote()->getShippingAddress()->getCity() == ""){
+            $this->getOnepage()->getQuote()->getShippingAddress()->setCity($billing_data['city']);
+        }
+
+        if(!$this->getOnepage()->getQuote()->getShippingAddress()->getStreet(1) || $this->getOnepage()->getQuote()->getShippingAddress()->getStreet(1) == ""){
+            $this->getOnepage()->getQuote()->getShippingAddress()->setStreet($billing_data['street'][0]. "\n" . $billing_data['street'][1]);
+        }
+
+        $this->getOnepage()->getQuote()->setData('customer_email', $billing_data['email']);
+        $this->getOnepage()->getQuote()->setData('customer_firstname', $billing_data['firstname']);
+        $this->getOnepage()->getQuote()->setData('customer_lastname', $billing_data['lastname']);
+
+        if (!Mage::helper('customer')->isLoggedIn()) {
+            //$emailExists = Mage::helper('sagepaysuite')->existsCustomerForEmail($billing_data['email']);
+
+            if (!empty($billing_data['customer_password']) && !empty($billing_data['confirm_password']) && ($billing_data['customer_password'] == $billing_data['confirm_password'])) {
+                $password = $billing_data['customer_password'];
+                $this->getOnepage()->getQuote()->setCheckoutMethod('register');
+                $this->getOnepage()->getQuote()->getCustomer()->setData('password', $password);
+                $this->getOnepage()->getQuote()->setData('password_hash', Mage::getModel('customer/customer')->encryptPassword($password));
+            }
+        }
+    }
+
     public function sanitize_string(&$val) {
         $val = filter_var($val, FILTER_SANITIZE_STRING);
     }
@@ -270,7 +306,14 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                 }
             }
             # Validate checkout Terms and Conditions
-        } else {
+
+            //Fix issue #9595957091315
+            if(!empty($paymentData) && !isset($paymentData['sagepay_token_cc_id'])) {
+                $this->getSageSuiteSession()->setLastSavedTokenccid(null);
+            }
+
+        }
+        else {
 
             /**
              * OSC
@@ -280,6 +323,16 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             }
             /**
              * OSC
+             */
+
+            /**
+             * IWD OPC
+             */
+            if (FALSE !== Mage::getConfig()->getNode('modules/IWD_OnepageCheckout')) {
+                $this->_IWD_OPCSaveBilling();
+            }
+            /**
+             * IWD OPC
              */
         }
 
