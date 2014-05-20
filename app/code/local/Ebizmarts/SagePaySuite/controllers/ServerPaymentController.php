@@ -267,21 +267,23 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         }
 
         //Check cart health on callback.
-        if(Mage::helper('sagepaysuite/checkout')->cartExpire($this->getOnepage()->getQuote())) {
+        if(1 === (int)Mage::getStoreConfig('payment/sagepaysuite/verify_cart_consistency')) {
+            if(Mage::helper('sagepaysuite/checkout')->cartExpire($this->getOnepage()->getQuote())) {
 
-            try {
+                try {
 
-                Mage::helper('sagepaysuite')->voidTransaction($dbtrn->getVendorTxCode(), 'sagepayserver');
+                    Mage::helper('sagepaysuite')->voidTransaction($dbtrn->getVendorTxCode(), 'sagepayserver');
 
-                Sage_Log::log("Transaction " . $dbtrn->getVendorTxCode() . " cancelled, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_POST_Requests.log');
+                    Sage_Log::log("Transaction " . $dbtrn->getVendorTxCode() . " cancelled, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_POST_Requests.log');
 
-            }catch(Exception $ex) {
-                Sage_Log::log("Transaction " . $dbtrn->getVendorTxCode() . " could not be cancelled and order was not created, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_POST_Requests.log');
+                }catch(Exception $ex) {
+                    Sage_Log::log("Transaction " . $dbtrn->getVendorTxCode() . " could not be cancelled and order was not created, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_POST_Requests.log');
+                }
+
+                $this->_returnInvalid('Your order could not be completed, please try again. Thanks.');
+                return;
+
             }
-
-            $this->_returnInvalid('Your order could not be completed, please try again. Thanks.');
-            return;
-
         }
         //Check cart health on callback.
 
