@@ -66,7 +66,6 @@ var varienGridAction = {
             return;
         }
 
-
         if(config.popup) {
 
         	if(config.modal){
