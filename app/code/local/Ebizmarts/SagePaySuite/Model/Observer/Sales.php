@@ -167,6 +167,21 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
         $payment = $order->getPayment();
 
+        $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($payment->getMethod());
+
+        /**
+         * Check if charged in Sage Pay and order Total amounts match.
+         */
+        if($isSage) {
+            $dbtrn = $this->_getTransactionsModel()->loadByParent($order->getId());
+            $amountsMatch = Mage::getModel('sagepaysuite/api_payment')
+                            ->floatsEqual($order->getGrandTotal(), $dbtrn->getTrnAmount(), 0.01);
+
+            if($dbtrn->getId() and (false === $amountsMatch)) {
+                Mage::throwException("Amounts do not match!\n" . $order->getGrandTotal() . "\n" . $dbtrn->getTrnAmount());
+            }
+        }
+
         /**
          * Add OSC comments to ORDER
          */
