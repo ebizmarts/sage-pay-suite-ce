@@ -347,6 +347,8 @@
 "0000 : The Authorisation was Successful.","0000 : The Authorisation was Successful."
 "2000 : The Authorisation was Declined by the bank.","2000 : The Authorisation was Declined by the bank."
 "2001 : The Authorisation was Rejected by the vendor rule-base.","2001 : The Authorisation was Rejected by the vendor rule-base."
+"REJECTED. %s","%s"
+"2001 : The Authorisation was Rejected by the vendor rule-base.","The billing address is incorrect."
 "2002 : The Authorisation timed out.","2002 : The Authorisation timed out."
 "2003 : An ERROR has occurred on the Sage Pay System.","2003 : An ERROR has occurred on the Sage Pay System."
 "2004 : The Release was Successful.","2004 : The Release was Successful."

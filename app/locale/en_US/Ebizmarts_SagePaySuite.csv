@@ -676,3 +676,6 @@
 "The module will not be able to receive payments unless you match <i>System > Configuration > GENERAL > Web > Session Validation Settings</i> with <a href=""%s"" target=""_blank"">this image</a>","The module will not be able to receive payments unless you match <i>System > Configuration > GENERAL > Web > Session Validation Settings</i> with <a href=""%s"" target=""_blank"">this image</a>"
 "Email Message","Email Message"
 "A message to the customer which is inserted into the successful transaction emails only. If provided this message is included toward the top of the customer confirmation emails.","A message to the customer which is inserted into the successful transaction emails only. If provided this message is included toward the top of the customer confirmation emails."
+"Enable Quick Checkout Button", "Enable Quick Checkout Button"
+"Enable on One Page Checkout","Enable on One Page Checkout"
+"Enable both","Enable both"
