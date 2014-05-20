@@ -98,14 +98,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
             $data['Currency'] = $quoteObj->getBaseCurrencyCode();
         }
 
-        if ((string) $this->getConfigData('trncurrency') == 'store') {
-            $data['Amount'] = $this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode());
-            $data['Currency'] = $quoteObj->getQuoteCurrencyCode();
-        } else {
-            $data['Amount'] = $this->formatAmount($quoteObj->getBaseGrandTotal(), $quoteObj->getBaseCurrencyCode());
-            $data['Currency'] = $quoteObj->getBaseCurrencyCode();
-        }
-
         $data['Description'] = $this->cleanInput('product purchase', 'Text');
 
         $data['SuccessURL'] = Mage::getUrl('sgps/formPayment/success', array(
