@@ -487,7 +487,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 ->setVendor($this->getConfigData('vendor'))
                 ->setVendorTxCode($vendorTxCode);
 
-        $request->setClientIPAddress($this->getClientIp());
+        $request->setClientIPAddress($this->getClientIp()); //@TODO: Support IPv6 addresses.
 
         if ($payment->getIntegra()) { //Server
 
@@ -495,7 +495,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 $confParam = (isset($adminParams['order']['send_confirmation'])) ? '&e=' . (int) $adminParams['order']['send_confirmation'] : '';
 
                 if (isset($adminParams['order']['account']['email'])) {
-                    $confParam .= '&l=' . $adminParams['order']['account']['email'];
+                    $confParam .= '&l=' . urlencode($adminParams['order']['account']['email']);
                 }
 
                 if (isset($adminParams['order']['account']['group_id'])) {
@@ -659,6 +659,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 return false;
             }
 
+            Mage::unregister('current_invoice');
+
             Mage::register('current_invoice', $invoice);
 
             $invoice->setRequestedCaptureCase($captureMode);
@@ -703,7 +705,13 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
     }
 
     public function getClientIp() {
-        return Mage::helper('core/http')->getRemoteAddr();
+        $remote_ip = Mage::helper('core/http')->getRemoteAddr();
+        //check if more than one IP:
+        $all_ips = explode(", ", $remote_ip);
+        if(count($all_ips)>1){
+            $remote_ip = $all_ips[count($all_ips)-1];
+        }
+        return $remote_ip;
     }
 
     /**
@@ -1235,6 +1243,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         self::log($rawresponse, null, 'SagePaySuite_RawResponse.log');
+        self::log(curl_getinfo($curlSession, CURLINFO_HTTP_CODE), Zend_Log::ALERT, 'SagePaySuite_REQUEST.log');
+        self::log(curl_getinfo($curlSession, CURLINFO_EFFECTIVE_URL), Zend_Log::ALERT, 'SagePaySuite_REQUEST.log');
 
         //Split response into name=value pairs
         $response = explode(chr(10), $rawresponse);
@@ -1426,8 +1436,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 }
 
                 //[SKU]|Name
-                $line = str_replace(':', '-', '[' . $this->_cleanString($item->getSku()) . ']|' . $this->_cleanString($item->getName()))
-                        . $this->_cleanString($_options) . self::BASKET_SEP;
+                $line = str_replace(':', '-', '[' . $this->_cleanString($item->getSku()) . ']|' . $item->getName()) . $this->_cleanString($_options) . self::BASKET_SEP;
 
                 //Quantity
                 $line .= ( $item->getQty() * 1) . self::BASKET_SEP;
@@ -1498,7 +1507,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }*/
 
         $deliveryName = $shippingAddress->getShippingDescription() ? $shippingAddress->getShippingDescription() : 'Delivery';
-        $delivery = $this->_cleanString($deliveryName) . self::BASKET_SEP . '1' . self::BASKET_SEP . $deliveryValue . self::BASKET_SEP
+        $delivery = $deliveryName . self::BASKET_SEP . '1' . self::BASKET_SEP . $deliveryValue . self::BASKET_SEP
                     . $deliveryTax . self::BASKET_SEP . $deliveryAmount . self::BASKET_SEP . $deliveryAmount;
 
         if (strlen($basket . $delivery) < 7498) {
