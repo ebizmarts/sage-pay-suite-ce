@@ -85,52 +85,59 @@
         </reference>
     </sagepaysuite_card_index>
 
-	<customer_account>
-	    <reference name="customer_account_navigation">
-	        <action method="addLink" ifconfig="payment/sagepaysuite/token_integration" translate="label" module="sagepaysuite">
-	        	<name>sagepaycards</name>
-	        	<path>sgps/card/</path>
-	        	<label>Sage Pay - Saved Credit Cards</label>
-	        </action>
-	    </reference>
-	</customer_account>
-	<checkout_multishipping_overview>
-	<reference name="head">
-	  <action method="addItem">
-       	<type>skin_css</type>
-       	<name>sagepaysuite/css/growler/growler.css</name>
-      </action>
-	  <action method="addItem">
-       	<type>skin_css</type>
-       	<name>sagepaysuite/css/sagePaySuite_Checkout.css</name>
-      </action>
-	  <action method="addItem">
-       	<type>skin_js</type>
-       	<name>sagepaysuite/js/growler/growler.js</name>
-      </action>
-			  <action method="addItem">
-		       	<type>js</type>
-		       	<name>sagepaysuite/direct.js</name>
-		      </action>
-	  <action method="addItem">
-       	<type>js</type>
-       	<name>sagepaysuite/common.js</name>
-      </action>
-	  <action method="addItem">
-       	<type>skin_js</type>
-       	<name>sagepaysuite/sagePaySuite.js</name>
-      </action>
-	  <action method="addItem">
-       	<type>skin_js</type>
-       	<name>sagepaysuite/js/sagePaySuite_Checkout.js</name>
-      </action>
-	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/livepipe.js</name></action>
-	  <action method="addItem"><type>js</type><name>sagepaysuite/livepipe/window.js</name></action>
-  	</reference>
-  	<reference name="content">
-    	<block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
-  	</reference>
-	</checkout_multishipping_overview>
+    <customer_account>
+        <reference name="customer_account_navigation">
+            <action method="addLink" ifconfig="payment/sagepaysuite/token_integration" translate="label" module="sagepaysuite">
+                <name>sagepaycards</name>
+                <path>sgps/card/</path>
+                <label>Sage Pay - Saved Credit Cards</label>
+            </action>
+        </reference>
+    </customer_account>
+
+    <checkout_multishipping_overview>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>sagepaysuite/css/growler/growler.css</name>
+            </action>
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>sagepaysuite/css/sagePaySuite_Checkout.css</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>sagepaysuite/js/growler/growler.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/direct.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/common.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>sagepaysuite/sagePaySuite.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>sagepaysuite/js/sagePaySuite_Checkout.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/livepipe/livepipe.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>sagepaysuite/livepipe/window.js</name>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+        </reference>
+    </checkout_multishipping_overview>
 
     <checkout_multishipping_billing>
         <reference name="head">
