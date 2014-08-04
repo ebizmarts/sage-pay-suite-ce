@@ -59,7 +59,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
         $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($order->getPayment()->getMethod());
 
-        if (!$order->getId() || $isSage === false) {
+        if (!$order->getId() || $isSage === false || $order->getIsRecurring()) {
             return $o;
         }
 
@@ -158,9 +158,9 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         if ($this->getSession()->getInvoicePayment() || (!is_null($reg) && $tran->getTxType() == 'PAYMENT')) {
             //Commented because casues invoices not to be generated on MAC
             //$this->getSession()->unsetData('invoice_payment');
-            Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
+            Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
         }
-	}
+    }
 
     public function saveBefore($o) {
         $order = $o->getEvent()->getOrder();
