@@ -137,7 +137,7 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
 
         $vendorTxCode = $this->getRequest()->getParam('v');
         $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                        ->loadByVendorTxCode($vendorTxCode);
+                ->loadByVendorTxCode($vendorTxCode);
 
         $emede = $transaction->getMd();
         $pares = $this->getRequest()->getPost('PaRes');
