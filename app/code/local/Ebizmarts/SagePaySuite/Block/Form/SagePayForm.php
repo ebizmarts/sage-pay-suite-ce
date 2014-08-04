@@ -8,11 +8,9 @@
  * @author     Ebizmarts <info@ebizmarts.com>
  */
 
-class Ebizmarts_SagePaySuite_Block_Form_SagePayForm extends Ebizmarts_SagePaySuite_Block_Form_SagePayToken
-{
+class Ebizmarts_SagePaySuite_Block_Form_SagePayForm extends Ebizmarts_SagePaySuite_Block_Form_SagePayToken {
 
-    protected function _construct()
-    {
+    protected function _construct() {
         parent::_construct();
         $this->setTemplate('sagepaysuite/payment/form/sagePayForm.phtml');
     }
