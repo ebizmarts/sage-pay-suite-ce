@@ -104,11 +104,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
                     '_secure' => true,
                     '_nosid' => true,
                     'vtxc' => $data['VendorTxCode'],
+                    'utm_nooverride' => 1
                 ));
         $data['FailureURL'] = Mage::getUrl('sgps/formPayment/failure', array(
                     '_secure' => true,
                     '_nosid' => true,
                     'vtxc' => $data['VendorTxCode'],
+                    'utm_nooverride' => 1
                 ));
 
         $data['BillingSurname']    = $this->ss($billing->getLastname(), 20);
