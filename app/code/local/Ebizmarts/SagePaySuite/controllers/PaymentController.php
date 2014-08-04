@@ -329,6 +329,20 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
              * IWD OPC
              */
             if (FALSE !== Mage::getConfig()->getNode('modules/IWD_OnepageCheckout')) {
+
+                # Validate checkout Terms and Conditions
+                $requiredAgreements = Mage::helper('checkout')->getRequiredAgreementIds();
+
+                if ($requiredAgreements) {
+                    $postedAgreements = array_keys($this->getRequest()->getPost('agreement', array()));
+                    if ($diff = array_diff($requiredAgreements, $postedAgreements)) {
+                        $result['success'] = false;
+                        $result['response_status'] = 'ERROR';
+                        $result['response_status_detail'] = $this->__('Please agree to all the terms and conditions before placing the order.');
+                        $this->getResponse()->setBody(Zend_Json::encode($result));
+                        return;
+                    }
+                }
                 $this->_IWD_OPCSaveBilling();
             }
             /**
