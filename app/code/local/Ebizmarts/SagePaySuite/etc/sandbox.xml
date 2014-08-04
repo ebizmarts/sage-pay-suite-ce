@@ -22,6 +22,11 @@
 			<ccn>5404000000000001</ccn>
 			<cvv>123</cvv>
 		</mastercard>
+		<mastercard_debit>
+			<code>MCDEBIT</code>
+			<ccn>5573470000000001</ccn>
+			<cvv>123</cvv>
+		</mastercard_debit>
 		<maestro>
 			<code>MAESTRO</code>
 			<ccn>5641820000000005</ccn>
