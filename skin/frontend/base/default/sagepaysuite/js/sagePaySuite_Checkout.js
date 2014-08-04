@@ -41,11 +41,6 @@ setOscLoad = function() {
     if(typeof OPC != "undefined") {
         checkout.setLoadWaiting(true);
     }
-    //var oscButton = $('onestepcheckout-place-order');
-    //if(oscButton) {
-    //    //transport.element().removeClassName('grey').addClassName('orange');
-    //    $$('div.onestepcheckout-place-order-loading').invoke('hide');
-    //}
 
 }
 
@@ -96,18 +91,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             this.getConfig('review').onSave = this.reviewSave.bindAsEventListener(this);
         }else if(this.getConfig('osc')){
 
-//            if("BUTTON" == window._sagepayonepageTriggerId.tagName) {
-//                var oncl = window._sagepayonepageTriggerId.readAttribute("onclick");
-//
-//                if(null == oncl.match(/void/gi)) {
-//                    window._sagepayonepageTriggerId.writeAttribute("onclick", "$('"+ window._sagepayonepageFormId +"').submit();");
-//                    //if("submit" == window._sagepayonepageTriggerId.readAttribute("type")) {
-//                        //window._sagepayonepageTriggerId.writeAttribute("onclick", "return false;");
-//                    //    window._sagepayonepageTriggerId.writeAttribute("type", "button");
-//                    //}
-//
-//                }
-//            }
 
             //IWD_OnePage
             if("undefined" != (typeof OPC)) {
@@ -197,8 +180,6 @@ getShippingMethodSubmit: function(){
 getPaymentMethod: function(){
 
     var form = null;
-
-    //Fix this when using IE patch
 
     if($('multishipping-billing-form')){
         form = $('multishipping-billing-form');
@@ -306,7 +287,7 @@ setShippingMethod: function(){
         alert(ser);
     }
 },
-setPaymentMethod: function(modcompat){
+setPaymentMethod: function(modcompat) {
 
     if(this.getConfig('review')){
         if(!this.isSagePay()) {
@@ -448,7 +429,6 @@ reviewSave: function(transport){
             //}
             var slPayM = this.getPaymentMethod();
 
-
             if(slPayM == this.servercode || slPayM == this.directcode){
                 new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_saveorder_url'),{
                     method:"post",
@@ -540,7 +520,12 @@ reviewSave: function(transport){
         return;
     }
 
-    if(this.isServerPaymentMethod()){
+    if(this.isServerPaymentMethod()) {
+
+        if(this._mobile) {
+            setLocation(response.redirect);
+            return;
+        }
 
         $('sagepayserver-dummy-link').writeAttribute('href', response.redirect);
 
@@ -627,8 +612,9 @@ reviewSave: function(transport){
 
         var threedLayout = SuiteConfig.getConfig('direct','threed_layout');
 
-        if(threedLayout == 'redirect') {
+        if(threedLayout == 'redirect' || this._mobile) {
             setLocation(response.redirect);
+            return;
         }
         else {
 
@@ -743,7 +729,7 @@ reviewSave: function(transport){
 }
 
 try{
-    Event.observe(window,"load",function(){
+    Event.observe(window,"load",function() {
 
         getOneStepCheckoutId();
 
@@ -972,6 +958,7 @@ Validation.addAllThese([
             var ccTypeRegExp = {
                 'VISA': new RegExp('^4[0-9]{12}([0-9]{3})?$'),
                 'MC': new RegExp('^5[1-5][0-9]{14}$'),
+                'MCDEBIT': new RegExp('(?:516730|516979|517000|517049|535110|535309|535420|535819|537210|537609|557347|557496|557498|557547))'),
                 'AMEX': new RegExp('^3[47][0-9]{13}$')
             };
 
