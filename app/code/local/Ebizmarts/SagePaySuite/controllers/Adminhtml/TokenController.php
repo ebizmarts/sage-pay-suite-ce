@@ -67,11 +67,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_TokenController extends Mage_Adminhtml_Co
 
 	  $response = '';
 
-	   if($post['Status'] == 'OK'){
+	   if($post['Status'] == 'OK') {
 
 		 $post['protocol'] = 'server';
 
-	     $_save = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')
+	     Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')
 	     ->setToken($post['Token'])
 	     ->setStatus($post['Status'])
 	     ->setCardType($post['CardType'])
@@ -80,13 +80,14 @@ class Ebizmarts_SagePaySuite_Adminhtml_TokenController extends Mage_Adminhtml_Co
 	     ->setProtocol($post['protocol'])
 	     ->setCustomerId($this->getRequest()->getParam('cid'))
 	     ->setLastFour($post['Last4Digits'])
+         ->setVendor(Mage::getModel('sagepaysuite/sagePayToken')->getConfigData('vendor'))
 	     ->save();
 
 	     $response .= 'Status=OK' . $this->_eoln;
 	     $response .= 'RedirectURL=' . Mage::helper('adminhtml')->getUrl('sgpsSecure/adminhtml_token/registerSuccess') . $this->_eoln;
          $response .= 'StatusDetail=Card successfully registered.' . $this->_eoln;
 
-	   }else if($post['Status'] == 'ABORT'){
+	   }else if($post['Status'] == 'ABORT') {
 
 			$response .= 'Status=OK' . $this->_eoln;
 	     	$response .= 'RedirectURL=' . Mage::helper('adminhtml')->getUrl('sgpsSecure/adminhtml_token/registerAbort') . $this->_eoln;
