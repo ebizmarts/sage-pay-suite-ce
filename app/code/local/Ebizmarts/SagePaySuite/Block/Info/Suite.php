@@ -21,11 +21,11 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
     protected function _construct() {
         parent::_construct();
 
-		if(Mage::getSingleton('core/translate')->getTranslateInline() === false && Mage::app()->getStore()->isAdmin()){ //For Emails
-			$this->setTemplate('sagepaysuite/payment/info/base-basic.phtml');
-		}else{
-			$this->setTemplate('sagepaysuite/payment/info/base.phtml');
-		}
+        if (Mage::getSingleton('core/translate')->getTranslateInline() === false && Mage::app()->getStore()->isAdmin()) { //For Emails
+            $this->setTemplate('sagepaysuite/payment/info/base-basic.phtml');
+        } else {
+            $this->setTemplate('sagepaysuite/payment/info/base.phtml');
+        }
     }
 
     public function getOnMemo() {
@@ -71,80 +71,71 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
                 return $types[$ccType];
             }
 
-            $url = $this->helper('sagepaysuite')->getCcImage($types[$ccType]);
-            $name = '<img alt="' . $types[$ccType] . '" title="' . $types[$ccType] . '" src="' . $this->helper('sagepaysuite')->getCcImage($types[$ccType]) . '"/>';
+            $name = '<img width="51" height="32" alt="' . $types[$ccType] . '" title="' . $types[$ccType] . '" src="' . $this->helper('sagepaysuite')->getCcImage($types[$ccType]) . '"/>';
 
             return $name;
         }
         return (empty($ccType)) ? Mage::helper('payment')->__('N/A') : $ccType;
     }
 
-	public function getBasicRealTitle()
-	{
-		$title = $this->getMethod()->getTitle();
+    public function getBasicRealTitle() {
+        $title = $this->getMethod()->getTitle();
 
         return $title;
-	}
+    }
 
-	protected function _getDetailUrl($vpsTxId)
-	{
-		return $this->helper('adminhtml')->getUrl('sagepayreporting/adminhtml_sagepayreporting/transactionDetailModal/', array('vpstxid'=>$vpsTxId));
-	}
+    protected function _getDetailUrl($vpsTxId) {
+        return $this->helper('adminhtml')->getUrl('sagepayreporting/adminhtml_sagepayreporting/transactionDetailModal/', array('vpstxid' => $vpsTxId));
+    }
 
-	public function getStoppedLabel($trn)
-	{
-		$txt = '-';
+    public function getStoppedLabel($trn) {
+        $txt = '-';
 
-		if($trn->getVoided()){
-			$txt = $this->__('Transaction is VOIDED.');
-		}
+        if($trn->getVoided()){
+            $txt = $this->__('Transaction is VOIDED.');
+        }
 
-		return $txt;
-	}
+        return $txt;
+    }
 
-	public function detailLink($vpsTxId)
-	{
-		$title = $this->__('Click here to view Transaction detail.');
-		return sprintf('<a title="%s" id="%s" class="trn-detail-modal" href="%s">%s</a>', $title, str_replace(array('{','}'), '', $vpsTxId), $this->_getDetailUrl($vpsTxId), $vpsTxId);
-	}
+    public function detailLink($vpsTxId) {
+        $title = $this->__('Click here to view Transaction detail.');
+        return sprintf('<a title="%s" id="%s" class="trn-detail-modal" href="%s">%s</a>', $title, str_replace(array('{', '}'), '', $vpsTxId), $this->_getDetailUrl($vpsTxId), $vpsTxId);
+    }
 
-	public function getParentOrderLink($sagepay)
-	{
-		$lnk = '';
+    public function getParentOrderLink($sagepay) {
+        $lnk = '';
 
-		if($sagepay->getParentTrnId()){
-			$parent = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')->load($sagepay->getParentTrnId());
-			if($parent->getOrderId()){
-				$order = Mage::getModel('sales/order')->load($parent->getOrderId());
+        if ($sagepay->getParentTrnId()) {
+            $parent = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')->load($sagepay->getParentTrnId());
+            if ($parent->getOrderId()) {
+                $order = Mage::getModel('sales/order')->load($parent->getOrderId());
 
-				$lnk .= '<a href="' . $this->getUrl('*/sales_order/view', array('order_id' => $order->getId())) . '">#' . $order->getIncrementId(). '</a>';
+                $lnk .= '<a href="' . $this->getUrl('*/sales_order/view', array('order_id' => $order->getId())) . '">#' . $order->getIncrementId() . '</a>';
+            }
+        }
 
-			}
-		}
-
-		return $lnk;
-	}
+        return $lnk;
+    }
 
     public function cs($str) {
         return Mage::helper('sagepaysuite')->cs($str);
     }
 
-    public function toPdf()
-    {
+    public function toPdf() {
         $this->setTemplate('sagepaysuite/payment/info/pdf/base-basic.phtml');
         return $this->toHtml();
     }
 
-	public function getThirdmanBreakdown($thirdmanId)
-	{
-		try{
-			$breakdown = Mage::getModel('sagepayreporting/sagepayreporting')
-				  ->getT3MDetail($thirdmanId);
-		}catch(Exception $e){
-			$breakdown = null;
-			Mage::logException($e);
-		}
-		return $breakdown;
-	}
+    public function getThirdmanBreakdown($thirdmanId) {
+        try {
+            $breakdown = Mage::getModel('sagepayreporting/sagepayreporting')
+                    ->getT3MDetail($thirdmanId);
+        } catch (Exception $e) {
+            $breakdown = null;
+            Mage::logException($e);
+        }
+        return $breakdown;
+    }
 
 }
