@@ -1533,7 +1533,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         //Split into rows
         $rows = count(array_chunk($items, 6));
         if ($rows != $numberOfLines) {
-            $basket = str_replace($numberOfLines, $rows, $basket);
+            $basket[0] = $rows;
         }
         /**
          * Verify that items count is correct
@@ -1550,6 +1550,17 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
      * @return string
      */
     public function getBasketXml($quote) {
+
+                /* @TODO
+                 *                 //Options
+                $options = $this->_getProductOptions($item);
+                $_options = '';
+                if (count($options) > 0) {
+                    foreach ($options as $opt) {
+                        $_options .= $opt['label'] . '-' . $opt['value'] . '.';
+                    }
+                    $_options = '_' . substr($_options, 0, -1) . '_';
+                }*/
 
         $basket = new Ebizmarts_Simplexml_Element('<basket />');
 
@@ -1826,6 +1837,90 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         return $equal;
+    }
+
+    /**
+     * Force 3D secure checking based on card rule
+     */
+    public function forceCardChecking($ccType = null)
+    {
+        $config = Mage::getStoreConfig("payment/sagepaydirectpro/force_threed_cards");
+
+        if (is_null($ccType) || strlen($config) === 0) {
+            return false;
+        }
+
+        $config = explode(',', $config);
+        if (in_array($ccType, $config)) {
+            return true;
+        }
+
+        return false;
+    }
+    public function recurringOthers($oldOrder, $newOrder)
+    {
+        $rc = New Varien_Object();
+        $orderId = $oldOrder->getId();
+        $newOrder->setIsRecurring(1);
+        $trn    = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
+            ->loadByParent($orderId);
+        $amount = $newOrder->getPayment()->getAmountOrdered();
+
+        try {
+
+            $paymentApi = Mage::getModel('sagepaysuite/api_payment');
+
+            $auth = new Varien_Object;
+
+            $paymentApi->setMcode($paymentApi->realIntegrationCode($trn->getIntegration()));
+            $repeat = $paymentApi->repeat($trn, $amount);
+            if($repeat['Status'] == 'OK') {
+                $repeatTransaction = clone $trn;
+                $repeatTransaction->setId(null)
+                    ->setOrderId($newOrder->getId())
+                    ->setReleased(null)
+                    ->setStatus($repeat['Status'])
+                    ->setStatusDetail($repeat['StatusDetail'])
+                    ->setVpsTxId($repeat['VPSTxId'])
+                    ->setTxAuthNo($repeat['TxAuthNo'])
+                    ->setSecurityKey($repeat['SecurityKey'])
+                    ->setIntegration($trn->getIntegration())
+                    ->setVendorTxCode($repeat['_requestvendor_'])
+                    ->setVpsProtocol($trn->getVpsProtocol())
+                    ->setVendorname($trn->getVendorname())
+                    ->setMode($trn->getMode())
+                    ->setTxType(strtoupper($repeat['_requesttxtype_']))
+                    ->setTrnCurrency($trn->getTrnCurrency())
+                    ->setTrndate($this->getDate())
+                    ->save();
+                $auth = Mage::getModel('sagepaysuite2/sagepaysuite_action')
+                    ->load($repeat['_requestvendor_'], 'vendor_tx_code');
+            }
+            else {
+                $rc->setPaymentDetails("ERROR: Could not repeat payment.");
+                $rc->setPaymentOK(false);
+            }
+
+            if($auth->getId()) {
+                //$rc->setPaymentDetails($auth->getStatusDetail());
+                $rc->setPaymentOK(true);
+            }
+            else {
+                $rc->setPaymentDetails("ERROR: Could not load authorisation.");
+                $rc->setPaymentOK(false);
+            }
+        }
+        catch(Exception $e) {
+            $rc->setPaymentDetails($e->getMessage());
+            $rc->setPaymentOK(false);
+            Mage::logException($e);
+        }
+        return $rc;
+    }
+    public function recurringFirst()
+    {
+        return $this;
+
     }
 
 }
