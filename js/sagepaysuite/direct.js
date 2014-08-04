@@ -124,6 +124,7 @@ changecsvclass = function(obj) {
                     var ccTypeRegExp = {
                         'VISA': new RegExp('^4[0-9]{12}([0-9]{3})?$'),
                         'MC': new RegExp('^5[1-5][0-9]{14}$'),
+                        'MCDEBIT': new RegExp('(?:516730|516979|517000|517049|535110|535309|535420|535819|537210|537609|557347|557496|557498|557547))'),
                         'AMEX': new RegExp('^3[47][0-9]{13}$')
                     };
 
