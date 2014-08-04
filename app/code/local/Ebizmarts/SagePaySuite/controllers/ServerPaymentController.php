@@ -568,7 +568,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
             } else {
 
                 $this->getOnepage()->getQuote()->collectTotals();
-                $order = $this->getOnepage()->saveOrder();
+
+                Mage::helper('sagepaysuite')->ignoreAddressValidation($this->getOnepage()->getQuote());
+
+                $this->getOnepage()->saveOrder();
 
                 Mage::register('last_order_id', Mage::getSingleton('checkout/session')->getLastOrderId());
 
