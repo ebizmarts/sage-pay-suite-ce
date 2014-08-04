@@ -69,13 +69,25 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $this->getSession()->clear();
     }
 
-	public function controllerMultishippingClear($o)
-	{
-		$this->getSession()->clear();
-	}
+    public function controllerMultishippingClear($o) {
 
-	public function controllerOnePageSuccess($o)
-	{
+        if($this->getSession()->getCreateInvoicePayment(true)) {
+            $orderIds = Mage::getSingleton('checkout/type_multishipping')->getOrderIds();
+
+            if(is_array($orderIds) and !empty($orderIds)) {
+
+                for($i=0;$i<count($orderIds);$i++) {
+                    Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderIds[$i]));
+                }
+
+            }
+        }
+
+        $this->getSession()->clear();
+
+    }
+
+    public function controllerOnePageSuccess($o) {
 
         //Capture data from Sage Pay API
         $orderId = $this->_getLastOrderId();
@@ -109,6 +121,10 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
                 $token->setCustomerId($customerId)
                         ->save();
             }
+        }
+
+        if($this->getSession()->getCreateInvoicePayment(true)) {
+            Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderId));
         }
 
         /**
