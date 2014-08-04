@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.17</version>
+            <version>3.0.19</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -54,7 +54,7 @@
 	   </events>
     </adminhtml>
     <global>
-        <ignoredModules> <!-- To avoid Mage_Log to slow down things -->
+        <ignoredModules> <!-- To avoid Mage_Log to slow down things. @TODO: http://tickets.ebizmarts.com/ticket.php?id=1458 -->
             <entities>
                 <sagepaysuite />
             </entities>
@@ -169,6 +169,10 @@
                         <code>MC</code>
                         <name>MasterCard</name>
                     </MC>
+                    <MCDEBIT>
+                        <code>MCDEBIT</code>
+                        <name><![CDATA[MasterCard (Debit)]]></name>
+                    </MCDEBIT>
                     <DELTA>
                         <code>DELTA</code>
                         <name>Visa Debit</name>
@@ -321,7 +325,6 @@
         </sagepaysuite>
         <payment>
             <sagepaysuite>
-            	<vendor>testebizmarts</vendor>
                 <referrer_id><![CDATA[01bf51f9-0dcd-49dd-a07a-3b1f918c77d7]]></referrer_id>
                 <license_key><![CDATA[[Obtain from Ebizmarts]]]></license_key>
                 <connection_timeout>30</connection_timeout>
