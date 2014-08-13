@@ -24,10 +24,27 @@ iframe#sagepaysuite-server-incheckout-iframe { border:none;height:840px;width:10
 div.lcontainer { background:#FFF; width:100%; height:100%; overflow:auto; }
 
 label[for="p_method_sagepaydirectpro"], label[for="p_method_sagepayserver"], label[for="p_method_sagepayform"] {
-	padding-bottom:1px;
-	padding-left: 65px;
-	background-repeat:no-repeat;
-	background-image:url(../images/sagepay-section.png);
+    padding-left: 135px !important;
+    padding-top: 7px !important;
+    background-repeat: no-repeat;
+    background-image: url(../images/sage-pay-small.jpg);
+    background-size: 86px;
+    background-position: 40px 2px;
+    display: block !important;
+    min-height: 31px;
+}
+
+#p_method_sagepayserver ,
+#p_method_sagepayform ,
+#p_method_sagepaydirectpro {
+    float: left;
+    margin-right: -40px;
+    margin-top: 10px;
+}
+
+.sagepay-form-content-image ,
+.sagepay-server-content-image {
+    width: 130px;
 }
 
 div.tokencvv { width:43px; display:inline; }
