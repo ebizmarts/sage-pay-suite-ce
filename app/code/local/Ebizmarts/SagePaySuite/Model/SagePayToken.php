@@ -123,7 +123,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
         $postData['storetoken']     = ($isGuest ? '0' : '1');
         $postData['description']    = '.';
         $postData['CV2']            = $this->getSageSuiteSession()->getTokenCvv();
-        $postData['vendor']         = $this->getConfigData('vendor');
+        $postData['vendor']         = $this->getConfigData('vendor'); //@TODO: Check this for token MOTO transactions.
 
         if (array_key_exists('integration', $postData) && strtolower($postData['integration']) == 'server') {
             $postData['Profile'] = 'LOW';
@@ -144,10 +144,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
         if ($this->_isMultishippingCheckout()) {
             $postData['Apply3DSecure'] = 2;
         }
+        else {
+            $postData['Apply3DSecure'] = (int) Mage::getStoreConfig("payment/sagepaydirectpro/secure3d");
+        }
+
+        if ($this->forceCardChecking($_t->getCardType()) === true) {
+            $postData['Apply3DSecure'] = 3;
+        }
 
         $postData['ApplyAVSCV2'] = (int) $this->getConfigData('avscv2');
-
-        //self::log($postData);
 
         $urlPost = $this->getTokenUrl('post', (isset($postData['Integration']) ? $postData['Integration'] : 'direct'));
 

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.17</version>
+            <version>3.0.19</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -51,10 +51,19 @@
                     </sagepay_update_api_add_button>
                 </observers>
             </core_block_abstract_to_html_before>
+            <checkout_submit_all_after>
+                <observers>
+                    <invoice_admin_orders>
+                        <type>model</type>
+                        <class>sagepaysuite/observer_sales</class>
+                        <method>invoiceAdminOrder</method>
+                    </invoice_admin_orders>
+                </observers>
+            </checkout_submit_all_after>
 	   </events>
     </adminhtml>
     <global>
-        <ignoredModules> <!-- To avoid Mage_Log to slow down things -->
+        <ignoredModules> <!-- To avoid Mage_Log to slow down things. @TODO: http://tickets.ebizmarts.com/ticket.php?id=1458 -->
             <entities>
                 <sagepaysuite />
             </entities>
@@ -169,6 +178,10 @@
                         <code>MC</code>
                         <name>MasterCard</name>
                     </MC>
+                    <MCDEBIT>
+                        <code>MCDEBIT</code>
+                        <name><![CDATA[MasterCard (Debit)]]></name>
+                    </MCDEBIT>
                     <DELTA>
                         <code>DELTA</code>
                         <name>Visa Debit</name>
@@ -321,10 +334,9 @@
         </sagepaysuite>
         <payment>
             <sagepaysuite>
-            	<vendor>testebizmarts</vendor>
                 <referrer_id><![CDATA[01bf51f9-0dcd-49dd-a07a-3b1f918c77d7]]></referrer_id>
                 <license_key><![CDATA[[Obtain from Ebizmarts]]]></license_key>
-                <connection_timeout>90</connection_timeout>
+                <connection_timeout>30</connection_timeout>
                 <max_token_card>6</max_token_card>
                 <logs>0</logs>
                 <profile_request>0</profile_request>
@@ -345,7 +357,8 @@
                 <sync_mode>sync</sync_mode>
                 <sagefifty_basket>0</sagefifty_basket>
                 <ignore_address_validation>1</ignore_address_validation>
-                <send_payment_failed_emails>1</send_payment_failed_emails>
+                <send_payment_failed_emails>0</send_payment_failed_emails>
+                <verify_cart_consistency>0</verify_cart_consistency>
             </sagepaysuite>
             <sagepaydirectpro>
                 <active>0</active>
@@ -370,6 +383,7 @@
                 <timeout_orders>0</timeout_orders>
                 <threed_iframe_height>500</threed_iframe_height>
                 <threed_iframe_width>600</threed_iframe_width>
+                <threed_layout>modal</threed_layout>
                 <avscv2>0</avscv2>
             </sagepaydirectpro>
             <sagepaydirectpro_moto>
@@ -486,6 +500,14 @@
             </updates>
         </layout>
         <events>
+            <checkout_type_onepage_save_order_after>
+                <observers>
+                    <save_order_after_sagepay>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>serverRegisterRecoverSession</method>
+                    </save_order_after_sagepay>
+                </observers>
+            </checkout_type_onepage_save_order_after>
             <customer_login>
                 <observers>
                     <customer_login_sagepay>

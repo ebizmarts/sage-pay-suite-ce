@@ -59,7 +59,7 @@
                     <not_exists>
                         <code>100</code>
                         <message>Requested transaction not exists.</message>
-                    </not_exists>                   
+                    </not_exists>
                     <filters_invalid>
                         <code>101</code>
                         <message>Invalid filters given. Details in error message.</message>
@@ -67,9 +67,9 @@
                     <api_error>
                         <code>102</code>
                         <message>Reporting API error.</message>
-                    </api_error>                    
+                    </api_error>
                 </faults>
-            </sage_pay_reporting>            
+            </sage_pay_reporting>
         </resources>
         <resources_alias>
             <sage_pay>sage_pay_transaction</sage_pay>
@@ -80,22 +80,22 @@
                     <title>Sage Pay</title>
                     <sort_order>69</sort_order>
                     <transaction translate="title" module="sagepaysuite">
-                        <title>Transactions</title>                        
+                        <title>Transactions</title>
                         <items translate="title" module="sagepaysuite">
                             <title>Retrieve list of transactions by filters</title>
                         </items>
                         <info translate="title" module="sagepaysuite">
                             <title>Retrieve transaction information for given VpsTxId</title>
-                        </info>                        
+                        </info>
                     </transaction>
                     <reporting translate="title" module="sagepayreporting">
-                        <title><![CDATA[Reporting & Admin API]]></title>                        
+                        <title><![CDATA[Reporting & Admin API]]></title>
                         <info translate="title" module="sagepayreporting">
                             <title>Retrieve transaction information for given VpsTxId</title>
                         </info>
                         <fraud_detail translate="title" module="sagepayreporting">
                             <title>Retrieve fraud information for given VpsTxId</title>
-                        </fraud_detail>                        
+                        </fraud_detail>
                     </reporting>
                 </sagepay>
             </resources>

@@ -18,7 +18,6 @@ class Ebizmarts_SagePaySuite_Block_Customer_Account_Card_Direct_Form extends Mag
         $types = Mage::getModel('sagepaysuite/config')->getCcTypesSagePayDirect();
 
         $availableTypes = Mage::getStoreConfig('payment/sagepaydirectpro/cctypesSagePayDirectPro');
-        //$availableTypes = 'VISA,MC,DELTA,SOLO,SWITCH,MAESTRO,AMEX,UKE,DINERS,JCB,LASER';
         if ($availableTypes) {
             $availableTypes = explode(',', $availableTypes);
 

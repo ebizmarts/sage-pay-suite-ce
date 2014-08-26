@@ -69,13 +69,25 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $this->getSession()->clear();
     }
 
-	public function controllerMultishippingClear($o)
-	{
-		$this->getSession()->clear();
-	}
+    public function controllerMultishippingClear($o) {
 
-	public function controllerOnePageSuccess($o)
-	{
+        if($this->getSession()->getCreateInvoicePayment(true)) {
+            $orderIds = Mage::getSingleton('checkout/type_multishipping')->getOrderIds();
+
+            if(is_array($orderIds) and !empty($orderIds)) {
+
+                for($i=0;$i<count($orderIds);$i++) {
+                    Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderIds[$i]));
+                }
+
+            }
+        }
+
+        $this->getSession()->clear();
+
+    }
+
+    public function controllerOnePageSuccess($o) {
 
         //Capture data from Sage Pay API
         $orderId = $this->_getLastOrderId();
@@ -111,6 +123,10 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
             }
         }
 
+        if($this->getSession()->getCreateInvoicePayment(true)) {
+            Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderId));
+        }
+
         /**
          * Delete session tokencards if any
          */
@@ -136,4 +152,31 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
 
         return $this;
     }
+
+    /**
+     * Fix SERVER integration issue when checkout method is REGISTER.
+     *
+     * @param $observer
+     * @return $this
+     */
+    public function serverRegisterRecoverSession($observer) {
+        $quote = $observer->getEvent()->getQuote();
+        $order = $observer->getEvent()->getOrder();
+
+        $isMage19OrUp    = version_compare(Mage::getVersion(), '1.9.0.0', '>=');
+        $isSagePayServer = ($order->getPayment()->getMethod() == 'sagepayserver');
+        $isRegister      = ($quote->getData('checkout_method') == 'register');
+
+        if($isMage19OrUp and $isSagePayServer and $isRegister) {
+
+            Mage::register('sagepay_last_real_order_id', $order->getIncrementId(), true);
+            Mage::register('sagepay_last_order_id', $order->getId(), true);
+            Mage::register('sagepay_last_quote_id', $quote->getId(), true);
+            Mage::register('sagepay_customer_id', $quote->getData('customer_id'), true);
+
+        }
+
+        return $this;
+    }
+
 }

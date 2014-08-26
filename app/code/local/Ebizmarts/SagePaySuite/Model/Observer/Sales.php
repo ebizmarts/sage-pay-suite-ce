@@ -59,7 +59,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
         $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($order->getPayment()->getMethod());
 
-        if (!$order->getId() || $isSage === false) {
+        if (!$order->getId() || $isSage === false || $order->getIsRecurring()) {
             return $o;
         }
 
@@ -158,14 +158,29 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         if ($this->getSession()->getInvoicePayment() || (!is_null($reg) && $tran->getTxType() == 'PAYMENT')) {
             //Commented because casues invoices not to be generated on MAC
             //$this->getSession()->unsetData('invoice_payment');
-            Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
+            Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
         }
-	}
+    }
 
     public function saveBefore($o) {
         $order = $o->getEvent()->getOrder();
 
         $payment = $order->getPayment();
+
+        $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($payment->getMethod());
+
+        /**
+         * Check if charged in Sage Pay and order Total amounts match.
+         */
+        if($isSage) {
+            $dbtrn = $this->_getTransactionsModel()->loadByParent($order->getId());
+            $amountsMatch = Mage::getModel('sagepaysuite/api_payment')
+                            ->floatsEqual($order->getGrandTotal(), $dbtrn->getTrnAmount(), 0.01);
+
+            if($dbtrn->getId() and (false === $amountsMatch)) {
+                Mage::throwException("Amounts do not match!\n" . $order->getGrandTotal() . "\n" . $dbtrn->getTrnAmount());
+            }
+        }
 
         /**
          * Add OSC comments to ORDER
@@ -193,6 +208,20 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
         if ($payment->getStatus() == 'FAIL') {
             $order->setStatus(Mage::getStoreConfig('payment/sagepaydirectpro/fail_order_status'));
+        }
+    }
+
+    public function invoiceAdminOrder($observer) {
+            $order = $observer->getEvent()->getOrder();
+
+            $payment = $order->getPayment();
+
+            $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($payment->getMethod());
+
+            if($isSage) {
+                    if($this->getSession()->getCreateInvoicePayment(true)) {
+                            Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order->getId());
+                        }
         }
     }
 

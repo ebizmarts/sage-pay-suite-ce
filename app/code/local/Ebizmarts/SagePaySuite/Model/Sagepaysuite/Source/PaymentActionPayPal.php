@@ -16,4 +16,5 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Source_PaymentActionPayPal
             ),
         );
     }
+
 }

@@ -98,25 +98,19 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
             $data['Currency'] = $quoteObj->getBaseCurrencyCode();
         }
 
-        if ((string) $this->getConfigData('trncurrency') == 'store') {
-            $data['Amount'] = $this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode());
-            $data['Currency'] = $quoteObj->getQuoteCurrencyCode();
-        } else {
-            $data['Amount'] = $this->formatAmount($quoteObj->getBaseGrandTotal(), $quoteObj->getBaseCurrencyCode());
-            $data['Currency'] = $quoteObj->getBaseCurrencyCode();
-        }
-
         $data['Description'] = $this->cleanInput('product purchase', 'Text');
 
         $data['SuccessURL'] = Mage::getUrl('sgps/formPayment/success', array(
                     '_secure' => true,
                     '_nosid' => true,
                     'vtxc' => $data['VendorTxCode'],
+                    'utm_nooverride' => 1
                 ));
         $data['FailureURL'] = Mage::getUrl('sgps/formPayment/failure', array(
                     '_secure' => true,
                     '_nosid' => true,
                     'vtxc' => $data['VendorTxCode'],
+                    'utm_nooverride' => 1
                 ));
 
         $data['BillingSurname']    = $this->ss($billing->getLastname(), 20);
@@ -208,6 +202,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
                 $dataToSend .= ($dataToSend == '') ? "$field=$value" : "&$field=$value";
             }
         }
+
+        ksort($data);
 
         Sage_Log::log("User-Agent: " . Mage::helper('core/http')->getHttpUserAgent(false), null, 'SagePaySuite_REQUEST.log');
         Sage_Log::log(Mage::helper('sagepaysuite')->getUserAgent(), null, 'SagePaySuite_REQUEST.log');

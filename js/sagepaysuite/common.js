@@ -75,7 +75,12 @@ fillSagePayTestData = function(){
 toggleNewCard = function(action){
 
 	var adminFrms = $$("#order-billing_method_form [name='payment[method]']");
-	var frontFrms = $$("#"+payment.form+" [name='payment[method]']");
+    if((typeof payment.form) == "undefined") {
+        var frontFrms = $$("div#payment-method [name='payment[method]']");//IWD OnePageCheckout
+    }
+    else {
+        var frontFrms = $$("#"+payment.form+" [name='payment[method]']");
+    }
 	var msFrms    = $$("#multishipping-billing-form [name='payment[method]']");
 
 	if(adminFrms.length){
@@ -137,6 +142,11 @@ toggleNewCard = function(action){
 		$$(frmSelector + ' ul li.tokencard-radio', frmSelector + ' a.addnew').invoke('show');
 
 	}
+
+    //hide unneeded fields
+    if(typeof SSCheckedsagepaydirectpro == 'function'){
+        SSCheckedsagepaydirectpro();
+    }
 
 }
 

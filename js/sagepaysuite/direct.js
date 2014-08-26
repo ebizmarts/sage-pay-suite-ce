@@ -117,7 +117,7 @@ changecsvclass = function(obj) {
                     var ccType = ccTypeContainer.value;
 
                     // Other card type or switch or solo card
-                    if (ccType == 'OT' ||  ccType == 'UKE' || ccType == 'DELTA' || ccType == 'MAESTRO' || ccType == 'SOLO' || ccType == 'SWITCH' || ccType == 'LASER' || ccType == 'JCB' || ccType == 'DC') {
+                    if (ccType == 'MCDEBIT' ||  ccType == 'OT' ||  ccType == 'UKE' || ccType == 'DELTA' || ccType == 'MAESTRO' || ccType == 'SOLO' || ccType == 'SWITCH' || ccType == 'LASER' || ccType == 'JCB' || ccType == 'DC') {
                         return true;
                     }
                     // Credit card type detecting regexp

@@ -19,7 +19,7 @@
 	    <li id="serversecure"<?php echo $sageStyle; ?>>
 	        <span>
 	            <?php
-	            	$_secImage = '<img src="' . $this->getSkinUrl('sagepaysuite/images/secured-by-sage-pay.png') . '" />';
+	            	$_secImage = '<img class="sagepay-server-content-image" src="' . $this->getSkinUrl('sagepaysuite/images/secured-by-sage-pay.png') . '" />';
 	            	echo preg_replace('/{{secured_logo}}/', $_secImage, Mage::getStoreConfig('payment/sagepayserver/selected_description'));
 	            ?>
 	        </span>

@@ -487,7 +487,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 ->setVendor($this->getConfigData('vendor'))
                 ->setVendorTxCode($vendorTxCode);
 
-        $request->setClientIPAddress($this->getClientIp());
+        $request->setClientIPAddress($this->getClientIp()); //@TODO: Support IPv6 addresses.
 
         if ($payment->getIntegra()) { //Server
 
@@ -495,7 +495,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 $confParam = (isset($adminParams['order']['send_confirmation'])) ? '&e=' . (int) $adminParams['order']['send_confirmation'] : '';
 
                 if (isset($adminParams['order']['account']['email'])) {
-                    $confParam .= '&l=' . $adminParams['order']['account']['email'];
+                    $confParam .= '&l=' . urlencode($adminParams['order']['account']['email']);
                 }
 
                 if (isset($adminParams['order']['account']['group_id'])) {
@@ -659,6 +659,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 return false;
             }
 
+            Mage::unregister('current_invoice');
+
             Mage::register('current_invoice', $invoice);
 
             $invoice->setRequestedCaptureCase($captureMode);
@@ -703,7 +705,13 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
     }
 
     public function getClientIp() {
-        return Mage::helper('core/http')->getRemoteAddr();
+        $remote_ip = Mage::helper('core/http')->getRemoteAddr();
+        //check if more than one IP:
+        $all_ips = explode(", ", $remote_ip);
+        if(count($all_ips)>1){
+            $remote_ip = $all_ips[count($all_ips)-1];
+        }
+        return $remote_ip;
     }
 
     /**
@@ -1235,6 +1243,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         self::log($rawresponse, null, 'SagePaySuite_RawResponse.log');
+        self::log(curl_getinfo($curlSession, CURLINFO_HTTP_CODE), Zend_Log::ALERT, 'SagePaySuite_REQUEST.log');
+        self::log(curl_getinfo($curlSession, CURLINFO_EFFECTIVE_URL), Zend_Log::ALERT, 'SagePaySuite_REQUEST.log');
 
         //Split response into name=value pairs
         $response = explode(chr(10), $rawresponse);
@@ -1426,8 +1436,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 }
 
                 //[SKU]|Name
-                $line = str_replace(':', '-', '[' . $this->_cleanString($item->getSku()) . ']|' . $this->_cleanString($item->getName()))
-                        . $this->_cleanString($_options) . self::BASKET_SEP;
+                $line = str_replace(':', '-', '[' . $this->_cleanString($item->getSku()) . ']|' . $item->getName()) . $this->_cleanString($_options) . self::BASKET_SEP;
 
                 //Quantity
                 $line .= ( $item->getQty() * 1) . self::BASKET_SEP;
@@ -1498,7 +1507,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }*/
 
         $deliveryName = $shippingAddress->getShippingDescription() ? $shippingAddress->getShippingDescription() : 'Delivery';
-        $delivery = $this->_cleanString($deliveryName) . self::BASKET_SEP . '1' . self::BASKET_SEP . $deliveryValue . self::BASKET_SEP
+        $delivery = $deliveryName . self::BASKET_SEP . '1' . self::BASKET_SEP . $deliveryValue . self::BASKET_SEP
                     . $deliveryTax . self::BASKET_SEP . $deliveryAmount . self::BASKET_SEP . $deliveryAmount;
 
         if (strlen($basket . $delivery) < 7498) {
@@ -1524,7 +1533,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         //Split into rows
         $rows = count(array_chunk($items, 6));
         if ($rows != $numberOfLines) {
-            $basket = str_replace($numberOfLines, $rows, $basket);
+            $basket[0] = $rows;
         }
         /**
          * Verify that items count is correct
@@ -1541,6 +1550,17 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
      * @return string
      */
     public function getBasketXml($quote) {
+
+                /* @TODO
+                 *                 //Options
+                $options = $this->_getProductOptions($item);
+                $_options = '';
+                if (count($options) > 0) {
+                    foreach ($options as $opt) {
+                        $_options .= $opt['label'] . '-' . $opt['value'] . '.';
+                    }
+                    $_options = '_' . substr($_options, 0, -1) . '_';
+                }*/
 
         $basket = new Ebizmarts_Simplexml_Element('<basket />');
 
@@ -1817,6 +1837,90 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         return $equal;
+    }
+
+    /**
+     * Force 3D secure checking based on card rule
+     */
+    public function forceCardChecking($ccType = null)
+    {
+        $config = Mage::getStoreConfig("payment/sagepaydirectpro/force_threed_cards");
+
+        if (is_null($ccType) || strlen($config) === 0) {
+            return false;
+        }
+
+        $config = explode(',', $config);
+        if (in_array($ccType, $config)) {
+            return true;
+        }
+
+        return false;
+    }
+    public function recurringOthers($oldOrder, $newOrder)
+    {
+        $rc = New Varien_Object();
+        $orderId = $oldOrder->getId();
+        $newOrder->setIsRecurring(1);
+        $trn    = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
+            ->loadByParent($orderId);
+        $amount = $newOrder->getPayment()->getAmountOrdered();
+
+        try {
+
+            $paymentApi = Mage::getModel('sagepaysuite/api_payment');
+
+            $auth = new Varien_Object;
+
+            $paymentApi->setMcode($paymentApi->realIntegrationCode($trn->getIntegration()));
+            $repeat = $paymentApi->repeat($trn, $amount);
+            if($repeat['Status'] == 'OK') {
+                $repeatTransaction = clone $trn;
+                $repeatTransaction->setId(null)
+                    ->setOrderId($newOrder->getId())
+                    ->setReleased(null)
+                    ->setStatus($repeat['Status'])
+                    ->setStatusDetail($repeat['StatusDetail'])
+                    ->setVpsTxId($repeat['VPSTxId'])
+                    ->setTxAuthNo($repeat['TxAuthNo'])
+                    ->setSecurityKey($repeat['SecurityKey'])
+                    ->setIntegration($trn->getIntegration())
+                    ->setVendorTxCode($repeat['_requestvendor_'])
+                    ->setVpsProtocol($trn->getVpsProtocol())
+                    ->setVendorname($trn->getVendorname())
+                    ->setMode($trn->getMode())
+                    ->setTxType(strtoupper($repeat['_requesttxtype_']))
+                    ->setTrnCurrency($trn->getTrnCurrency())
+                    ->setTrndate($this->getDate())
+                    ->save();
+                $auth = Mage::getModel('sagepaysuite2/sagepaysuite_action')
+                    ->load($repeat['_requestvendor_'], 'vendor_tx_code');
+            }
+            else {
+                $rc->setPaymentDetails("ERROR: Could not repeat payment.");
+                $rc->setPaymentOK(false);
+            }
+
+            if($auth->getId()) {
+                //$rc->setPaymentDetails($auth->getStatusDetail());
+                $rc->setPaymentOK(true);
+            }
+            else {
+                $rc->setPaymentDetails("ERROR: Could not load authorisation.");
+                $rc->setPaymentOK(false);
+            }
+        }
+        catch(Exception $e) {
+            $rc->setPaymentDetails($e->getMessage());
+            $rc->setPaymentOK(false);
+            Mage::logException($e);
+        }
+        return $rc;
+    }
+    public function recurringFirst()
+    {
+        return $this;
+
     }
 
 }

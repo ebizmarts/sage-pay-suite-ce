@@ -266,6 +266,17 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </send_payment_failed_emails>
+                            <verify_cart_consistency translate="label comment">
+                            <label>Verify cart consistency during transaction</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/sagepaysuite/verify_cart_consistency</config_path>
+                            <comment><![CDATA[This will check if the customer has modified the cart while paying on another tab. Please note that the sole action of checking the cart on another tab will turn on this flag.]]></comment>
+                            <sort_order>265</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verify_cart_consistency>
                     </fields>
             	</sagepaysuite>
                 <sagepayserver translate="label comment" module="sagepaysuite">
@@ -939,6 +950,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </threed_iframe_width>
+                        <threed_layout translate="label">
+                            <label>3D layout</label>
+                            <frontend_type>select</frontend_type>
+                            <config_path>payment/sagepaydirectpro/threed_layout</config_path>
+                            <source_model>sagepaysuite/sagepaysuite_source_threedLayout</source_model>
+                            <sort_order>13</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </threed_layout>
                         <avscv2 translate="label">
                             <label>AVS CV2</label>
                             <frontend_type>select</frontend_type>

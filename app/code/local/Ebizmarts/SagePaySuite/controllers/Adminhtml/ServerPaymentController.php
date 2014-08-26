@@ -82,7 +82,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
                 $this->_getSagePayServerSession()->setGroupId($post['order']['account']['group_id']);
             }
             if (array_key_exists('email', $post['order']['account'])) {
-                $this->_getSagePayServerSession()->setEmail($post['order']['account']['email']);
+                $this->_getSagePayServerSession()->setEmail(urlencode($post['order']['account']['email']));
             }
         }
 
@@ -265,8 +265,15 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
             $strPayerStatus = $request->getParam('PayerStatus', '');
             $strCardType = $request->getParam('CardType', '');
             $strLast4Digits = $request->getParam('Last4Digits', '');
+            $strDeclineCode = $request->getParam('DeclineCode', '');
+            $strExpiryDate = $request->getParam('ExpiryDate', '');
+            $strFraudResponse = $request->getParam('FraudResponse', '');
+            $strBankAuthCode = $request->getParam('BankAuthCode', '');
 
-            $strMessage = $strVPSTxId . $strVendorTxCode . $strStatus . $strTxAuthNo . $strVendorName . $strAVSCV2 . $strSecurityKey . $strAddressResult . $strPostCodeResult . $strCV2Result . $strGiftAid . $str3DSecureStatus . $strCAVV . $strAddressStatus . $strPayerStatus . $strCardType . $strLast4Digits;
+            $strMessage = $strVPSTxId . $strVendorTxCode . $strStatus . $strTxAuthNo . $strVendorName . $strAVSCV2 . $strSecurityKey
+                . $strAddressResult . $strPostCodeResult . $strCV2Result . $strGiftAid . $str3DSecureStatus . $strCAVV
+                . $strAddressStatus . $strPayerStatus . $strCardType . $strLast4Digits . $strDeclineCode
+                . $strExpiryDate . $strFraudResponse . $strBankAuthCode;
 
             $strMySignature = strtoupper(md5($strMessage));
 
@@ -276,6 +283,13 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
             $validSignature = (((int) $this->getSPSModel()->getConfigData('validate_md5') == 1) && ($this->getSPSModel()->getConfigData('mode') == 'live')) ? ($strMySignature !== $strVPSSignature) : false;
 
             if ($validSignature) {
+
+                Sage_Log::log("Cannot match the MD5 Hash", null, 'SagePaySuite_POST_Requests.log');
+                Sage_Log::log("My Message: $strMessage", null, 'SagePaySuite_POST_Requests.log');
+                Sage_Log::log("My Signature: $strMySignature", null, 'SagePaySuite_POST_Requests.log');
+                Sage_Log::log("VPS Signature: $strVPSSignature", null, 'SagePaySuite_POST_Requests.log');
+                Sage_Log::log("TRN from DB:", null, 'SagePaySuite_POST_Requests.log');
+                Sage_Log::log($dbtrn->toArray(), null, 'SagePaySuite_POST_Requests.log');
 
                 $this->_returnInvalid('Cannot match the MD5 Hash. Order might be tampered with. ' . $strStatusDetail);
             } else {

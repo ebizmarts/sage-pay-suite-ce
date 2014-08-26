@@ -172,7 +172,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function F91B2E37D34E5DC4FFC59C324BDC1157C()  { return true; }
 
     public function getCcImage($cname) {
-        return Mage::getModel('core/design_package')->getSkinUrl('sagepaysuite/images/cc/' . str_replace(' ', '_', strtolower($cname)) . '.gif');
+        return Mage::getModel('core/design_package')->getSkinUrl('sagepaysuite/images/cc/' . str_replace(array(' ', '(', ')'), '_', strtolower($cname)) . '.png');
     }
 
     public function getCardLabel($value, $concatImage = true) {
@@ -184,7 +184,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         $cardLabel = (isset($this->_ccCards[$value]) ? $this->_ccCards[$value] : '');
 
         if ($concatImage) {
-            $label = '<img src="' . $this->getCcImage($cardLabel) . '" title="' . $cardLabel . ' logo" alt="' . $cardLabel . ' logo" />  ';
+            $label = '<img width="51" height="32" src="' . $this->getCcImage($cardLabel) . '" title="' . $cardLabel . ' logo" alt="' . $cardLabel . ' logo" />  ';
         }
 
         $label .= $cardLabel;
