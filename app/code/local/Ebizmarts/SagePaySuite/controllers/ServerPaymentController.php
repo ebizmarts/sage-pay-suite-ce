@@ -110,14 +110,16 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         return $url;
     }
 
-    protected function _getSuccessRedirectUrl() {
+    protected function _getSuccessRedirectUrl($params = array()) {
 
-        $url = Mage :: getUrl('sgps/ServerPayment/success', array(
-                    '_secure'  => true,
-                    '_current' => true,
-                    '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-                    'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-        ));
+                $myParams = array_merge(array(
+                        '_secure'  => true,
+                        '_current' => true,
+                        '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                        'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                    ), $params);
+
+                $url = Mage :: getUrl('sgps/ServerPayment/success', $myParams);
 
         return $url;
     }
@@ -147,10 +149,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         return;
     }
 
-    private function _returnOk() {
+    private function _returnOk($params = array()) {
         $strResponse = 'Status=OK' . $this->eoln;
         $strResponse .= 'StatusDetail=Transaction completed successfully' . $this->eoln;
-        $strResponse .= 'RedirectURL=' . $this->_getSuccessRedirectUrl() . $this->eoln;
+        $strResponse .= 'RedirectURL=' . $this->_getSuccessRedirectUrl($params) . $this->eoln;
 
         $this->getResponse()->setHeader('Content-type', 'text/plain');
         $this->getResponse()->setBody($strResponse);
@@ -459,7 +461,13 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
                         Mage :: getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
 
-                        $this->_returnOk();
+                        if(Mage::registry('sagepay_last_quote_id')) {
+                            $this->_returnOk(array('cusid' => Mage::registry('sagepay_customer_id'), 'qide' => Mage::registry('sagepay_last_quote_id'), 'incide' => Mage::registry('sagepay_last_real_order_id'), 'oide' => Mage::registry('sagepay_last_order_id')));
+                        }
+                        else {
+                            $this->_returnOk();
+                        }
+
                         return;
                     } catch (Exception $e) {
 

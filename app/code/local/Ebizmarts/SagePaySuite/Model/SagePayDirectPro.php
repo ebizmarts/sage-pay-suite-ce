@@ -500,7 +500,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     $ccTypeRegExpList = array(
                         'VISA' => '/^4[0-9]{12}([0-9]{3})?$/', // Visa
                         'MC'   => '/^5[1-5][0-9]{14}$/', // Master Card
-                        'MCDEBIT'   => '(?:516730|516979|517000|517049|535110|535309|535420|535819|537210|537609|557347|557496|557498|557547))', // Master Card Debit
                         'AMEX' => '/^3[47][0-9]{13}$/' //,        // American Express
                         //'DI' => '/^6011[0-9]{12}$/'          // Discovery
                     );

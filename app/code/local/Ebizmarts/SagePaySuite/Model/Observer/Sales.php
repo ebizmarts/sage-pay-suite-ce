@@ -211,6 +211,20 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         }
     }
 
+    public function invoiceAdminOrder($observer) {
+            $order = $observer->getEvent()->getOrder();
+
+            $payment = $order->getPayment();
+
+            $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($payment->getMethod());
+
+            if($isSage) {
+                    if($this->getSession()->getCreateInvoicePayment(true)) {
+                            Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order->getId());
+                        }
+        }
+    }
+
     public function updateButton($observer) {
         $block = $observer->getEvent()->getBlock();
 

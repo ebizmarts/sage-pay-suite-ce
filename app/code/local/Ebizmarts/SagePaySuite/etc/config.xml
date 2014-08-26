@@ -49,6 +49,15 @@
                        <class>sagepaysuite/observer_sales</class>
                        <method>addButtonToOrderView</method>
                     </sagepay_update_api_add_button>
+                    <checkout_submit_all_after>
+                        <observers>
+                            <invoice_admin_orders>
+                                <type>model</type>
+                                <class>sagepaysuite/observer_sales</class>
+                                <method>invoiceAdminOrder</method>
+                            </invoice_admin_orders>
+                        </observers>
+                    </checkout_submit_all_after>
                 </observers>
             </core_block_abstract_to_html_before>
 	   </events>
@@ -491,6 +500,14 @@
             </updates>
         </layout>
         <events>
+            <checkout_type_onepage_save_order_after>
+                <observers>
+                    <save_order_after_sagepay>
+                        <class>sagepaysuite/observer_checkout</class>
+                        <method>serverRegisterRecoverSession</method>
+                    </save_order_after_sagepay>
+                </observers>
+            </checkout_type_onepage_save_order_after>
             <customer_login>
                 <observers>
                     <customer_login_sagepay>
