@@ -277,8 +277,19 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </verify_cart_consistency>
+                        <check_amounts translate="label comment">
+                            <label>Check if amounts match</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <config_path>payment/sagepaysuite/check_amounts</config_path>
+                            <comment><![CDATA[This will check if the grand total and amount sent to Sage Pay match before saving the order in Magento.]]></comment>
+                            <sort_order>270</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </check_amounts>
                     </fields>
-            	</sagepaysuite>
+                </sagepaysuite>
                 <sagepayserver translate="label comment" module="sagepaysuite">
                     <label>Sage Pay Suite [Frontend - SERVER Integration]</label>
                     <sort_order>670</sort_order>
