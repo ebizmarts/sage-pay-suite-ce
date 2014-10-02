@@ -21,9 +21,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
             Mage::app()->setCurrentStore((int) $storeId);
         }
 
-        Mage::getModel('sagepaysuite/api_payment')->getQuote();
-
+        //Thanks to our partner agency de-facto.com for the feedback on this one.
         parent::preDispatch();
+        Mage::getModel('sagepaysuite/api_payment')->getQuote();
 
         return $this;
     }
@@ -112,14 +112,14 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
     protected function _getSuccessRedirectUrl($params = array()) {
 
-                $myParams = array_merge(array(
-                        '_secure'  => true,
-                        '_current' => true,
-                        '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-                        'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-                    ), $params);
+        $myParams = array_merge(array(
+            '_secure'  => true,
+            '_current' => true,
+            '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+            'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+        ), $params);
 
-                $url = Mage :: getUrl('sgps/ServerPayment/success', $myParams);
+        $url = Mage :: getUrl('sgps/ServerPayment/success', $myParams);
 
         return $url;
     }
@@ -401,7 +401,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                                     ->setCustomerBalanceInstance($checkout_session->getSagePayCustBalanceInst());
                         }
 
-							$this->_getSagePayServerSession()->setInvoicePayment(true);
+                        if ((string) $request->getParam('Status') == 'OK' && (string) $request->getParam('TxType') == 'PAYMENT') {
+                            $this->_getSagePayServerSession()->setInvoicePayment(true);
+                            Mage::register('sagepay_create_invoice', 1, true);//For Magento 1.9+ when customer is Checkout=Register
+                        }
 
                         Mage::register('sageserverpost', new Varien_Object($_POST));
 
@@ -459,10 +462,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                             $sagePayServerSession->setSuccessStatus($strDBStatus);
                         }
 
-                        Mage :: getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
+                        Mage::getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
 
                         if(Mage::registry('sagepay_last_quote_id')) {
-                            $this->_returnOk(array('cusid' => Mage::registry('sagepay_customer_id'), 'qide' => Mage::registry('sagepay_last_quote_id'), 'incide' => Mage::registry('sagepay_last_real_order_id'), 'oide' => Mage::registry('sagepay_last_order_id')));
+                            $this->_returnOk(array('inv' => (int)Mage::registry('sagepay_create_invoice'), 'cusid' => Mage::registry('sagepay_customer_id'), 'qide' => Mage::registry('sagepay_last_quote_id'), 'incide' => Mage::registry('sagepay_last_real_order_id'), 'oide' => Mage::registry('sagepay_last_order_id')));
                         }
                         else {
                             $this->_returnOk();
@@ -573,7 +576,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 $this->getMultishipping()->getCheckoutSession()->setDisplaySuccess(true);
 
                 return true;
-            } else {
+            }
+            else {
 
                 $this->getOnepage()->getQuote()->collectTotals();
 

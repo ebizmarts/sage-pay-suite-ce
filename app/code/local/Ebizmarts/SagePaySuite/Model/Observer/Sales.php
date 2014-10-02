@@ -172,7 +172,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         /**
          * Check if charged in Sage Pay and order Total amounts match.
          */
-        if($isSage) {
+        if($isSage && ((int)Mage::getStoreConfig('payment/sagepaysuite/check_amounts') === 1)) {
             $dbtrn = $this->_getTransactionsModel()->loadByParent($order->getId());
             $amountsMatch = Mage::getModel('sagepaysuite/api_payment')
                             ->floatsEqual($order->getGrandTotal(), $dbtrn->getTrnAmount(), 0.01);
@@ -212,16 +212,16 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
     }
 
     public function invoiceAdminOrder($observer) {
-            $order = $observer->getEvent()->getOrder();
+        $order = $observer->getEvent()->getOrder();
 
-            $payment = $order->getPayment();
+        $payment = $order->getPayment();
 
-            $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($payment->getMethod());
+        $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($payment->getMethod());
 
-            if($isSage) {
-                    if($this->getSession()->getCreateInvoicePayment(true)) {
-                            Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order->getId());
-                        }
+        if($isSage) {
+            if($this->getSession()->getCreateInvoicePayment(true)) {
+                Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order->getId());
+            }
         }
     }
 

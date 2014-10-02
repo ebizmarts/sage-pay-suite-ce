@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.19</version>
+            <version>3.0.19.1</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -359,6 +359,7 @@
                 <ignore_address_validation>1</ignore_address_validation>
                 <send_payment_failed_emails>0</send_payment_failed_emails>
                 <verify_cart_consistency>0</verify_cart_consistency>
+                <check_amounts>0</check_amounts>
             </sagepaysuite>
             <sagepaydirectpro>
                 <active>0</active>

@@ -36,6 +36,12 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
                     ->setLastQuoteId($this->getRequest()->getParam('qide'))
                     ->setLastOrderId($this->getRequest()->getParam('oide'))
                     ->setLastRealOrderId($this->getRequest()->getParam('incide'));
+
+                $autoInvoice = (int)$this->getRequest()->getParam('inv');
+                if($autoInvoice) {
+                    Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice);
+                }
+
             }
 
             //Mage::getSingleton('checkout/type_onepage')->getQuote()->save();
