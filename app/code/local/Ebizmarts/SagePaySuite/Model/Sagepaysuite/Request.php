@@ -23,4 +23,18 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Request extends Varien_Object
         throw new Varien_Exception("Invalid method ".get_class($this)."::".$method."(".print_r($args,1).")");
     }
 
+    public function setCreateToken($value,$ccNumber,$ccExpireDate,$ccType){
+
+        $lastFour = substr($ccNumber,-4);
+
+        if($value == 1){
+            if(Mage::helper('sagepaysuite/token')->loadCustomerCards(null,$lastFour,$ccType,$ccExpireDate)->getSize() == 0){
+                return $this->setData('CreateToken',(int) 1);
+            }
+            return FALSE;
+        }else{
+            return $this->setData('CreateToken',$value);
+        }
+    }
+
 }

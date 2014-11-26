@@ -13,7 +13,7 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Source_PaymentAction
             array(
                 'value' => Ebizmarts_SagePaySuite_Model_Api_Payment::ACTION_AUTHORIZE_CAPTURE,
                 'label' => Mage::helper('sagepaysuite')->__('Authorise and Capture')
-            ),
+            )
         );
     }
 }

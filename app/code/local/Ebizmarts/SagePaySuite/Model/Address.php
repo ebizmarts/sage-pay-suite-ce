@@ -15,6 +15,10 @@ class Ebizmarts_SagePaySuite_Model_Address extends Varien_Object
     	$this->setStreet2($this->getStreet(2));
 
 		$this->setStreet($this->getStreet(1) . "\n" . $this->getStreet(2));
+/*
+		if( $this->getRegionCode() ){
+			$this->setRegionCode($this->getRegionCode());
+		}*/
 
         return parent::toArray($arrAttributes);
     }

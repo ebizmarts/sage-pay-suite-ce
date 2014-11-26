@@ -49,6 +49,8 @@ class Ebizmarts_SagePaySuite_Adminhtml_TokenController extends Mage_Adminhtml_Co
 
 		Mage::register('admin_tokenregister', $this->getRequest()->getParam('customer_id'));
 
+		//TODO: Check here the Integration TYPE, we are forcing SERVER but CHECK Token Integration, if it is DIRECT
+		//check this config data not SERVER
 		$result = Mage::getModel('sagepaysuite/sagePayToken')->registerCard();
 		if(!isset($result['NextURL'])){
 			$this->_getSession()->addError($this->__('Could not register token, please try again.'));

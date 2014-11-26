@@ -25,7 +25,9 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Formpost extends Mage_Core_Block_Tem
             ->setUseContainer(true);
 
         $crypt = $this->getFormModel()->makeCrypt();
-
+        
+        //FORM does not work in SIMULATOR because CRYPT is generated a different way.
+        
         $form->addField('VPSProtocol', 'hidden', array('name'=>'VPSProtocol', 'value' => $this->getFormModel()->getVpsProtocolVersion()));
         $form->addField('TxType', 'hidden', array('name'=>'TxType', 'value' => strtoupper($this->getFormModel()->getConfigData('payment_action'))));
         $form->addField('Vendor', 'hidden', array('name'=>'Vendor', 'value' => $this->getFormModel()->getConfigData('vendor')));

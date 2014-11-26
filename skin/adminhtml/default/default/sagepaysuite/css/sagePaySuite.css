@@ -48,8 +48,10 @@ div.lcontainer { background:#FFF; width:100%; height:100%; }
 select.month {width:140px;}
 select.year {width:103px;}
 
+/*input#p_method_sagepaydirectpro_moto + label, input#p_method_sagepayserver_moto + label { padding-bottom:1px; padding-left: 65px; background-repeat:no-repeat; background-image:url(../images/sagepay-section.png); }
+input#p_method_sagepaydirectpro_moto + label span, input#p_method_sagepayserver_moto + label span { color:#FF0000; }*/
 
-label[for="p_method_sagepaydirectpro_moto"], label[for="p_method_sagepayserver_moto"] { padding-bottom:1px; padding-left: 65px; background-repeat:no-repeat; background-image:url(../images/sagepay-section.png); }
+label[for="p_method_sagepaydirectpro_moto"], label[for="p_method_sagepayserver_moto"], label[for="p_method_sagepayrepeat"] { padding-bottom:1px; padding-left: 65px; background-repeat:no-repeat; background-image:url(../images/sagepay-section.png); }
 label[for="p_method_sagepaydirectpro_moto"] span, label[for="p_method_sagepayserver_moto"] span { color:#FF0000; }
 
 div.sagepaytrndetail tr td.label p { font-weight:bold; }

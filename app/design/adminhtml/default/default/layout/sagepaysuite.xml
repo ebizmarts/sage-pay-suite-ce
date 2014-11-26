@@ -154,12 +154,16 @@
 	<adminhtml_system_config_edit>
 		<reference name="head">
 			<action method="addItem">
-				<type>skin_css</type>
-				<name>sagepaysuite/css/sagePaySuite.css</name>
+				<type>js</type>
+				<name>sagepaysuite/livepipe/livepipe.js</name>
 			</action>
 			<action method="addItem">
 				<type>js</type>
-				<name>sagepaysuite/common.js</name>
+				<name>sagepaysuite/livepipe/window.js</name>
+			</action>
+			<action method="addItem">
+				<type>skin_css</type>
+				<name>sagepaysuite/css/sagePaySuite.css</name>
 			</action>
             <action method="addItem">
                 <type>js</type>
@@ -360,4 +364,5 @@
 			</action>
 		</reference>
 	</adminhtml_sales_order_invoice_new>
+
 </layout>

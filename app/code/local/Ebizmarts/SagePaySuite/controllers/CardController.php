@@ -77,19 +77,29 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                     'StatusDetail' => $rs['StatusDetail'],
                     'Protocol'     => 'direct',
                     'CardNumber'   => $post['CardNumber'],
+                    'Nickname'     => $post['Nickname']
                 );
                 $save = Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
 
-                $rs   = array_change_key_case($rs);
-                $resp = $rs;
-                $resp ['mark'] = array(
-                    'cctype'         => $save->getLabel(),
-                    'id'             => $save->getId(),
-                    'defaultchecked' => ($save->getIsDefault() == 1 ? ' checked="checked"' : ''),
-                    'ccnumber'       => $save->getCcNumber(),
-                    'exp'            => $save->getExpireDate(),
-                    'delurl'         => Mage::getUrl('sgps/card/delete', array('card' => $save->getId()))
-                );
+                if(isset($save) && $save !== FALSE){
+                    $rs   = array_change_key_case($rs);
+                    $resp = $rs;
+                    $resp ['mark'] = array(
+                        'cctype'         => $save->getLabel(),
+                        'id'             => $save->getId(),
+                        'defaultchecked' => ($save->getIsDefault() == 1 ? ' checked="checked"' : ''),
+                        'ccnumber'       => $save->getCcNumber(),
+                        'exp'            => $save->getExpireDate(),
+                        'ccnickname'     => $save->getNickname(),
+                        'delurl'         => Mage::getUrl('sgps/card/delete', array('card' => $save->getId()))
+                    );
+                }else{
+                    $rs['Status'] = 'ERROR';
+                    $rs['StatusDetail'] = Mage::helper('sagepaysuite')->__('Credit card could not be saved for future use. You already have this card attached to your account or you have reached your account\'s maximum card storage capacity.');
+                    $rs   = array_change_key_case($rs);
+                    $resp = $rs;
+                }
+
             } else {
                 $rs = array_change_key_case($rs);
                 $resp = $rs;
@@ -172,7 +182,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 															if(url.match(/serverform/gi)){
 																window.parent.location.href="' . Mage::getUrl('sgps/card/closeserverform') . '";
 															}else{
-																window.parent.location.reload();
+															    var successCallback = function(){window.parent.location.reload();};
+															    window.parent.updateNickname('.$this->getRequest()->getParam('token_id').',window.parent.$("sagepaytoken_cc_nickname").value,successCallback,null);
 															}
 														</script>
                                                     </body>
@@ -225,13 +236,20 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                 'Protocol'     => $post['protocol'],
                 'CardNumber'   => $post['Last4Digits'],
             );
+
             $save = Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
 
-            Mage::getSingleton('sagepaysuite/session')->setLastSavedTokenccid($save->getId());
+            if(isset($save) && $save !== FALSE) {
+                Mage::getSingleton('sagepaysuite/session')->setLastSavedTokenccid($save->getId());
 
-            $response .= 'Status=OK' . $this->_eoln;
-            $response .= 'RedirectURL=' . Mage::getUrl('sgps/card/registerSuccess') . '?SID=' . $this->getRequest()->getParam('SID', '') . $this->_eoln;
-            $response .= 'StatusDetail=Card successfully registered.' . $this->_eoln;
+                $response .= 'Status=OK' . $this->_eoln;
+                $response .= 'RedirectURL=' . Mage::getUrl('sgps/card/registerSuccess') . '?SID=' . $this->getRequest()->getParam('SID', '') . $this->_eoln;
+                $response .= 'StatusDetail=Card successfully registered.' . $this->_eoln;
+            }else{
+                $response .= 'Status=OK' . $this->_eoln;
+                $response .= 'RedirectURL=' . Mage::getUrl('sgps/card/registerAbort') . '?SID=' . $this->getRequest()->getParam('SID', '') . $this->_eoln;
+                $response .= 'StatusDetail='.Mage::helper('sagepaysuite')->__('Credit card could not be saved for future use. You already have this card attached to your account or you have reached your account\'s maximum card storage capacity.') . $this->_eoln;
+            }
 
         } else if ($post['Status'] == 'ABORT') {
 
@@ -265,6 +283,56 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 
         $this->getLayout()->getBlock('head')->setTitle(Mage::helper('sagepaysuite')->__('Sage Pay - Saved Credit Cards'));
         $this->renderLayout();
+    }
+
+    /**
+     * Update card nickname on local database.
+     *
+     * @return string(JSON)
+     */
+    public function updateNicknameAction(){
+
+
+        $resp = array('st' => 'nok', 'text' => '');
+
+        if (!Mage::getSingleton('customer/session')->authenticate($this)) {
+            $resp ['text'] = $this->__('Please login, you session expired.');
+            $this->getResponse()->setBody(Zend_Json::encode($resp));
+            return;
+        }
+
+        $cardId = (int) $this->getRequest()->getParam('card');
+        $cardNickname = $this->getRequest()->getParam('nickname');
+
+        $objCard = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->load($cardId);
+
+        if ($objCard->getId()) {
+
+            # Check if card is from this customer
+            if ($objCard->getCustomerId() != $this->_getCustomerId()) {
+                $resp ['text'] = $this->__('Invalid Card #');
+                $this->getResponse()->setBody(Zend_Json::encode($resp));
+                return;
+            }
+
+            $update = $objCard->setNickname($cardNickname)->save();
+
+            if($update){
+                $resp ['text'] = $this->__('Success!');
+                $resp ['st']   = 'ok';
+                $this->getResponse()->setBody(Zend_Json::encode($resp));
+                return;
+            }else{
+                $resp ['text'] = $this->__('Something prevented this credit card to be saved.');
+                $this->getResponse()->setBody(Zend_Json::encode($resp));
+                return;
+            }
+
+        }else{
+            $resp ['text'] = $this->__('The requested Card does not exist.');
+            $this->getResponse()->setBody(Zend_Json::encode($resp));
+            return;
+        }
     }
 
     /**

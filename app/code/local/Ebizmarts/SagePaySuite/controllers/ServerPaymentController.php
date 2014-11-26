@@ -182,8 +182,13 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
     protected function _getHRStatus($strStatus, $strStatusDetail) {
         if ($strStatus == 'OK')
             $strDBStatus = 'AUTHORISED - The transaction was successfully authorised with the bank.';
-        elseif ($strStatus == 'NOTAUTHED')
-            $strDBStatus = 'DECLINED - The transaction was not authorised by the bank.';
+        elseif ($strStatus == 'NOTAUTHED'){
+            if($strStatusDetail == "1003 : The transaction timed out."){
+                $strDBStatus = 'ERROR - The transaction timed out.';
+            }else{
+                $strDBStatus = 'DECLINED - The transaction was not authorised by the bank.';
+            }
+        }
         elseif ($strStatus == 'ABORT')
             $strDBStatus = 'ABORTED - The customer clicked Cancel on the payment pages, or the transaction was timed out due to customer inactivity.';
         elseif ($strStatus == 'REJECTED')
@@ -194,6 +199,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
             $strDBStatus = 'REGISTERED - The transaction was could not be 3D-Secure Authenticated, but has been registered to be Authorised.';
         elseif ($strStatus == 'ERROR')
             $strDBStatus = 'ERROR - There was an error during the payment process.  The error details are: ' . $strStatusDetail;
+        elseif ($strStatus == 'PENDING')
+            $strDBStatus = 'PENDING - Transaction pending';
         else
             $strDBStatus = 'UNKNOWN - An unknown status was returned from Sage Pay.  The Status was: ' . $strStatus . ', with StatusDetail:' . $strStatusDetail;
 
@@ -218,6 +225,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 'CardType' => $result->getPost('CardType'),
                 'ExpiryDate' => $result->getPost('ExpiryDate'),
                 'StatusDetail' => $result->getPost('StatusDetail'),
+                'Nickname'      => $_transaction->getNickname(),
                 'Protocol' => 'server',
                 'CardNumber' => '00000000' . $result->getPost('Last4Digits')
             );
@@ -232,6 +240,17 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         $request = $this->getRequest();
         $dbtrn   = $this->_trn();
 
+        //set euro payments status
+        $euro_payment_status = ((string)$request->getPost("Status") == "PENDING" ? "PENDING" : (string)$dbtrn->getEuroPaymentsStatus());
+        $returning_from_euro_payment = false;
+        //if it was already 'PENDING' I update it
+        if((string)$dbtrn->getStatus() == "PENDING"){
+            $euro_payment_status = $request->getPost("Status");
+            $returning_from_euro_payment = true;
+        }
+        //reset session flag
+        $this->_getSagePayServerSession()->setEuroPaymentIsPending(false);
+
         $dbtrn->addData(Mage::helper('sagepaysuite')->arrayKeysToUnderscore($_POST))
                 ->setPostcodeResult($this->getRequest()->getPost('PostCodeResult'))
                 ->setData('cv2result', $this->getRequest()->getPost('CV2Result'))
@@ -240,6 +259,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 ->setRedFraudResponse($this->getRequest()->getPost('FraudResponse'))
                 ->setBankAuthCode($this->getRequest()->getPost('BankAuthCode'))
                 ->setDeclineCode($this->getRequest()->getPost('DeclineCode'))
+                ->setEuroPaymentsStatus($euro_payment_status)
                 ->save();
 
         //Saving TOKEN.
@@ -260,12 +280,41 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         /**
          * Handle ABORT
          */
+
+
         if ($dbtrn->getId() && $dbtrn->getOrderId()) {
-            $dbtrn
-                    ->setStatusDetail("Sage Pay Retry. " . $dbtrn->getStatusDetail())
-                    ->save();
-            $this->_returnOk();
-            return;
+
+            if($returning_from_euro_payment == true){ //EURO Payment PENDING doing 2nd POST
+
+                if($euro_payment_status == "OK"){
+                    //invoice it
+                    $order = Mage::getModel('sales/order')->load($dbtrn->getOrderId());
+                    $invoiced = Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
+                    if($invoiced == true){
+                        $dbtrn->setStatusDetail($request->getParam('StatusDetail'))->save();
+                        $order->setStatus("processing")->save();
+                    }
+
+                }else{
+                    //transaction was failed, cancel it
+                    Mage::helper('sagepaysuite')->cancelTransaction($dbtrn);
+                    Sage_Log::log("Transaction " . $dbtrn->getVendorTxCode() . " cancelled due to error " . $request->getParam('StatusDetail'), '', '');
+                }
+                $this->_returnOk();
+                return;
+            }else if($euro_payment_status !== null){
+                //Euro Payment RETRY
+
+                //do nothing for now
+                $this->_returnOk();
+                return;
+
+            }else{ //General RETRY
+
+                $dbtrn->setStatusDetail("Sage Pay Retry. " . $dbtrn->getStatusDetail())->save();
+                $this->_returnOk();
+                return;
+            }
         }
 
         //Check cart health on callback.
@@ -310,6 +359,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
         $response = '';
         if (strlen($strSecurityKey) == 0) {
+
 
             Sage_Log::log("Security Key invalid", null, 'SagePaySuite_POST_Requests.log');
             Sage_Log::log("TRN from DB:", null, 'SagePaySuite_POST_Requests.log');
@@ -362,7 +412,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
             /** We can now compare our MD5 Hash signature with that from Sage Pay Server * */
             $validSignature = ($strMySignature !== $strVPSSignature);
 
+
             if ($validSignature) {
+
 
                 Sage_Log::log("Cannot match the MD5 Hash", null, 'SagePaySuite_POST_Requests.log');
                 Sage_Log::log("My Message: $strMessage", null, 'SagePaySuite_POST_Requests.log');
@@ -381,8 +433,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
             }
             else {
 
+
                 $strDBStatus = $this->_getHRStatus($strStatus, $strStatusDetail);
                 if ($strStatus == 'OK' || $strStatus == 'AUTHENTICATED' || $strStatus == 'REGISTERED') {
+
 
                     try {
 
@@ -406,7 +460,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                             Mage::register('sagepay_create_invoice', 1, true);//For Magento 1.9+ when customer is Checkout=Register
                         }
 
-                        Mage::register('sageserverpost', new Varien_Object($_POST));
+                        $sageserverpost = new Varien_Object($_POST);
+                        Mage::register('sageserverpost', $sageserverpost);
 
                         $sOrder = $this->_saveMagentoOrder();
 
@@ -482,6 +537,115 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
                         Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $e->getMessage()));
                     }
+                }
+                else if($strStatus == 'PENDING'){ //handle EURO payments
+
+                    //set flag
+                    $this->_getSagePayServerSession()->setEuroPaymentIsPending(true);
+
+                    try {
+
+                        $sagePayServerSession->setTrnhData($this->_setAdditioanlPaymentInfo($strDBStatus));
+
+                        $checkout_session = Mage::getSingleton('checkout/session');
+                        if ($checkout_session->getSagePayRewInst()) {
+                            $this->getOnepage()->getQuote()
+                                ->setUseRewardPoints(1)
+                                ->setRewardInstance($checkout_session->getSagePayRewInst());
+                        }
+
+                        if ($checkout_session->getSagePayCustBalanceInst()) {
+                            $this->getOnepage()->getQuote()
+                                ->setUseCustomerBalance(1)
+                                ->setCustomerBalanceInstance($checkout_session->getSagePayCustBalanceInst());
+                        }
+
+                        //no invoice since it's PENDING
+                        $this->_getSagePayServerSession()->setInvoicePayment(false);
+                        Mage::register('sagepay_create_invoice', 0, true);
+
+                        $sageserverpost = new Varien_Object($_POST);
+                        Mage::register('sageserverpost', $sageserverpost);
+
+                        $sOrder = $this->_saveMagentoOrder();
+
+                        if ($sOrder !== true) {
+
+                            $sagePayServerSession->setFailStatus('An error occurred: ' . $sOrder);
+
+                            /** The status indicates a failure of one state or another, so send the customer to orderFailed instead * */
+                            $strRedirectPage = $this->_getFailedRedirectUrl();
+
+                            //Mage::helper('sagepaysuite')->cancelTransaction($dbtrn);
+
+                            $dbtrn->setStatus('MAGE_ERROR')
+                                ->setStatusDetail('Could not save order: ' . $sOrder . $dbtrn->getStatusDetail())
+                                ->save();
+
+                            $this->_returnInvalid('Could not save order: ' . $sOrder);
+                            return;
+
+                        }
+                        else {
+
+                            $orderId = Mage::registry('last_order_id');
+                            $msOrderIds = $this->_getMsOrderIds();
+                            if ($orderId || $msOrderIds) {
+
+                                if (false !== $msOrderIds) {
+                                    $aidis = array_keys($msOrderIds);
+                                    $orderId = $aidis[0];
+                                    #Mage::register('ms_parent_trn_id', $dbtrn->getId());
+                                    $dbtrn->setOrderId($aidis[0])->save();
+
+                                    unset($aidis[0]);
+                                    $trns = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
+                                        ->getCollection()
+                                        ->getChilds($dbtrn->getId())
+                                        ->load()->toArray();
+                                    foreach ($aidis as $_order) {
+                                        foreach ($trns['items'] as $ka => $_t) {
+                                            Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
+                                                ->load($_t['id'])->setOrderId($_order)->save();
+                                            unset($trns['items'][$ka]);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $dbtrn
+                                ->setOrderId($orderId)
+                                ->save();
+
+                            //set PENDING status
+                            //$order = Mage::getModel('sales/order')->load($orderId);
+                            //$order->setStatus("pending")->save();
+
+                            $sagePayServerSession->setSuccessStatus($strDBStatus);
+                        }
+
+                        Mage::getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
+
+                        if(Mage::registry('sagepay_last_quote_id')) {
+                            $this->_returnOk(array('inv' => (int)Mage::registry('sagepay_create_invoice'), 'cusid' => Mage::registry('sagepay_customer_id'), 'qide' => Mage::registry('sagepay_last_quote_id'), 'incide' => Mage::registry('sagepay_last_real_order_id'), 'oide' => Mage::registry('sagepay_last_order_id')));
+                        }
+                        else {
+                            $this->_returnOk();
+                        }
+
+                        return;
+                    } catch (Exception $e) {
+
+                        $dbtrn->setStatus('MAGE_ERROR')
+                            ->setStatusDetail($e->getMessage() . $dbtrn->getStatusDetail())
+                            ->save();
+                        Mage::logException($e);
+                        Mage::log($e->getMessage());
+
+                        Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $e->getMessage()));
+                    }
+
                 }
                 else {
 

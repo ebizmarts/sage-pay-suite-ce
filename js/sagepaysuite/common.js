@@ -151,6 +151,14 @@ toggleNewCard = function(action){
 }
 
 tokenRadioCheck = function(radioID, cvv){
+
+    //disable all else
+    $$('input.tokencvv').each(function(inp){
+        if(inp.id != cvv.id){
+            inp.disabled = 'disabled';
+        }
+    })
+
 	try{
 		$(radioID).checked = true;
 	}catch(noex){}
@@ -172,7 +180,15 @@ tokenRadioCheck = function(radioID, cvv){
 	}
 }
 
-switchToken = function(radio){
+switchToken = function(radio,card_type){
+
+    //set cc type
+    if($("sagepaydirectpro_cc_type_token")){
+        $("sagepaydirectpro_cc_type_token").value = card_type;
+    }else if($("sagepaydirectpro_moto_cc_type_token")){
+        $("sagepaydirectpro_moto_cc_type_token").value = card_type;
+    }
+
 	$$('div.tokencvv').invoke('hide');
 	$$('input.tokencvv').each(function(inp){
 		inp.disabled = 'disabled';
@@ -217,4 +233,5 @@ rand = function (min, max) {
     }
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 document.observe("dom:loaded",function(){$$(".hidesuite").each(function(a){a.writeAttribute({disabled:"disabled"})});$$("div [id^=row_sagepaysuite_]").each(function(a){a.addClassName("tooltip-suite")})});

@@ -222,6 +222,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
             $this->getSageSuiteSession()->setInvoicePayment(true);
         }
 
+        $token_nickname = (array_key_exists("cc_nickname",$this->_postPayment) ? $this->_postPayment['cc_nickname'] : null);
+
         $trn = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                 ->loadByVendorTxCode($request->getData('VendorTxCode'))
                 ->setVendorTxCode($request->getData('VendorTxCode'))
@@ -239,6 +241,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
                 ->setVpsTxId($response->getData('v_ps_tx_id'))
                 ->setTrnCurrency($request->getData('Currency'))
                 ->setTrnAmount($request->getData('Amount'))
+                ->setNickname($token_nickname)
                 ->setTrndate($this->getDate());
         $trn->save();
 
@@ -330,8 +333,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
             $data['Amount']   = $this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode());
             $data['Currency'] = $quoteObj->getQuoteCurrencyCode();
         } else if ((string) $this->getConfigData('trncurrency') == 'switcher') {
-            $data['Amount']   = $this->formatAmount($quoteObj->getGrandTotal(), Mage::app()->getStore()->getCurrentCurrencyCode());
-            $data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
+            if($this->_code == "sagepayserver_moto"){
+                $data['Amount']   = $this->formatAmount($quoteObj->getGrandTotal(), $adminParams['order']['currency']);
+                $data['Currency'] = $adminParams['order']['currency'];
+            }else{
+                $data['Amount']   = $this->formatAmount($quoteObj->getGrandTotal(), Mage::app()->getStore()->getCurrentCurrencyCode());
+                $data['Currency'] = Mage::app()->getStore()->getCurrentCurrencyCode();
+            }
         }
         else {
             $data['Amount']   = $this->formatAmount($quoteObj->getBaseGrandTotal(), $quoteObj->getBaseCurrencyCode());
@@ -424,7 +432,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
 
         $data['AllowGiftAid'] = (int) $this->getConfigData('allow_gift_aid');
         $data['ApplyAVSCV2']  = $this->getConfigData('avscv2');
-
 
         $customerXML = $this->getCustomerXml($quoteObj);
         if (!is_null($customerXML)) {

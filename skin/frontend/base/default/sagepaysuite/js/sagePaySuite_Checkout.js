@@ -38,9 +38,17 @@ getOneStepCheckoutId = function() {
 setOscLoad = function() {
 
     //IWD_OnePage
-    if(typeof OPC != "undefined") {
-        checkout.setLoadWaiting(true);
-    }
+    //if(IWD && typeof IWD.OPC != "undefined") {
+        //checkout.setLoadWaiting(true);
+    //}
+
+    //http://stackoverflow.com/questions/19209647/magento-pass-billing-and-shipping-info-to-sagepay-module-from-iwd-cart
+
+    //var oscButton = $('onestepcheckout-place-order');
+    //if(oscButton) {
+    //    //transport.element().removeClassName('grey').addClassName('orange');
+    //    $$('div.onestepcheckout-place-order-loading').invoke('hide');
+    //}
 
 }
 
@@ -57,9 +65,9 @@ restoreOscLoad = function() {
     }
     else {
         //IWD_OnePage
-        if(typeof OPC != "undefined") {
-            checkout.setLoadWaiting(false);
-        }
+        //if(IWD && typeof IWD.OPC != "undefined") {
+        //    checkout.setLoadWaiting(false);
+        //}
     }
 
 }
@@ -91,9 +99,22 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             this.getConfig('review').onSave = this.reviewSave.bindAsEventListener(this);
         }else if(this.getConfig('osc')){
 
+//            if("BUTTON" == window._sagepayonepageTriggerId.tagName) {
+//                var oncl = window._sagepayonepageTriggerId.readAttribute("onclick");
+//
+//                if(null == oncl.match(/void/gi)) {
+//                    window._sagepayonepageTriggerId.writeAttribute("onclick", "$('"+ window._sagepayonepageFormId +"').submit();");
+//                    //if("submit" == window._sagepayonepageTriggerId.readAttribute("type")) {
+//                        //window._sagepayonepageTriggerId.writeAttribute("onclick", "return false;");
+//                    //    window._sagepayonepageTriggerId.writeAttribute("type", "button");
+//                    //}
+//
+//                }
+//            }
 
             //IWD_OnePage
-            if("undefined" != (typeof OPC)) {
+            /*
+            if(IWD && "undefined" != (typeof IWD.OPC)) {
                 //checkout.saveUrl = SuiteConfig.getConfig('global', 'sgps_saveorder_url');
                 //checkout._save = checkout.save.clone();
                 //checkout.save    = this.reviewSave.bindAsEventListener(this);
@@ -104,9 +125,10 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                     $(window._sagepayonepageFormId).writeAttribute("method", "post");
                 }
             }
+            */
 
             Event.stopObserving($(window._sagepayonepageFormId));
-            $(window._sagepayonepageFormId)._submit = $(window._sagepayonepageFormId).submit;
+            $(window._sagepayonepageFormId)._submit = document.createElement("form").submit;
             $(window._sagepayonepageFormId).submit = function(){
                 this.reviewSave();
             }.bind(this);
@@ -180,6 +202,8 @@ getShippingMethodSubmit: function(){
 getPaymentMethod: function(){
 
     var form = null;
+
+    //Fix this when using IE patch
 
     if($('multishipping-billing-form')){
         form = $('multishipping-billing-form');
@@ -380,20 +404,20 @@ reviewSave: function(transport){
 
         if(!this.isSagePay()) {
 
-            if(typeof OPC != "undefined") {
-                checkout.save();
-            }
-            else {
+            //if(IWD && typeof IWD.OPC != "undefined") {
+            //    checkout.save();
+            //}
+            //else {
                 $(window._sagepayonepageFormId)._submit();
-            }
+            //}
 
             return;
         }
 
         //Update billing IWD_OnePage
-        if(typeof OPC != "undefined") {
+        //if(IWD && typeof IWD.OPC != "undefined") {
             //checkout.update();
-        }
+        //}
 
             window._sagepayprocessingorder = true;
 
@@ -730,7 +754,7 @@ reviewSave: function(transport){
 
 try{
     Event.observe(window,"load",function() {
-
+    //document.observe('dom:loaded', function(){
         getOneStepCheckoutId();
 
         $(document.body).insert(new Element('a', {
@@ -951,13 +975,14 @@ Validation.addAllThese([
             var ccType = ccTypeContainer.value;
 
             // Other card type or switch or solo card
-            if (ccType == 'MCDEBIT' ||  ccType == 'OT' ||  ccType == 'UKE' || ccType == 'DELTA' || ccType == 'MAESTRO' || ccType == 'SOLO' || ccType == 'SWITCH' || ccType == 'LASER' || ccType == 'JCB' || ccType == 'DC') {
+            if (ccType == 'MCDEBIT' || ccType == 'OT' ||  ccType == 'UKE' || ccType == 'DELTA' || ccType == 'MAESTRO' || ccType == 'SOLO' || ccType == 'SWITCH' || ccType == 'LASER' || ccType == 'JCB' || ccType == 'DC') {
                 return true;
             }
             // Credit card type detecting regexp
             var ccTypeRegExp = {
                 'VISA': new RegExp('^4[0-9]{12}([0-9]{3})?$'),
                 'MC': new RegExp('^5[1-5][0-9]{14}$'),
+                //'MCDEBIT': new RegExp('(?:516730|516979|517000|517049|535110|535309|535420|535819|537210|537609|557347|557496|557498|557547)'),
                 'AMEX': new RegExp('^3[47][0-9]{13}$')
             };
 

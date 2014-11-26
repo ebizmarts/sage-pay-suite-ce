@@ -20,9 +20,8 @@ class Ebizmarts_SagePayReporting_Model_Cron {
 		->limit(15);
 
 		foreach($transactions as $_trn) {
+
 			$_trn->updateFromApi();
 		}
-
 	}
-
 }

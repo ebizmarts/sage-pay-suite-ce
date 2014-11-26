@@ -158,8 +158,12 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         if ($this->getSession()->getInvoicePayment() || (!is_null($reg) && $tran->getTxType() == 'PAYMENT')) {
             //Commented because casues invoices not to be generated on MAC
             //$this->getSession()->unsetData('invoice_payment');
+            //Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
             Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
         }
+
+        //Save to queue
+        //Mage::getModel('sagepaysuite2/sagepaysuite_queue')->push($tran);
     }
 
     public function saveBefore($o) {
@@ -315,7 +319,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
                     'onclick' => 'setLocation(\'' . $block->getUrl('sgpsSecure/adminhtml_transaction/sync', array('_secure' => true, 'trn_id' => $sagePayData->getId())) . '\')',
                     'class' => 'go'
                 ));
-
             }
 
         }

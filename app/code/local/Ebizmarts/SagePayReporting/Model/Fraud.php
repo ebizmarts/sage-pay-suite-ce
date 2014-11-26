@@ -20,4 +20,5 @@ class Ebizmarts_SagePayReporting_Model_Fraud
 		return $fraud;
 	}
 
+
 }

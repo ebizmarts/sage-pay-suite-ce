@@ -128,7 +128,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
                         'field'   => 'id',
                     ),
                     array(
-                        'caption' => Mage::helper('sagepaysuite')->__('Recover [beta]'),
+                        'caption' => Mage::helper('sagepaysuite')->__('Recover'),
                         'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/recover'),
                         'field'   => 'vendortxcode',
                         'confirm' => Mage::helper('sagepaysuite')->__("Are you sure?\nA new order will be created and payment will be associated."),

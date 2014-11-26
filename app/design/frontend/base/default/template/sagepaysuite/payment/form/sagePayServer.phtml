@@ -30,7 +30,30 @@
 			<label for="remembertoken-<?php echo $_code; ?>"><?php echo $this->__('Do you wish to have your credit card details remembered for faster checkout next time?'); ?></label>&nbsp;
 			<input checked="checked" type="checkbox" name="payment[remembertoken]" value="1" id="remembertoken-<?php echo $_code; ?>" />
 		</li>
+        <li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_nickname_li" >
+            <label for="<?php echo $_code ?>_cc_nickname"><?php echo $this->__('Credit Card Description') ?></label>
+            <div class="input-box">
+                <input type="text" title="<?php echo $this->__('Credit Card Description') ?>" class="input-text" id="<?php echo $_code ?>_cc_nickname" name="payment[cc_nickname]" value="<?php echo $this->htmlEscape($this->getInfoData('cc_nickname')) ?>" />
+            </div>
+        </li>
 	<?php endif; ?>
 
 	</ul>
+
+    <script type="text/javascript">
+
+        var saveTokenChecked<?php echo $_code ?> = function(){
+            if($('remembertoken-<?php echo $_code; ?>').checked){
+                $('<?php echo $_code ?>_cc_nickname_li').show();
+            }else{
+                $('<?php echo $_code ?>_cc_nickname_li').hide();
+            }
+        };
+
+        if(typeof $('remembertoken-<?php echo $_code; ?>') != 'undefined' && $('remembertoken-sagepayserver') != null){
+            Event.observe($('remembertoken-<?php echo $_code; ?>'), 'change', saveTokenChecked<?php echo $_code ?>);
+        }
+
+    </script>
+
 </div>

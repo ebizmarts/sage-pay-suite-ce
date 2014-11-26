@@ -12,16 +12,31 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
     protected $_code = 'sagepaytoken';
     protected $_formBlockType = 'sagepaysuite/form_sagePayToken';
 
-    /*
+    /**
      * Check if the current logged in customer can add a new card.
      * @return bool
      */
 
-    public function customerCanAddCard() {
+    public function customerCanAddCard($methodCode = null, $ccNumber = null, $ccExpireDate = null, $ccType = null) {
         $customerCards = Mage::helper('sagepaysuite/token')->loadCustomerCards()->getSize();
         $maxCards = (int) Mage::getStoreConfig('payment/sagepaysuite/max_token_card');
 
-        return ($customerCards < $maxCards);
+        if(is_null($ccNumber) && is_null($ccExpireDate) && is_null($ccType)){
+            return ($customerCards < $maxCards);
+        }
+
+        if(is_string($ccNumber) && strlen($ccNumber) != 4){
+            $lastFour = substr($ccNumber,-4);
+        }else{
+            $lastFour = $ccNumber;
+        }
+
+        if(Mage::helper('sagepaysuite/token')->loadCustomerCards($methodCode,$lastFour,$ccType,$ccExpireDate)->getSize() == 0){
+            return ($customerCards < $maxCards);
+        }
+
+        return FALSE;
+
     }
 
     public function getSessionCustomerId() {
@@ -39,10 +54,31 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
             $sessId = null;
         }
 
+        $methodCode = null;
+
+        if($info['Protocol'] == 'direct'){
+            $methodCode = 'sagepaydirectpro';
+        }else if($info['Protocol'] == 'server'){
+            $methodCode = 'sagepayserver';
+        }
+
+        // As in some cases we are not able to prevent the token creation we need to delete it after creation if it is not possible to store the token.
+
+        if(!$this->customerCanAddCard($methodCode,$info['CardNumber'],$info['ExpiryDate'],$info['CardType'])){
+
+            $this->removeCard($info['Token']);
+
+            $message = Mage::helper('sagepaysuite')->__('Credit card could not be saved for future use. You already have this card attached to your account or you have reached your account\'s maximum card storage capacity.');
+            Mage::getSingleton('core/session')->addWarning($message);
+
+            return FALSE;
+        }
+
         $save = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')
                 ->setToken($info['Token'])
                 ->setStatus($info['Status'])
                 ->setVendor($info['Vendor'])
+                ->setNickname($info['Nickname'])
                 ->setCardType($info['CardType'])
                 ->setExpiryDate($info['ExpiryDate'])
                 ->setStatusDetail($info['StatusDetail'])
@@ -169,9 +205,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
     }
 
     public function registerCard(array $data = array(), $persist = false) {
-        if ($this->customerCanAddCard() === false) {
-            return array('Status' => 'ERROR', 'StatusDetail' => Mage::helper('sagepaysuite')->__('You can\'t add more tokens. Please contact the administrator.'));
-        }
 
         $postData                = array();
         $postData['VPSProtocol'] = $this->getVpsProtocolVersion();
@@ -194,11 +227,17 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
 
         if (array_key_exists('CardType', $data)) { #DIRECT
             $urlPost = $this->getTokenUrl('register', 'direct');
+            $methodCode = 'sagepaydirectpro';
             $postData += $data;
         }
         else { #SERVER
             $urlPost = $this->getTokenUrl('register', 'server');
+            $methodCode = 'sagepayserver';
             $postData['Profile'] = 'LOW';
+        }
+
+        if ($this->customerCanAddCard($methodCode, $data['CardNumber'], $data['ExpiryDate'], $data['CardType']) === false) {
+            return array('Status' => 'ERROR', 'StatusDetail' => Mage::helper('sagepaysuite')->__('Credit card could not be saved for future use. You already have this card attached to your account or you have reached your account\'s maximum card storage capacity.'));
         }
 
         $result = $this->requestPost($urlPost, $postData);

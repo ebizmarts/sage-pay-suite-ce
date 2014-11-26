@@ -9,14 +9,15 @@
     <div id="tokencards-payment-<?php echo $c; ?>"<?php if($c == 'sagepayserver' or $c == 'sagepayserver_moto'): ?> class="nothide"<?php endif; ?>>
     <ul class="form-list tokensage">
     <?php
+        $default_token = "";
     	foreach($tokenCards as $_tcard):
 		$radioId = $c . '_tokencard_' . $_tcard->getId();
 		$isDef = $_tcard->getId() == $defToken->getId();
 	?>
 
 		<li class="tokencard-radio">
-			<input<?php if($isDef): ?> checked="checked"<?php endif; ?> type="radio" id="<?php echo $radioId; ?>" name="payment[sagepay_token_cc_id]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-radio" value="<?php echo $_tcard->getId(); ?>" onclick="switchToken(this);" />
-			<label class="token" for="<?php echo $radioId; ?>"><?php echo $this->__('%s, Exp. %s', $_tcard->getCcNumber(), $_tcard->getExpireDate()); ?></label>
+			<input<?php if($isDef): ?> checked="checked"<?php endif; ?> type="radio" id="<?php echo $radioId; ?>" name="payment[sagepay_token_cc_id]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-radio" value="<?php echo $_tcard->getId(); ?>" onclick="switchToken(this,'<?php echo $_tcard->getCardType(); ?>');" />
+			<label class="token" for="<?php echo $radioId; ?>"><?php echo $this->__('%s, Exp. %s', $_tcard->getCcNumber(), $_tcard->getExpireDate()); ?> <?php if($_tcard->Nickname !== NULL){ echo ' - '.$_tcard->Nickname; } ?></label>
 			<img width="35" src="<?php echo $this->helper('sagepaysuite')->getCcImage($this->helper('sagepaysuite')->getCardLabel($_tcard->getCardType(), false)); ?>" />&nbsp;&nbsp;&nbsp;
 
                         <?php if($c != 'sagepayserver_moto'): ?>
@@ -26,8 +27,12 @@
 	        </div>
                         <?php endif; ?>
 		</li>
-	<?php endforeach; ?>
+        <?php
+            if($isDef) {$default_token = $_tcard->getCardType(); }
+        ?>
+        <?php endforeach; ?>
 	</ul>
-	</div>
-	<a class="addnew" href="" onclick="toggleNewCard(2); return false;"><?php echo $this->__('No Token'); ?></a>
+    <input type="hidden" id="<?php echo $c ?>_cc_type_token" name="payment[cc_type_token]" value="<?php echo $default_token; ?>" />
+    </div>
+	<a class="addnew" href="" onclick="toggleNewCard(2); return false;"><?php echo $this->__('Add new card'); ?></a>
 <?php endif; ?>
