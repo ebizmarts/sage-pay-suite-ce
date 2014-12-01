@@ -260,9 +260,6 @@
                     <sagepaysuite_fraud>
                         <table>sagepaysuite_fraud</table>
                     </sagepaysuite_fraud>
-                    <sagepaysuite_queue>
-                        <table>sagepaysuite_transaction_queue</table>
-                    </sagepaysuite_queue>
                 </entities>
             </sagepaysuite_mysql4>
         </models>

@@ -255,12 +255,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         $result = $this->_postRequest($request, true);
         Sage_Log::log($result, null, '3D-Result.log');
 
-        //save surcharge to server post for later use
-        $session_surcharge_amount = Mage::getSingleton('sagepaysuite/session')->getSurcharge();
-        if(!is_null($session_surcharge_amount) && $session_surcharge_amount > 0){
-            Mage::log("SESSION: " . $session_surcharge_amount);
-            $result->setData('Surcharge',$session_surcharge_amount);
-        }
         Mage::register('sageserverpost', $result);
 
         if ($result->getResponseStatus() == self::RESPONSE_CODE_APPROVED || $result->getResponseStatus() == 'AUTHENTICATED') {
@@ -1075,20 +1069,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
         return $mail->getSentSuccess();
     }
-
-    /* public function getOrderPlaceRedirectUrl()
-      {
-      $tmp = $this->getSageSuiteSession();
-
-      Ebizmarts_SagePaySuite_Log::w($tmp->getAcsurl().'-'.$tmp->getEmede().'-'.$tmp->getPareq());
-
-      if ( $tmp->getAcsurl() && $tmp->getEmede() && $tmp->getPareq()) {
-      #return Mage::getUrl('sagepaydirectpro/payment/redirect', array('_secure' => true));
-      return Mage::getUrl('sagepaydirectpro-3dsecure', array('_secure' => true));
-      } else {
-      return false;
-      }
-      } */
 
     public function getPayPalTitle() {
         return Mage::getStoreConfig('payment/sagepaypaypal/title', Mage::app()->getStore()->getId());

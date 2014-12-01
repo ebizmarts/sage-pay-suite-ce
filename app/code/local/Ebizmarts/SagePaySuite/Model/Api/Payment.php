@@ -1973,7 +1973,9 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
             if ($customer->getDob()) {
                 $_dob = substr($customer->getDob(), 0, strpos($customer->getDob(), ' '));
-                $xml->addChildCData('customerBirth', $_dob); //YYYY-MM-DD
+                if($_dob != "0000-00-00"){
+                    $xml->addChildCData('customerBirth', $_dob); //YYYY-MM-DD
+                }
             }
 
             if ($customer->getWorkPhone()) {

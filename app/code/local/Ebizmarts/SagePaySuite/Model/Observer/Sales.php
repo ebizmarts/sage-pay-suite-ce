@@ -161,9 +161,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
             //Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
             Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
         }
-
-        //Save to queue
-        //Mage::getModel('sagepaysuite2/sagepaysuite_queue')->push($tran);
     }
 
     public function saveBefore($o) {
