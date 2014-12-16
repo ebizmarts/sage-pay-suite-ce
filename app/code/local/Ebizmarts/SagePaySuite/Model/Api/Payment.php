@@ -1127,7 +1127,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         $params ['storeid'] = Mage::app()->getStore()->getId();
-        $params ['qid'] = (int) Mage::app()->getRequest()->getParam('qid');
+        //$params ['qid'] = (int) Mage::app()->getRequest()->getParam('qid');
+        $params ['qid'] = (int) Mage::getSingleton('checkout/session')->getQuoteId();
 
         return $params;
     }

@@ -463,6 +463,12 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         $sageserverpost = new Varien_Object($_POST);
                         Mage::register('sageserverpost', $sageserverpost);
 
+                        //1.9.1 ssl fix
+                        if($this->getOnepage()->getQuote()->getId() == null){
+                            $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
+                            $this->getOnepage()->setQuote(Mage::getModel('sales/quote')->loadActive($rqQuoteId));
+                        }
+
                         $sOrder = $this->_saveMagentoOrder();
 
                         if ($sOrder !== true) {

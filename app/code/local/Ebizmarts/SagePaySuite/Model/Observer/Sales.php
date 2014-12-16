@@ -76,6 +76,10 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         $rqVendorTxCode = Mage::app()->getRequest()->getParam('vtxc');
         $sessionVendor = ($rqVendorTxCode) ? $rqVendorTxCode : $this->getSession()->getLastVendorTxCode();
 
+        if($sessionVendor == null){
+            $sessionVendor = Mage::app()->getRequest()->getParam('VendorTxCode');
+        }
+
         /**
          * Multishipping vendors
          */
@@ -94,6 +98,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         /**
          * Multishipping vendors
          */
+
+
         $reg = Mage::registry('Ebizmarts_SagePaySuite_Model_Api_Payment::recoverTransaction');
         if (!is_null($reg)) {
             $sessionVendor = $reg;
