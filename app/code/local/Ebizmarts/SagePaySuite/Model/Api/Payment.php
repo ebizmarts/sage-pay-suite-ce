@@ -14,30 +14,27 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
     protected $_quote = null;
     protected $_canEdit = TRUE;
 
-    const BASKET_SEP = ':';
-    const RESPONSE_DELIM_CHAR = "\r\n";
-    const REQUEST_BASKET_ITEM_DELIMITER = ':';
-    const RESPONSE_CODE_APPROVED = 'OK';
-    const RESPONSE_CODE_REGISTERED = 'REGISTERED';
-    const RESPONSE_CODE_DECLINED = 'OK';
-    const RESPONSE_CODE_ABORTED = 'OK';
-    const RESPONSE_CODE_AUTHENTICATED = 'OK';
-    const RESPONSE_CODE_REJECTED = 'REJECTED';
-    const RESPONSE_CODE_INVALID = 'INVALID';
-    const RESPONSE_CODE_ERROR = 'ERROR';
-    const RESPONSE_CODE_NOTAUTHED = 'NOTAUTHED';
-    const RESPONSE_CODE_3DAUTH = '3DAUTH';
-    const RESPONSE_CODE_MALFORMED = 'MALFORMED';
-
-    const REQUEST_TYPE_PAYMENT = 'PAYMENT';
-    const REQUEST_TYPE_VOID = 'VOID';
-
-    const XML_CREATE_INVOICE = 'payment/sagepaydirectpro/create_invoice';
-
-    const REQUEST_METHOD_CC = 'CC';
-    const REQUEST_METHOD_ECHECK = 'ECHECK';
-
-    const ACTION_AUTHORIZE_CAPTURE = 'payment';
+    const BASKET_SEP                           = ':';
+    const BASKET_SEP_ESCAPE                    = '-';
+    const RESPONSE_DELIM_CHAR                  = "\r\n";
+    const REQUEST_BASKET_ITEM_DELIMITER        = ':';
+    const RESPONSE_CODE_APPROVED               = 'OK';
+    const RESPONSE_CODE_REGISTERED             = 'REGISTERED';
+    const RESPONSE_CODE_DECLINED               = 'OK';
+    const RESPONSE_CODE_ABORTED                = 'OK';
+    const RESPONSE_CODE_AUTHENTICATED          = 'OK';
+    const RESPONSE_CODE_REJECTED               = 'REJECTED';
+    const RESPONSE_CODE_INVALID                = 'INVALID';
+    const RESPONSE_CODE_ERROR                  = 'ERROR';
+    const RESPONSE_CODE_NOTAUTHED              = 'NOTAUTHED';
+    const RESPONSE_CODE_3DAUTH                 = '3DAUTH';
+    const RESPONSE_CODE_MALFORMED              = 'MALFORMED';
+    const REQUEST_TYPE_PAYMENT                 = 'PAYMENT';
+    const REQUEST_TYPE_VOID                    = 'VOID';
+    const XML_CREATE_INVOICE                   = 'payment/sagepaydirectpro/create_invoice';
+    const REQUEST_METHOD_CC                    = 'CC';
+    const REQUEST_METHOD_ECHECK                = 'ECHECK';
+    const ACTION_AUTHORIZE_CAPTURE             = 'payment';
 
     protected $ACSURL = NULL;
     protected $PAReq = NULL;
@@ -183,6 +180,11 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
         Mage::dispatchEvent('sagepaysuite_get_configvalue_' . $field, array('confobject' => $confValue, 'path' => $path));
 
+        //euro payment pending status
+        if($path == "payment/sagepayserver/order_status" && $this->getSageSuiteSession()->getEuroPaymentIsPending() === true){
+            $confValue->value = "pending";
+        }
+
         return $confValue->value;
     }
 
@@ -313,8 +315,16 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
         $this->getSageSuiteSession()->setTokenCvv($data->getTokenCvv());
 
-	//Direct GiftAidPayment flag
-	$dgift = (!is_null($data->getCcGiftaid()) ? 1 : NULL);
+        if ($this->isMobile()) {
+            $cct = Mage::getSingleton('sagepaysuite/config')->getTranslateCc();
+            if (in_array($data->getCcType(), $cct)) {
+                $cctF = array_flip($cct);
+                $data->setCcType($cctF[$data->getCcType()]);
+            }
+        }
+
+        //Direct GiftAidPayment flag
+        $dgift = (!is_null($data->getCcGiftaid()) ? 1 : NULL);
 
         //Remember token
         $info->setRemembertoken((!is_null($data->getRemembertoken()) ? 1 : 0));
@@ -332,6 +342,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 ->setTokenCvv($data->getTokenCvv())
                 ->setCcStartMonth($data->getCcStartMonth())
                 ->setCcStartYear($data->getCcStartYear())
+                ->setCcNickname($data->getCcNickname())
                 ->setCcGiftaid($dgift);
         return $this;
     }
@@ -678,7 +689,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
             //If using Magemaven_OrderComment, change this to TRUE, otherwise
             //comment is not visible on email.
-            $invoice->getOrder()->setCustomerNoteNotify($sendemail);
+            //$invoice->getOrder()->setCustomerNoteNotify($sendemail);
 
             $transactionSave = Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
@@ -870,8 +881,6 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 ->setActionCode(strtolower($request['TxType']))
                 ->setActionDate($this->getDate());
 
-
-
         //Add additional transaction data to action
         if(isset($result['AVSCV2'])) {
             $model->setAvscv2($result['AVSCV2']);
@@ -939,9 +948,36 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             return $this;
         }
 
-		$t = strtoupper($trn->getTxType());
-        if($t == 'PAYMENT'){
-            $this->voidPayment($trn);
+        if($trn->getEuroPaymentsStatus() === null || $trn->getEuroPaymentsStatus() == "OK"){
+            //if it's not an euro payment I try to cancel the sagepay transaction
+
+            $t = strtoupper($trn->getTxType());
+
+            if ($t == self::REQUEST_TYPE_AUTHENTICATE) {
+                $this->_cancel($trn);
+            } else if ($t == 'PAYMENT') {
+                $this->voidPayment($trn);
+            } else if ($t == 'DEFERRED') {
+
+                //If its fully released
+                //If $order->canInvoice() is TRUE it means that was partially invoiced already
+                if ((int) $trn->getReleased() === 1) {
+                    if (!$order->canInvoice()) {
+                        $this->voidPayment($trn);
+                    }
+                } else {
+                    $this->abortPayment($trn);
+                }
+            }
+        }else{
+            $trn->setAborted(1)->save();
+
+            //set order status
+            $order->setStatus("canceled")->save();
+
+            //send canceled email
+            $comment = "<b>Your payment failed due to error " . $trn->getStatusDetail() . "</b>";
+            $order->sendOrderUpdateEmail(true, $comment);
         }
 
         return $this;
@@ -1091,7 +1127,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         $params ['storeid'] = Mage::app()->getStore()->getId();
-        $params ['qid'] = (int) Mage::app()->getRequest()->getParam('qid');
+        //$params ['qid'] = (int) Mage::app()->getRequest()->getParam('qid');
+        $params ['qid'] = (int) Mage::getSingleton('checkout/session')->getQuoteId();
 
         return $params;
     }
@@ -1333,6 +1370,10 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         return (bool) ($this->getCode() == 'sagepaydirectpro');
     }
 
+    public function isMobile() {
+        return Mage::helper('sagepaysuite')->isMobileApp();
+    }
+
     /**
      * Trim $string to certaing $length
      */
@@ -1377,9 +1418,12 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
      * @param  Mage_Sales_Model_Quote $quote
      * @return string Basket as string.
      */
+    /*
     public function getSageBasket($quote) {
 
         $basket = '';
+
+        $fakeColon = "%$%!this^must&be±unique!%$%";
 
         //$orderCurrencyCode = $this->getConfigCurrencyCode($quote);
         //$_currency         = Mage::getModel('directory/currency')->load($orderCurrencyCode);
@@ -1403,7 +1447,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 }
             }
 
-            $basket .= $numberOfdetailLines . self::BASKET_SEP;
+            $basket .= $numberOfdetailLines . $fakeColon;
 
             foreach ($itemsCollection as $item) {
 
@@ -1436,22 +1480,22 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 }
 
                 //[SKU]|Name
-                $line = str_replace(':', '-', '[' . $this->_cleanString($item->getSku()) . ']|' . $item->getName()) . $this->_cleanString($_options) . self::BASKET_SEP;
+                $line = str_replace($fakeColon, '-', '[' . $this->_cleanString($item->getSku()) . ']|' . $item->getName()) . $this->_cleanString($_options) . $fakeColon;
 
                 //Quantity
-                $line .= ( $item->getQty() * 1) . self::BASKET_SEP;
+                $line .= ( $item->getQty() * 1) . $fakeColon;
 
                 //if ($this->getConfigData('sagefifty_basket')) {
                 $taxAmount = number_format(($item->getTaxAmount() / ($item->getQty() * 1)), 2);
 
                 //Item value
-                $line .= $calculationPrice . self::BASKET_SEP;
+                $line .= $calculationPrice . $fakeColon;
 
                 //Item tax
-                $line .= number_format($taxAmount, 2) . self::BASKET_SEP;
+                $line .= number_format($taxAmount, 2) . $fakeColon;
 
                 //Item total
-                $line .= number_format($calculationPrice + $taxAmount, 2) . self::BASKET_SEP;
+                $line .= number_format($calculationPrice + $taxAmount, 2) . $fakeColon;
 
                 if($useBaseMoney) {
                     $rowTotal = $item->getBaseRowTotal();
@@ -1461,22 +1505,9 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 }
 
                 //Line total
-                $line .= (($rowTotal + $tax) - $item->getDiscountAmount()) . self::BASKET_SEP;
+                $line .= (($rowTotal + $tax) - $item->getDiscountAmount()) . $fakeColon;
 
-                /*} else {
-                    //Item value
-                    $line .= $_currency->formatPrecision($item->getCalculationPrice(), 2, array(), false) . self::BASKET_SEP;
-
-                    //Item tax
-                    $line .= $_currency->formatPrecision($item->getTaxAmount(), 2, array(), false) . self::BASKET_SEP;
-
-                    //Item total
-                    $line .= $_currency->formatPrecision($item->getTaxAmount() + $item->getCalculationPrice(), 2, array(), false) . self::BASKET_SEP;
-
-                    //Line total
-                    $line .= $_currency->formatPrecision((($item->getRowTotal() + $tax) - $item->getDiscountAmount()), 2, array(), false) . self::BASKET_SEP;
-                }*/
-
+                //add item to string if not too large
                 if (strlen($basket . $line) < 7498) {
                     $basket .= $line;
                 }
@@ -1489,7 +1520,6 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         //Delivery data
         $shippingAddress = $quote->getShippingAddress();
 
-        //if ($this->getConfigData('sagefifty_basket')) {
         if($useBaseMoney) {
             $deliveryValue  = $shippingAddress->getBaseShippingAmount();
             $deliveryTax    = $shippingAddress->getBaseShippingTaxAmount();
@@ -1500,16 +1530,12 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             $deliveryTax    = $shippingAddress->getShippingTaxAmount();
             $deliveryAmount = $shippingAddress->getShippingInclTax();
         }
-        /*} else {
-            $deliveryValue = $_currency->formatPrecision($shippingAddress->getShippingAmount(), 2, array(), false);
-            $deliveryTax = $_currency->formatPrecision($shippingAddress->getShippingTaxAmount(), 2, array(), false);
-            $deliveryAmount = $_currency->formatPrecision($shippingAddress->getShippingInclTax(), 2, array(), false);
-        }*/
 
         $deliveryName = $shippingAddress->getShippingDescription() ? $shippingAddress->getShippingDescription() : 'Delivery';
-        $delivery = $deliveryName . self::BASKET_SEP . '1' . self::BASKET_SEP . $deliveryValue . self::BASKET_SEP
-                    . $deliveryTax . self::BASKET_SEP . $deliveryAmount . self::BASKET_SEP . $deliveryAmount;
+        $delivery = $deliveryName . $fakeColon . '1' . $fakeColon . $deliveryValue . $fakeColon
+                    . $deliveryTax . $fakeColon . $deliveryAmount . $fakeColon . $deliveryAmount;
 
+        //add delivery to string if not too large
         if (strlen($basket . $delivery) < 7498) {
             $basket .= $delivery;
         }
@@ -1517,17 +1543,17 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             $todelete++;
         }
 
-        $numberOfLines = substr($basket, 0, strpos($basket, ':'));
+        $numberOfLines = substr($basket, 0, strpos($basket, $fakeColon));
 
         if ($todelete > 0) {
             $num    = $numberOfLines - $todelete;
             $basket = str_replace($numberOfLines, $num, $basket);
         }
 
-        /**
-         * Verify that items count is correct
-         */
-        $items = explode(':', $basket);
+
+        // Verify that items count is correct
+
+        $items = explode($fakeColon, $basket);
         //Remove line number from basket
         array_shift($items);
         //Split into rows
@@ -1535,11 +1561,163 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         if ($rows != $numberOfLines) {
             $basket[0] = $rows;
         }
-        /**
-         * Verify that items count is correct
-         */
+
+        //Verify that items count is correct
+
+
+        $basket = str_replace(self::BASKET_SEP,self::BASKET_SEP_ESCAPE,$basket);
+        $basket = str_replace($fakeColon,self::BASKET_SEP,$basket);
+
+        //verify that last char is not the separator
+        $lastCharacters = substr($basket, strlen(self::BASKET_SEP) * -1);
+        if($lastCharacters == self::BASKET_SEP){
+            //remove last separator
+            $basket = substr($basket, 0, strlen(self::BASKET_SEP) * -1);
+        }
 
         return $basket;
+    }
+    */
+
+    public function getSageBasket($quote) {
+
+        $basketArray = array();
+        $useBaseMoney = true;
+
+        $trnCurrency = (string)$this->getConfigData('trncurrency', $quote->getStoreId());
+        if ($trnCurrency == 'store' or $trnCurrency == 'switcher') {
+            $useBaseMoney = false;
+        }
+
+        $itemsCollection = $quote->getItemsCollection();
+        if ($itemsCollection->getSize() > 0) {
+
+            foreach ($itemsCollection as $item) {
+
+                //Avoid duplicates SKUs on basket
+                if ($this->_isSkuDuplicatedInSageBasket($basketArray,$this->_cleanString($item->getSku())) == true) {
+                    continue;
+                }
+                //Avoid configurables
+                if ($item->getParentItem()) {
+                    continue;
+                }
+
+                $newItem = array("item"=>"",
+                                 "qty"=>0,
+                                 "item_value"=>0,
+                                 "item_tax"=>0,
+                                 "item_total"=>0,
+                                 "line_total"=>0,);
+
+                $tax = ($item->getBaseTaxBeforeDiscount() ? $item->getBaseTaxBeforeDiscount() : ($item->getBaseTaxAmount() ? $item->getBaseTaxAmount() : 0));
+
+                if($useBaseMoney) {
+                    $calculationPrice = $item->getBaseCalculationPrice();
+                }
+                else {
+                    $calculationPrice = $item->getCalculationPrice();
+                }
+
+                //Options
+                $options = $this->_getProductOptions($item);
+                $_options = '';
+                if (count($options) > 0) {
+                    foreach ($options as $opt) {
+                        $_options .= $opt['label'] . '-' . $opt['value'] . '.';
+                    }
+                    $_options = '_' . substr($_options, 0, -1) . '_';
+                }
+
+                //[SKU] Name
+                $newItem["item"] = str_replace(self::BASKET_SEP, self::BASKET_SEP_ESCAPE, '[' . $this->_cleanString($item->getSku()) . '] ' . $this->_cleanString($item->getName()) . $this->_cleanString($_options));
+
+                //Quantity
+                $newItem["qty"] = $item->getQty() * 1;
+
+                //Item value
+                $newItem["item_value"] = $calculationPrice;
+
+                //Item tax
+                $taxAmount = number_format(($item->getTaxAmount() / ($item->getQty() * 1)), 2);
+                $newItem["item_tax"] = $taxAmount;
+
+                //Item total
+                $newItem["item_total"] = $calculationPrice + $taxAmount;
+
+                if($useBaseMoney) {
+                    $rowTotal = $item->getBaseRowTotal();
+                }
+                else {
+                    $rowTotal = $item->getRowTotal();
+                }
+
+                //Line total
+                $newItem["line_total"] = (($rowTotal + $tax) - $item->getDiscountAmount());
+
+                //add item to array
+                $basketArray[] = $newItem;
+            }
+        }
+
+        //Delivery data
+        $shippingAddress = $quote->getShippingAddress();
+
+        if($useBaseMoney) {
+            $deliveryValue  = $shippingAddress->getBaseShippingAmount();
+            $deliveryTax    = $shippingAddress->getBaseShippingTaxAmount();
+            $deliveryAmount = $shippingAddress->getBaseShippingInclTax();
+        }
+        else {
+            $deliveryValue  = $shippingAddress->getShippingAmount();
+            $deliveryTax    = $shippingAddress->getShippingTaxAmount();
+            $deliveryAmount = $shippingAddress->getShippingInclTax();
+        }
+
+        $deliveryName = $shippingAddress->getShippingDescription() ? $shippingAddress->getShippingDescription() : 'Delivery';
+
+        //delivery item
+        $deliveryItem = array("item"=>str_replace(self::BASKET_SEP, self::BASKET_SEP_ESCAPE, $this->_cleanString($deliveryName)),
+            "qty"=>1,
+            "item_value"=>$deliveryValue,
+            "item_tax"=>$deliveryTax,
+            "item_total"=>$deliveryAmount,
+            "line_total"=>$deliveryAmount,);
+        $basketArray[] = $deliveryItem;
+
+        //create basket string
+        $basketString = '';
+        $rowCount = 0;
+        for($i = 0;$i<count($basketArray);$i++){
+            $line = self::BASKET_SEP . $basketArray[$i]['item'] .
+                self::BASKET_SEP . $basketArray[$i]['qty'] .
+                self::BASKET_SEP . $basketArray[$i]['item_value'] .
+                self::BASKET_SEP . $basketArray[$i]['item_tax'] .
+                self::BASKET_SEP . $basketArray[$i]['item_total'] .
+                self::BASKET_SEP . $basketArray[$i]['line_total'];
+
+            if (strlen($basketString . $line) < 7498) {
+                $basketString .= $line;
+                $rowCount ++;
+            }else{
+                break;
+            }
+        }
+
+        //add total rows
+        $basketString = $rowCount . $basketString;
+
+        return $basketString;
+    }
+
+    private function _isSkuDuplicatedInSageBasket($basketArray,$itemSku){
+        for($i = 0;$i<count($basketArray);$i++){
+            if(strpos($basketArray[$i]['item'], $itemSku) !== FALSE){
+                return true;
+                break;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1796,7 +1974,9 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
             if ($customer->getDob()) {
                 $_dob = substr($customer->getDob(), 0, strpos($customer->getDob(), ' '));
-                $xml->addChildCData('customerBirth', $_dob); //YYYY-MM-DD
+                if($_dob != "0000-00-00"){
+                    $xml->addChildCData('customerBirth', $_dob); //YYYY-MM-DD
+                }
             }
 
             if ($customer->getWorkPhone()) {
@@ -1820,7 +2000,6 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
         return $_xml;
     }
-
     /**
     * Check that two floats are equal
     *

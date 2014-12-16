@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.19.1</version>
+            <version>3.0.21.1</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -165,7 +165,10 @@
             <stateid_24><![CDATA[PayPal Transaction Registered]]></stateid_24>
             <stateid_25><![CDATA[Token Registered.]]></stateid_25>
             <stateid_26><![CDATA[AUTHENTICATE transaction that can no longer be AUTHORISED against.  It has either expired, or been fully authorised.]]></stateid_26>
-            <stateid_27><![CDATA[DEFERRED transaction that expired before it was RELEASEd or ABORTed.]]></stateid_27>
+            <stateid_27><![CDATA[DEFERRED transaction that expired before it was RELEASED or ABORTED.]]></stateid_27>
+            <!-- EURO Payment statuses -->
+            <stateid_28><![CDATA[Transaction waiting for authorisation.]]></stateid_28>
+            <stateid_29><![CDATA[Successfully authorised transaction.]]></stateid_29>
         </tx_states>
         <payment>
             <cc_sgps>
@@ -462,13 +465,6 @@
                 <model>sagepaysuite/sagePayForm</model>
                 <allowspecific>0</allowspecific>
             </sagepayform>
-            <sagepaypaypal>
-            	<active>0</active>
-            	<payment_action>payment</payment_action>
-            	<title>PayPal via SagePay</title>
-            	<model>sagepaysuite/sagePayPayPal</model>
-                <frontend_behaviour>checkout</frontend_behaviour>
-            </sagepaypaypal>
         </payment>
     </default>
     <frontend>

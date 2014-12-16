@@ -174,14 +174,17 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             }
         }
 
+        //save addresses
+        if(Mage::helper('customer')->isLoggedIn()){
+            $this->getOnepage()->getQuote()->getBillingAddress()->setSaveInAddressBook(empty($billing_data['save_in_address_book']) ? 0 : 1);
+            $this->getOnepage()->getQuote()->getShippingAddress()->setSaveInAddressBook(empty($shipping_data['save_in_address_book']) ? 0 : 1);
+        }
+
         $shipping_method = $this->getRequest()->getPost('shipping_method', false);
 
         if (!empty($shipping_method)) {
             $helper->saveShippingMethod($shipping_method);
         }
-
-        //Commented, it breaks totals
-        //$this->getOnepage()->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
 
         $requestParams = $this->getRequest()->getParams();
         if (array_key_exists('onestepcheckout_comments', $requestParams)

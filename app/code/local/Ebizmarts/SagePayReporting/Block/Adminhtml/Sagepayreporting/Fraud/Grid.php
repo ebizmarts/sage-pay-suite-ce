@@ -60,7 +60,11 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
 		array('pmnt' => $collection->getTable('sales/order_payment')), # sales_flat_order_payment
             'main_table.entity_id = pmnt.parent_id',
 		array()
-		)->joinLeft(
+		)/*->joinLeft(
+		array('sls' => $collection->getTable('sales/order')), # sales_flat_order
+		'main_table.entity_id = sls.entity_id',
+		array('status')
+		)*/->joinLeft(
 		array('fraud' => Mage :: getSingleton('core/resource')->getTableName('sagepayreporting_fraud')),
             'main_table.entity_id = fraud.order_id',
 		array('thirdman_score', 'thirdman_action', 'thirdman_id')
@@ -80,10 +84,9 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
 
 		foreach($collection as $_c){
 
-            if($_c->getTxType() == 'PAYMENT'){
+			if($_c->getTxType() == 'PAYMENT'){
 				$_c->setPaymentStatus(Mage::helper('sagepaysuite')->__('OK Captured'));
 			}
-
 		}
 
 		$this->setDefaultSort('increment_id');
@@ -224,11 +227,11 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
                 'type'      => 'action',
                 'getter'     => 'getId',
                 'actions'   => array(
-		array(
-                        'caption' => Mage::helper('sagepaysuite')->__('Check 3rd Man'),
-                        'url'     => array('base'=>'*/*/fraudCheck'),
-                        'field'   => 'order_id',
-		),
+                    array(
+                                    'caption' => Mage::helper('sagepaysuite')->__('Check 3rd Man'),
+                                    'url'     => array('base'=>'*/*/fraudCheck'),
+                                    'field'   => 'order_id',
+                    )
 		),
                 'filter'    => false,
                 'sortable'  => false,

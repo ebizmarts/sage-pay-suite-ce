@@ -16,16 +16,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
     /**
      * Availability options
      */
-    protected $_isGateway               = true;
-    protected $_canAuthorize            = false;
-    protected $_canCapture              = true;
-    protected $_canCapturePartial       = false;
-    protected $_canRefund               = false;
+    protected $_isGateway = true;
+    protected $_canAuthorize = false;
+    protected $_canCapture = true;
+    protected $_canCapturePartial = false;
+    protected $_canRefund = false;
     protected $_canRefundInvoicePartial = false;
-    protected $_canVoid                 = false;
-    protected $_canUseInternal          = false;
-    protected $_canUseCheckout          = true;
-    protected $_canUseForMultishipping  = false;
+    protected $_canVoid = false;
+    protected $_canUseInternal = false;
+    protected $_canUseCheckout = true;
+    protected $_canUseForMultishipping = false;
 
     public function validate() {
         Mage_Payment_Model_Method_Abstract::validate();

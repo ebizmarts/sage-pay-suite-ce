@@ -13,6 +13,7 @@
     <thead>
         <tr>
             <th><?php echo $this->helper('sagepaysuite')->__('Type') ?></th>
+            <th><?php echo $this->helper('sagepaysuite')->__('Description') ?></th>
             <th><?php echo $this->helper('sagepaysuite')->__('Number') ?></th>
             <th><?php echo $this->helper('sagepaysuite')->__('Exp. Date') ?></th>
             <th><?php echo $this->helper('sagepaysuite')->__('Default') ?></th>
@@ -34,6 +35,9 @@
         <tr>
             <td>
             	<?php echo $_card->getLabel(); ?>
+            </td>
+            <td class="nickname" id="nickname_<?php echo $_card->getId(); ?>" >
+                <div style="cursor: pointer" title="<?php echo $this->helper('sagepaysuite')->__("Click to edit the credit card description.") ?>"><?php if($_card->getNickname()) {echo $_card->getNickname();}else{ echo 'Click to add a Description';} ?></div>
             </td>
             <td>
             	<?php echo $_card->getCcNumber(); ?>

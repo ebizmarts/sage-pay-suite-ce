@@ -19,6 +19,10 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_System_Config_Fieldset_Hint extends
     }
 
     public function getSagePaySuiteVersion() {
+
+        //This tracking is just for analytics proposes, in example, notify in case of new versions or critical issue, you can safely comment this line, email us if you have doubts: info@ebizmarts.com
+        Mage::helper('sagepaysuite/tracker')->send();
+
         return (string) Mage::getConfig()->getNode('modules/Ebizmarts_SagePaySuite/version');
     }
 

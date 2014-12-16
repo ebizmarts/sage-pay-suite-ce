@@ -99,6 +99,8 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
 
                 if((string)$details->getErrorcode() === '0000') {
 
+                        //Mage::log("STATUS: " . (int)$details->getTxstateid() . " " . $details->getStatus());
+
                         if(((int)$details->getTxstateid()) === 16) {
                             $this->setStatus('OK');
                         }

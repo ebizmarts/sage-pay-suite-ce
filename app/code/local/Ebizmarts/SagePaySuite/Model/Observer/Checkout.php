@@ -165,18 +165,14 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
 
         $isMage19OrUp    = version_compare(Mage::getVersion(), '1.9.0.0', '>=');
         $isSagePayServer = ($order->getPayment()->getMethod() == 'sagepayserver');
-        $isRegister      = ($quote->getData('checkout_method') == 'register');
 
-        if($isMage19OrUp and $isSagePayServer and $isRegister) {
-
+        if($isMage19OrUp and $isSagePayServer) {
             Mage::register('sagepay_last_real_order_id', $order->getIncrementId(), true);
             Mage::register('sagepay_last_order_id', $order->getId(), true);
             Mage::register('sagepay_last_quote_id', $quote->getId(), true);
             Mage::register('sagepay_customer_id', $quote->getData('customer_id'), true);
-
         }
 
         return $this;
     }
-
 }

@@ -135,11 +135,14 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
      * @return null|Mage_Sales_Model_Order
      */
     public function cancelTransaction(Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction $transaction) {
+
         $orderId = $transaction->getOrderId();
         if (!$orderId) {
             return;
         }
+
         $order = Mage::getModel('sales/order')->load($orderId);
+
         return $order->cancel();
     }
 
@@ -169,7 +172,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         return (bool) in_array($code, $this->_sageMethods);
     }
 
-	public function F91B2E37D34E5DC4FFC59C324BDC1157C()  { return true; }
+    public function F91B2E37D34E5DC4FFC59C324BDC1157C()  { return true; }
 
     public function getCcImage($cname) {
         return Mage::getModel('core/design_package')->getSkinUrl('sagepaysuite/images/cc/' . str_replace(array(' ', '(', ')'), '_', strtolower($cname)) . '.png');
@@ -288,7 +291,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
 
         $conf = array();
 
-        $conf ['global']= array_intersect_key($_store->getConfig('payment/sagepaysuite'), array_flip(array('debug', 'max_token_card')));
+        $conf ['global'] = array_intersect_key($_store->getConfig('payment/sagepaysuite'), array_flip(array('debug', 'max_token_card')));
         $conf ['global']['onepage_progress_url'] = $_url->getUrl('checkout/onepage/progress', array('_secure' => true));
         $conf ['global']['onepage_success_url'] = $_url->getUrl('checkout/onepage/success', array('_secure' => true));
         $conf ['global']['valid'] = (int) Mage::helper('sagepaysuite')->F91B2E37D34E5DC4FFC59C324BDC1157C();

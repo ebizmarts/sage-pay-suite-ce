@@ -76,6 +76,10 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         $rqVendorTxCode = Mage::app()->getRequest()->getParam('vtxc');
         $sessionVendor = ($rqVendorTxCode) ? $rqVendorTxCode : $this->getSession()->getLastVendorTxCode();
 
+        if($sessionVendor == null){
+            $sessionVendor = Mage::app()->getRequest()->getParam('VendorTxCode');
+        }
+
         /**
          * Multishipping vendors
          */
@@ -94,6 +98,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         /**
          * Multishipping vendors
          */
+
+
         $reg = Mage::registry('Ebizmarts_SagePaySuite_Model_Api_Payment::recoverTransaction');
         if (!is_null($reg)) {
             $sessionVendor = $reg;
@@ -158,6 +164,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         if ($this->getSession()->getInvoicePayment() || (!is_null($reg) && $tran->getTxType() == 'PAYMENT')) {
             //Commented because casues invoices not to be generated on MAC
             //$this->getSession()->unsetData('invoice_payment');
+            //Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
             Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
         }
     }
@@ -315,7 +322,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
                     'onclick' => 'setLocation(\'' . $block->getUrl('sgpsSecure/adminhtml_transaction/sync', array('_secure' => true, 'trn_id' => $sagePayData->getId())) . '\')',
                     'class' => 'go'
                 ));
-
             }
 
         }

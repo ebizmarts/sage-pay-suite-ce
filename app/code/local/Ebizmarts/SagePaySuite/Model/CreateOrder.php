@@ -52,10 +52,15 @@ class Ebizmarts_SagePaySuite_Model_CreateOrder
 			            ->load($orderItem->getProductId());
 
 			        if ($product->getId()) {
-			            $info = $orderItem->getProductOptionByCode('info_buyRequest');
-			            $info = new Varien_Object($info);
+
 			            $product->setSkipCheckRequiredOption(true);
-			            $item = $quote->addProduct($product, $info);
+
+                        $buyRequest = $orderItem->getBuyRequest();
+                        if (is_numeric($qty)) {
+                            $buyRequest->setQty($qty);
+                        }
+
+			            $item = $quote->addProduct($product, $buyRequest);
 			            if (is_string($item)) {
 			                Mage::throwException($item);
 			            }

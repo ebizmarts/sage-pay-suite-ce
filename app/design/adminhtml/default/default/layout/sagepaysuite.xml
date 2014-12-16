@@ -157,13 +157,9 @@
 				<type>skin_css</type>
 				<name>sagepaysuite/css/sagePaySuite.css</name>
 			</action>
-			<action method="addItem">
-				<type>js</type>
-				<name>sagepaysuite/common.js</name>
-			</action>
             <action method="addItem">
                 <type>js</type>
-                <name>sagepaysuite/adminhtml.js</name>
+                <name>sagepaysuite/common.js</name>
             </action>
 		</reference>
 	</adminhtml_system_config_edit>
@@ -360,4 +356,5 @@
 			</action>
 		</reference>
 	</adminhtml_sales_order_invoice_new>
+
 </layout>

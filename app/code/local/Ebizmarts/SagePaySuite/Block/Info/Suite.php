@@ -91,7 +91,7 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
     public function getStoppedLabel($trn) {
         $txt = '-';
 
-        if($trn->getVoided()){
+        if ($trn->getVoided()) {
             $txt = $this->__('Transaction is VOIDED.');
         }
 

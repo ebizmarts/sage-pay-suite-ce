@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <config>
     <menu>
+        <!--
         <sagepay_dashboard translate="title" module="sagepaysuite">
             <title>Sage Pay Dashboard</title>
             <sort_order>15</sort_order>
             <action>sgpsSecure/adminhtml_dashboard</action>
         </sagepay_dashboard>
+        -->
         <sales>
             <depends>
                 <module>Ebizmarts_SagePaySuite</module>
@@ -15,35 +17,40 @@
                     <title>Sage Pay</title>
                     <sort_order>999</sort_order>
                     <children>
-                        <!--<dashboard translate="title" module="sagepaysuite">
+                        <dashboard translate="title" module="sagepaysuite">
                             <title>Dashboard</title>
-                            <sort_order>5</sort_order>
+                            <sort_order>10</sort_order>
                             <action>sgpsSecure/adminhtml_dashboard</action>
-                        </dashboard>-->
+                        </dashboard>
                         <token_cards translate="title" module="sagepaysuite">
                             <title>Token Cards</title>
-                            <sort_order>10</sort_order>
+                            <sort_order>20</sort_order>
                             <action>sgpsSecure/adminhtml_token</action>
                         </token_cards>
                         <deferred_orders translate="title" module="sagepaysuite">
                             <title>Deferred Orders</title>
-                            <sort_order>20</sort_order>
+                            <sort_order>30</sort_order>
                             <action>sgpsSecure/adminhtml_sales_order_deferred</action>
                         </deferred_orders>
                         <orphans translate="title" module="sagepaysuite">
                             <title>Orphan Transactions</title>
-                            <sort_order>30</sort_order>
+                            <sort_order>40</sort_order>
                             <action>sgpsSecure/adminhtml_transaction/orphan</action>
                         </orphans>
                         <payments translate="title" module="sagepaysuite">
                             <title>Payment Transactions</title>
-                            <sort_order>40</sort_order>
+                            <sort_order>50</sort_order>
                             <action>sgpsSecure/adminhtml_transaction/payments</action>
                         </payments>
+                        <logs translate="title" module="sagepaysuite">
+                            <title>Logs</title>
+                            <sort_order>60</sort_order>
+                            <action>sgpsSecure/adminhtml_log</action>
+                        </logs>
                         <sagepayreporting translate="title" module="sagepayreporting">
                             <title><![CDATA[Admin & Access API]]>
                             </title>
-                            <sort_order>99</sort_order>
+                            <sort_order>70</sort_order>
                             <children>
                                 <transaction_detail translate="title" module="sagepayreporting">
                                     <title>Transaction Detail</title>
@@ -80,11 +87,12 @@
                                 </showpost>
                             </children>
                         </sagepayreporting>
-                        <logs translate="title" module="sagepaysuite">
-                            <title>Logs</title>
-                            <sort_order>41</sort_order>
-                            <action>sgpsSecure/adminhtml_log</action>
-                        </logs>
+
+                        <configuration translate="title" module="sagepaysuite">
+                            <title>Configuration</title>
+                            <sort_order>80</sort_order>
+                            <action>adminhtml/system_config/edit/section/sagepaysuite</action>
+                        </configuration>
                     </children>
                 </sagepay>
             </children>
@@ -105,17 +113,17 @@
                             </config>
                         </children>
                     </system>
-                    <sagepay_dashboard translate="title" module="sagepaysuite">
+                    <!--<sagepay_dashboard translate="title" module="sagepaysuite">
                         <title>Sage Pay Dashboard</title>
-                    </sagepay_dashboard>
+                    </sagepay_dashboard>-->
                     <sales>
                         <children>
                             <sagepay>
                                 <title>Sage Pay</title>
                                 <children>
-                                    <!--dashboard translate="title">
+                                    <dashboard translate="title">
                                         <title>Sage Pay Dashboard</title>
-                                    </dashboard-->
+                                    </dashboard>
                                     <token_cards translate="title">
                                         <title>Sage Pay Token Cards</title>
                                     </token_cards>

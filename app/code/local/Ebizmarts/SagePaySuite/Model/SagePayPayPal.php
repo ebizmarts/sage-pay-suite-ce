@@ -26,4 +26,5 @@ class Ebizmarts_SagePaySuite_Model_SagePayPayPal extends Mage_Payment_Model_Meth
     protected $_canUseCheckout          = false;
     protected $_canUseForMultishipping  = false;
 
+
 }

@@ -41,7 +41,8 @@
 <img width="270" height="43" src="<?php echo $this->getSkinUrl('sagepaysuite/images/sagepay-section-heading.png'); ?>" />
 
 <p>
-<?php echo $this->getMethod()->getTitle() ?>
+
+	<?php echo $this->getMethod()->getTitle() ?>
     <br />
 <?php echo $this->__('%s Transaction placed in %s mode.', strtoupper($sagepay->getTxType()), strtoupper($sagepay->getMode())); ?>
 </p>
@@ -105,6 +106,7 @@
     	if(!is_null($td_status)): ?>
     <li><strong><?php echo $this->__('3D Status'); ?></strong>: <span class="shield-flag threed-<?php echo strtolower(trim($td_status)); ?>"><?php echo $td_status; ?></span></li>
     <?php endif; ?>
+
 </ul>
 
 <ul id="card-checks">

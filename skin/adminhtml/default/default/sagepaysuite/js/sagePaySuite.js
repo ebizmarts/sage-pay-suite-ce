@@ -48,6 +48,7 @@ logSelectObserve = function(){
 loadActions = function(){
 	colorResults();
 	logSelectObserve();
+
 }
 
 Event.observe(window, 'load', loadActions);
@@ -65,7 +66,6 @@ var varienGridAction = {
             select.options[0].selected = true;
             return;
         }
-
 
         if(config.popup) {
 

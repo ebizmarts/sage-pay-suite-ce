@@ -302,8 +302,8 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
                         $sagePayServerSession->setTrnhData($this->_setAdditioanlPaymentInfo($strDBStatus));
 
                         $sOrder = $this->_sAdminOrder();
-                        if (FALSE === $sOrder || !$sOrder->getId()) {
-                            $sagePayServerSession->setFailStatus($strDBStatus);
+                        if (is_string($sOrder)) {
+                            $sagePayServerSession->setFailStatus($sOrder);
                             /** The status indicates a failure of one state or another, so send the customer to orderFailed instead * */
                             $strRedirectPage = $this->_getFailedRedirectUrl();
 
@@ -441,7 +441,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
         } catch (Exception $e) {
             Mage :: log($e->getMessage());
             Mage :: logException($e);
-            return false;
+            return $e->getMessage();
         }
     }
 

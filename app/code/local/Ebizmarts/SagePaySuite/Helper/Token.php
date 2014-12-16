@@ -28,7 +28,7 @@ class Ebizmarts_SagePaySuite_Helper_Token extends Mage_Core_Helper_Abstract {
         return Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->getDefaultCard();
     }
 
-    public function loadCustomerCards($methodCode = null) {
+    public function loadCustomerCards($methodCode = null, $ccLastFour = null, $ccType = null, $ccExpireDate = null) {
 
         $this->_tokenCards = new Varien_Object;
 
@@ -68,8 +68,19 @@ class Ebizmarts_SagePaySuite_Helper_Token extends Mage_Core_Helper_Abstract {
                 $this->_tokenCards->addVendorFilter($method->getConfigData('vendor'));
             }
 
-            $this->_tokenCards->load();
+            if($ccLastFour){
+                $this->_tokenCards->addFieldToFilter('last_four', $ccLastFour);
+            }
 
+            if($ccType){
+                $this->_tokenCards->addFieldToFilter('card_type', $ccType);
+            }
+
+            if($ccExpireDate){
+                $this->_tokenCards->addFieldToFilter('expiry_date', $ccExpireDate);
+            }
+
+            $this->_tokenCards->load();
         }
 
         return $this->_tokenCards;

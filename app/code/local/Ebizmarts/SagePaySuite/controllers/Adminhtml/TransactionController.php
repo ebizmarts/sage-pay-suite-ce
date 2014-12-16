@@ -256,7 +256,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_TransactionController extends Mage_Adminh
                         }
                     }
 
-					$trn->delete();
+                    $trn->delete();
 
                     $this->_getSession()->addSuccess($this->__('Transaction #%s deleted.', $id));
                 } else {
