@@ -464,9 +464,17 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         Mage::register('sageserverpost', $sageserverpost);
 
                         //1.9.1 ssl fix
+                        $customer_id = null;
                         if($this->getOnepage()->getQuote()->getId() == null){
                             $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
                             $this->getOnepage()->setQuote(Mage::getModel('sales/quote')->loadActive($rqQuoteId));
+                            $customer_id = $this->getOnepage()->getQuote()->getData('customer_id');
+                            if(!is_null($customer_id)){
+                                $customer = Mage::getModel('customer/customer')->load($customer_id);
+                                if(!is_null($customer)){
+                                    Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
+                                }
+                            }
                         }
 
                         $sOrder = $this->_saveMagentoOrder();
@@ -526,7 +534,11 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         Mage::getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
 
                         if(Mage::registry('sagepay_last_quote_id')) {
-                            $this->_returnOk(array('inv' => (int)Mage::registry('sagepay_create_invoice'), 'cusid' => Mage::registry('sagepay_customer_id'), 'qide' => Mage::registry('sagepay_last_quote_id'), 'incide' => Mage::registry('sagepay_last_real_order_id'), 'oide' => Mage::registry('sagepay_last_order_id')));
+                            $this->_returnOk(array('inv' => (int)Mage::registry('sagepay_create_invoice'),
+                                'cusid' => is_null($customer_id) ? Mage::registry('sagepay_customer_id') : $customer_id,
+                                'qide' => Mage::registry('sagepay_last_quote_id'),
+                                'incide' => Mage::registry('sagepay_last_real_order_id'),
+                                'oide' => Mage::registry('sagepay_last_order_id')));
                         }
                         else {
                             $this->_returnOk();
@@ -572,6 +584,22 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
                         $sageserverpost = new Varien_Object($_POST);
                         Mage::register('sageserverpost', $sageserverpost);
+
+
+                        //1.9.1 ssl fix
+                        $customer_id = null;
+                        if($this->getOnepage()->getQuote()->getId() == null){
+                            $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
+                            $this->getOnepage()->setQuote(Mage::getModel('sales/quote')->loadActive($rqQuoteId));
+                            $customer_id = $this->getOnepage()->getQuote()->getData('customer_id');
+                            if(!is_null($customer_id)){
+                                $customer = Mage::getModel('customer/customer')->load($customer_id);
+                                if(!is_null($customer)){
+                                    Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
+                                }
+                            }
+                        }
+
 
                         $sOrder = $this->_saveMagentoOrder();
 
@@ -634,7 +662,11 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         Mage::getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
 
                         if(Mage::registry('sagepay_last_quote_id')) {
-                            $this->_returnOk(array('inv' => (int)Mage::registry('sagepay_create_invoice'), 'cusid' => Mage::registry('sagepay_customer_id'), 'qide' => Mage::registry('sagepay_last_quote_id'), 'incide' => Mage::registry('sagepay_last_real_order_id'), 'oide' => Mage::registry('sagepay_last_order_id')));
+                            $this->_returnOk(array('inv' => (int)Mage::registry('sagepay_create_invoice'),
+                                'cusid' => is_null($customer_id) ? Mage::registry('sagepay_customer_id') : $customer_id,
+                                'qide' => Mage::registry('sagepay_last_quote_id'),
+                                'incide' => Mage::registry('sagepay_last_real_order_id'),
+                                'oide' => Mage::registry('sagepay_last_order_id')));
                         }
                         else {
                             $this->_returnOk();
