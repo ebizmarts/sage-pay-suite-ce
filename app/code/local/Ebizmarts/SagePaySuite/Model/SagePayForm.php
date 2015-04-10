@@ -252,12 +252,4 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
 
         return substr($decrypted, 0, -$padChar);
     }
-
-    public function capture(Varien_Object $payment, $amount) {
-        #Process invoice
-        if (!$payment->getRealCapture()) {
-            return $this->captureInvoice($payment, $amount);
-        }
-    }
-
 }

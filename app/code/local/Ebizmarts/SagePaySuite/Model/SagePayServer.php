@@ -563,13 +563,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
         return $result;
     }
 
-    public function capture(Varien_Object $payment, $amount) {
-        #Process invoice
-        if (!$payment->getRealCapture()) {
-            return $this->captureInvoice($payment, $amount);
-        }
-    }
-
     protected function _getOrderCreateModel() {
         return Mage::getSingleton('adminhtml/sales_order_create');
     }

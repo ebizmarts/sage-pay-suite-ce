@@ -38,10 +38,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
     }
 
     public function directRegisterTransaction(Varien_Object $payment, $amount) {
-        #Process invoice
-        if (!$payment->getRealCapture()) {
-            return $this->captureInvoice($payment, $amount);
-        }
 
         /**
          * Token Transaction
@@ -899,10 +895,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
      * @return  Mage_Payment_Model_Abstract
      */
     public function capture(Varien_Object $payment, $amount) {
-        #Process invoice
-        if (!$payment->getRealCapture()) {
-            return $this->captureInvoice($payment, $amount);
-        }
 
         /**
          * Token Transaction
