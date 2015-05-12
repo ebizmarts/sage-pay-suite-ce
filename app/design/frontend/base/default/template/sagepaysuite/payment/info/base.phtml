@@ -61,10 +61,6 @@
        <?php endif; ?>
 
 <?php endif; ?>
-
-	<p><?php echo $this->getMethod()->getTitle(); ?></p>
-
-<?php }else{ ?>
 	<p><?php echo $this->getMethod()->getTitle(); ?></p>
     <?php if($sagepay->getLastFourDigits()): ?>
         <table>
@@ -84,7 +80,6 @@
             <?php endif; ?>
         </table>
     <?php endif; ?>
-<?php } ?>
 
 <?php if(Mage::getSingleton('core/translate')->getTranslateInline() === true && $this->getIsSecureMode() != true && !Mage::app()->getRequest()->isXmlHttpRequest()): ?>
 	<?php echo $this->getChildHtml(); ?>
