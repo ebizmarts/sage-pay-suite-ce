@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.21.2</version>
+            <version>3.0.23</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -139,6 +139,7 @@
             </sales_convert_quote_payment>
         </fieldsets>
         <tx_states>
+            <stateid_0><![CDATA[Transaction not found at SagePay. Either your API credentials are not correct or the transaction doesn't exists.]]></stateid_0>
             <stateid_1><![CDATA[Transaction failed registration. Either an INVALID or MALFORMED response was returned.]]></stateid_1>
             <stateid_2><![CDATA[User on Card Selection page.]]></stateid_2>
             <stateid_3><![CDATA[User on the Card Details Entry Page.]]></stateid_3>
@@ -363,6 +364,8 @@
                 <send_payment_failed_emails>0</send_payment_failed_emails>
                 <verify_cart_consistency>0</verify_cart_consistency>
                 <check_amounts>0</check_amounts>
+                <curl_ssl_version>CURL_SSLVERSION_DEFAULT</curl_ssl_version>
+                <validate_quote>1</validate_quote>
             </sagepaysuite>
             <sagepaydirectpro>
                 <active>0</active>

@@ -158,7 +158,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
         $postData['token']          = $_t->getToken();
         $postData['storetoken']     = ($isGuest ? '0' : '1');
         $postData['description']    = '.';
-        $postData['CV2']            = $this->getSageSuiteSession()->getTokenCvv();
+        //$postData['CV2']            = $this->getSageSuiteSession()->getTokenCvv();
+        //Mage::log($info->getPayment()->getTokenCvv());
+        $postData['CV2']            = $info->getPayment()->getTokenCvv();
         $postData['vendor']         = $this->getConfigData('vendor'); //@TODO: Check this for token MOTO transactions.
 
         if (array_key_exists('integration', $postData) && strtolower($postData['integration']) == 'server') {
@@ -236,7 +238,22 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
             $postData['Profile'] = 'LOW';
         }
 
-        if ($this->customerCanAddCard($methodCode, $data['CardNumber'], $data['ExpiryDate'], $data['CardType']) === false) {
+        $CardNumber = null;
+        $ExpiryDate = null;
+        $CardType = null;
+        if(!is_null($data)){
+            if(array_key_exists("CardNumber",$data)){
+                $CardNumber = $data['CardNumber'];
+            }
+            if(array_key_exists("ExpiryDate",$data)){
+                $ExpiryDate = $data['ExpiryDate'];
+            }
+            if(array_key_exists("CardType",$data)){
+                $CardType = $data['CardType'];
+            }
+        }
+
+        if ($this->customerCanAddCard($methodCode, $CardNumber, $ExpiryDate, $CardType) === false) {
             return array('Status' => 'ERROR', 'StatusDetail' => Mage::helper('sagepaysuite')->__('Credit card could not be saved for future use. You already have this card attached to your account or you have reached your account\'s maximum card storage capacity.'));
         }
 

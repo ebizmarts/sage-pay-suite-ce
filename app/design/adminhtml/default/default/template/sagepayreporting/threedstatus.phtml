@@ -1,6 +1,7 @@
 <?php
     /* @var $this Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Threedstatus */
     $statusXml = $this->get3dStatus();
+    $statusXml = $statusXml['result'];
 ?>
 <div class="content-header">
     <table cellspacing="0">
@@ -35,7 +36,8 @@
 	<h3><?php echo $this->__('3D Secure checking is <code class="%s">%s</code>', strtolower($status), $status); ?>&nbsp;&nbsp;<a title="<?php echo $this->__('Click here to %s 3D checking', $statusChange); ?>" id="threeds-status-toggle" href="<?php echo $this->getUrl('*/*/threedtoggle', array('st'=>$status, '_current'=>true)); ?>"><?php echo $statusChange; ?></a></h3>
 	<h4><?php echo $this->__('3D Secure checking rules are <code class="%s">%s</code>', strtolower($statusRules), $statusRules); ?></h4>
 
-	<?php if($statusRules === 'ON'): $rules = $this->get3dRules(); ?>
+	<?php if($statusRules === 'ON'): $rules = $this->get3dRules();
+            $rules = $rules['result'];?>
 		<?php if(!is_string($rules) && get_class($rules) == 'SimpleXMLElement'): ?>
 
 			<div class="grid np">

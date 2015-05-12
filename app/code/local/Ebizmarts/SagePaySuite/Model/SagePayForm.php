@@ -157,7 +157,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
             $data['BillingState'] = $billing->getRegionCode();
         }
 
-        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote());
+        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote(),false);
         if(!empty($basket)) {
             if($basket[0] == "<") {
                 $data['BasketXML'] = $basket;
@@ -169,7 +169,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
 
         $data['AllowGiftAid'] = (int)$this->getConfigData('allow_gift_aid');
         $data['ApplyAVSCV2']  = $this->getConfigData('avscv2');
-        $data['SendEMail']    = (int)$this->getConfigData('send_email');
+
+        //Skip PostCode and Address Validation for overseas orders
+        if((int)Mage::getStoreConfig('payment/sagepaysuite/apply_AVSCV2') === 1){
+            if($this->_SageHelper()->isOverseasOrder($billing->getCountry())){
+                $data['ApplyAVSCV2'] = 2;
+            }
+        }
+
+        $data['SendEmail']    = (string)$this->getConfigData('send_email');
 
         $vendorEmail = (string) $this->getConfigData('vendor_email');
         if ($vendorEmail) {
@@ -252,4 +260,12 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
 
         return substr($decrypted, 0, -$padChar);
     }
+
+    public function capture(Varien_Object $payment, $amount) {
+        #Process invoice
+        if (!$payment->getRealCapture()) {
+            return $this->captureInvoice($payment, $amount);
+        }
+    }
+
 }

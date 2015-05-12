@@ -73,40 +73,81 @@ class Ebizmarts_SagePaySuite_Adminhtml_TransactionController extends Mage_Adminh
      * Update transaction data from API on demand
      */
     public function syncAction() {
-        $transactionId = $this->getRequest()->getParam('trn_id');
-        $vendorTxCode = $this->getRequest()->getParam('vendortxcode');
 
-        try {
+        if ($this->getRequest()->isPost()) { #Mass action
 
-            $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction');
+            $trnIds = $this->getRequest()->getPost('transaction_ids', array());
 
-            if ($vendorTxCode) {
-                $transaction->loadByVendorTxCode($vendorTxCode);
-            } else {
-                $transaction->load($transactionId);
-            }
+            foreach ($trnIds as $paramVendor) {
 
-            if ($transaction->getId()) {
+                $transaction = $this->_getTransaction()->load($paramVendor);
 
-                $result = $transaction->updateFromApi();
+                $errors = false;
 
-                if (!$result->getApiError()) {
-                    $this->_getSession()->addSuccess(Mage::helper('sagepaysuite')->__('Transaction successfully updated.'));
+                if ($transaction->getId()) {
+
+                    try {
+                        $result = $transaction->updateFromApi();
+
+                        if ($result->getApiError()) {
+                            $errors = true;
+                        }
+
+                    } catch (Exception $e) {
+                        $this->_getSession()->addError($e->getMessage());
+                        $errors = true;
+                    }
                 } else {
-                    $this->_getSession()->addError(Mage::helper('sagepaysuite')->__('Could not update. %s', $result->getApiError()));
+                    $errors = true;
                 }
-
-                $this->_redirectReferer();
-                return;
-            } else {
-                $this->_getSession()->addError(Mage::helper('sagepaysuite')->__('Transaction not found.'));
-                $this->_redirectReferer();
-                return;
             }
-        } catch (Exception $e) {
-            $this->_getSession()->addError($e->getMessage());
+
+            if($errors == true){
+                $this->_getSession()->addError('Some transactions where not found at SagePay. Either your API credentials are not correct or the transactions doesn\'t exist.');
+            }else{
+                $this->_getSession()->addSuccess(Mage::helper('sagepaysuite')->__('Transactions successfully updated.'));
+            }
+
             $this->_redirectReferer();
             return;
+
+        } else {
+
+            $transactionId = $this->getRequest()->getParam('trn_id');
+            $vendorTxCode = $this->getRequest()->getParam('vendortxcode');
+
+            try {
+
+                $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction');
+
+                if ($vendorTxCode) {
+                    $transaction->loadByVendorTxCode($vendorTxCode);
+                } else {
+                    $transaction->load($transactionId);
+                }
+
+                if ($transaction->getId()) {
+
+                    $result = $transaction->updateFromApi();
+
+                    if (!$result->getApiError()) {
+                        $this->_getSession()->addSuccess(Mage::helper('sagepaysuite')->__('Transaction successfully updated.'));
+                    } else {
+                        $this->_getSession()->addError(Mage::helper('sagepaysuite')->__('Could not update. %s', $result->getApiError()));
+                    }
+
+                    $this->_redirectReferer();
+                    return;
+                } else {
+                    $this->_getSession()->addError(Mage::helper('sagepaysuite')->__('Transaction not found.'));
+                    $this->_redirectReferer();
+                    return;
+                }
+            } catch (Exception $e) {
+                $this->_getSession()->addError($e->getMessage());
+                $this->_redirectReferer();
+                return;
+            }
         }
     }
 

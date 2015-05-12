@@ -129,8 +129,12 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
 
     public function getThirdmanBreakdown($thirdmanId) {
         try {
-            $breakdown = Mage::getModel('sagepayreporting/sagepayreporting')
-                    ->getT3MDetail($thirdmanId);
+            $breakdown = Mage::getModel('sagepayreporting/sagepayreporting')->getT3MDetail($thirdmanId);
+            if($breakdown['ok'] === true){
+                $breakdown = $breakdown['result'];
+            }else{
+                $breakdown = null;
+            }
         } catch (Exception $e) {
             $breakdown = null;
             Mage::logException($e);

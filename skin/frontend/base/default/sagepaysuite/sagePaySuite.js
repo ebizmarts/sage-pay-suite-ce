@@ -62,12 +62,13 @@ postRegisterCard = function(frm){
         onComplete: function(trn){
 
             var rsp = trn.responseText.evalJSON();
-            if(rsp.mark.ccnickname == ''){
-                rsp.mark.ccnickname = 'Click to add a Description';
-            }
             if(rsp.status != 'OK'){
                 alert(rsp.status.toString() +' -> '+ rsp.statusdetail.toString());
             }else{
+                if(rsp.mark.ccnickname == ''){
+                    rsp.mark.ccnickname = 'Click to add a Description';
+                }
+
                 var newCardRow = new Template('<tr><td>#{cctype}</td><td class="nickname" id="nickname_#{id}"><div style="cursor: pointer" title="Click to edit the credit card description.">#{ccnickname}</div></td><td>#{ccnumber}</td><td>#{exp}</td><td class="a-center"><input#{defaultchecked} type="radio" value="#{id}" name="tokencard_def" onclick="tokenSetDefault(this);" /></td><td class="last"><a href="#{delurl}" onclick="if(confirm(\''+Translator.translate('Are you sure?')+'\')){removeCard(this); return false; }else{return false;}">'+Translator.translate('Delete')+'</a></td></tr>');
                 new Insertion.Before($$('table#my-sagepaycards-table tbody tr')[0], newCardRow.evaluate(rsp.mark));
                 setObservers();

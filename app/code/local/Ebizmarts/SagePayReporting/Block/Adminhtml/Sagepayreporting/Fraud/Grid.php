@@ -14,6 +14,8 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
 		$this->setDefaultSort('created_at');
 		$this->setDefaultDir('DESC');
 		$this->setSaveParametersInSession(false);
+
+
 	}
 
 	/**
@@ -87,6 +89,7 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
 			if($_c->getTxType() == 'PAYMENT'){
 				$_c->setPaymentStatus(Mage::helper('sagepaysuite')->__('OK Captured'));
 			}
+
 		}
 
 		$this->setDefaultSort('increment_id');
@@ -227,11 +230,11 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
                 'type'      => 'action',
                 'getter'     => 'getId',
                 'actions'   => array(
-                    array(
-                                    'caption' => Mage::helper('sagepaysuite')->__('Check 3rd Man'),
-                                    'url'     => array('base'=>'*/*/fraudCheck'),
-                                    'field'   => 'order_id',
-                    )
+			array(
+                        'caption' => Mage::helper('sagepaysuite')->__('Check 3rd Man'),
+                        'url'     => array('base'=>'*/*/fraudCheck'),
+                        'field'   => 'order_id'
+			)
 		),
                 'filter'    => false,
                 'sortable'  => false,

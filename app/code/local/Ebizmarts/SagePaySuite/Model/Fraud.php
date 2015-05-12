@@ -70,6 +70,9 @@ class Ebizmarts_SagePaySuite_Model_Fraud
         // Open the cURL session
         $curlSession = curl_init();
 
+        //ssl version from config
+        $sslversion = Mage::getStoreConfig('payment/sagepaysuite/curl_ssl_version');
+        curl_setopt($curlSession, CURLOPT_SSLVERSION, $sslversion);
         // Set the URL
         curl_setopt ($curlSession, CURLOPT_URL, $this->_getAccessUrl());
         // No headers, please
@@ -86,6 +89,10 @@ class Ebizmarts_SagePaySuite_Model_Fraud
         //You should remove them if you have any problems in earlier versions of cURL
         curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
+
+        if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
+            curl_setopt($curlSession, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));
+        }
 
         //Send the request and store the result in an array
 

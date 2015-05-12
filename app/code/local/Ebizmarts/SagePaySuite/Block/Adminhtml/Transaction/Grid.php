@@ -46,7 +46,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
 
         $this->addColumn('mode', array(
             'header'=> Mage::helper('sagepaysuite')->__('Mode'),
-            'width' => '80px',
+            'width' => '50px',
             'index' => 'mode'
         ));
 
@@ -57,24 +57,26 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
         ));
 
         $this->addColumn('status', array(
-            'header'=> Mage::helper('sagepaysuite')->__('Transaction Status'),
-            'width' => '80px',
+            'header'=> Mage::helper('sagepaysuite')->__('Status'),
+            'width' => '40px',
             'index' => 'status',
-            'renderer'   => 'sagepaysuite/adminhtml_sales_order_grid_renderer_state',
+            'renderer'   => 'sagepaysuite/adminhtml_transaction_grid_renderer_state',
+            'align' => 'center'
         ));
 
         $this->addColumn('status_detail', array(
-            'header'=> Mage::helper('sagepaysuite')->__('Transaction Status Detail'),
-            'width' => '80px',
+            'header'=> Mage::helper('sagepaysuite')->__('Original Error Detail'),
+            'width' => '160px',
             'index' => 'status_detail'
         ));
-
+        /*
         $this->addColumn('tx_state_id', array(
             'header'=> Mage::helper('sagepaysuite')->__('System Status'),
             'width' => '80px',
             'index' => 'tx_state_id',
             'renderer'   => 'sagepaysuite/adminhtml_widget_grid_column_renderer_txState',
         ));
+        */
 
         $this->addColumn('customer_cc_holder_name', array(
             'header'=> Mage::helper('sagepaysuite')->__('Card Holder Name'),
@@ -98,13 +100,13 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
 
         $this->addColumn('last_four_digits', array(
             'header'=> Mage::helper('sagepaysuite')->__('Last 4 Digits'),
-            'width' => '80px',
+            'width' => '40px',
             'index' => 'last_four_digits'
         ));
 
         $this->addColumn('integration', array(
             'header'=> Mage::helper('sagepaysuite')->__('Integration'),
-            'width' => '80px',
+            'width' => '50px',
             'index' => 'integration'
         ));
 
@@ -165,10 +167,16 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
         $this->getMassactionBlock()->setFormFieldName('transaction_ids');
         $this->getMassactionBlock()->setUseSelectAll(false);
 
-        $this->getMassactionBlock()->addItem('dlete', array(
+        $this->getMassactionBlock()->addItem('delete', array(
              'label'=> Mage::helper('sagepaysuite')->__('Delete'),
              'url'  => $this->getUrl('sgpsSecure/adminhtml_transaction/delete'),
         ));
+
+        $this->getMassactionBlock()->addItem('syncFromApi', array(
+            'label'=> Mage::helper('sagepaysuite')->__('Sync from API'),
+            'url'  => $this->getUrl('sgpsSecure/adminhtml_transaction/sync'),
+        ));
+
         return $this;
     }
 

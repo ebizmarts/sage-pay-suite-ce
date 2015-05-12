@@ -4,7 +4,7 @@
     $ips = $this->getValidIPs();
 ?>
 
-<?php if(is_object($ips) AND get_class($ips) == 'SimpleXMLElement'): ?>
+<?php if(is_object($ips) && $ips['ok'] === true && get_class($ips['result']) == 'SimpleXMLElement'): ?>
 <div class="entry-edit-head">
     <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('IPs on Whitelist'); ?></h4>
 </div>
@@ -21,7 +21,7 @@
             </tr>
         </thead>
 	    <tbody>
-	    <?php foreach($ips->ipaddresses->ipaddress as $_index=>$_item): ?>
+	    <?php foreach($ips['result']->ipaddresses->ipaddress as $_index=>$_item): ?>
 	        <tr>
 	            <td><?php echo $_item->address; ?></td>
 	            <td><?php echo $_item->mask; ?></td>
@@ -42,7 +42,7 @@
     <ul class="messages">
         <li class="error-msg">
             <ul>
-                <li><span><?php echo $this->__('An error occurred: %s', $ips); ?></span></li>
+                <li><span><?php echo $this->__('An error occurred: %s', $ips['result']); ?></span></li>
             </ul>
         </li>
     </ul>

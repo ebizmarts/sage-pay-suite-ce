@@ -41,6 +41,13 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
         $order->setState($state);
 
+        /* Set order status based on ReD response.
+         * $sagedata = $this->_getTransactionsModel()->loadByParent($order->getId());
+        $ReD      = $sagedata->getRedFraudResponse();
+        if(strtoupper($ReD) == 'DENY') {
+            $order->setStatus('security_check');
+        }*/
+
     }
 
     public function loadAfter($o) {
@@ -98,6 +105,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         /**
          * Multishipping vendors
          */
+
 
 
         $reg = Mage::registry('Ebizmarts_SagePaySuite_Model_Api_Payment::recoverTransaction');

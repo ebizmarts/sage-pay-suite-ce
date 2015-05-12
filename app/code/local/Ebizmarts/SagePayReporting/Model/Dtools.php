@@ -15,7 +15,7 @@ class Ebizmarts_SagePayReporting_Model_Dtools
 			 $xml = new Varien_Simplexml_Element($xml);
 
 			$ip = (string)$xml->ip_address;*/
-			$ip = explode('.', file_get_contents('http://ebizmarts.com/magento/ipcheck.php'));
+			$ip = explode('.', file_get_contents('https://ebizmarts.com/magento/ipcheck.php'));
 			$ip = array_map(array($this, 'pad'), $ip);
 
 			return implode('.', $ip);

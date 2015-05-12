@@ -20,7 +20,7 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
         $generalData['vendorname'] = Mage::getModel('sagepaysuite/sagePayServer')->getConfigData('vendor');
         $generalData['magento_version'] = Mage::getVersion();
 
-        if(method_exists(Mage,'getEdition')){ // Fix for earlier Magento versions
+        if(method_exists('Mage','getEdition')){ // Fix for earlier Magento versions
             $generalData['magento_edition'] = Mage::getEdition();
         }
 
@@ -79,18 +79,22 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
         try {
 
             $data = $this->grabData();
-            $url = 'http://ebizmarts.com/sagepaysuite_tracker.php';
+            $url = 'https://ebizmarts.com/sagepaysuite_tracker.php';
 
             $curl = curl_init();
 
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_POST, 1);
             curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
-
+            $sslversion = Mage::getStoreConfig('payment/sagepaysuite/curl_ssl_version');
+            curl_setopt($curl, CURLOPT_SSLVERSION, $sslversion);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl, CURLOPT_TIMEOUT, 4);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+            if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
+                curl_setopt($curl, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));
+            }
 
             $response = curl_exec($curl);
 

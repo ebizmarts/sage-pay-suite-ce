@@ -74,7 +74,7 @@ var varienGridAction = {
 				try{
 					var cont = new Element('div',{className: 'lcontainer'});
 			        var wndow = new Control.Modal(config.href,{
-							     className: 'modal',
+							     className: 'modal-sagepaysuite',
 							     iframe: true,
 							     insertRemoteContentAt: cont,
 							     height: '800',
@@ -113,7 +113,7 @@ var orphansGridMassaction = Class.create(varienGridMassaction, {
 				try{
 					var cont = new Element('div',{className: 'lcontainer'});
 			        var wndow = new Control.Modal(trElement.title,{
-							     className: 'modal',
+							     className: 'modal-sagepaysuite',
 							     iframe: true,
 							     insertRemoteContentAt: cont,
 							     height: '800',

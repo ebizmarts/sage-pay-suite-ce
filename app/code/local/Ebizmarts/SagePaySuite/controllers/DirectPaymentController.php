@@ -47,8 +47,8 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
                     'response_status' => 'threed',
                     'redirect' => Mage :: getModel('core/url'
                     )->getUrl('sgps/DirectPayment/threedPost', array('_secure' => true, 'txc' => $vendorTxCode)));
-            } else
-            if ($response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_APPROVED || $response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_REGISTERED) {
+            } else if ($response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_APPROVED ||
+                $response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_REGISTERED) {
 
                 $op = Mage :: getSingleton('checkout/type_onepage');
                 $op->getQuote()->collectTotals();

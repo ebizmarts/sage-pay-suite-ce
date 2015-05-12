@@ -1,5 +1,6 @@
 <?php
 	$statusXml = $this->getAvsCv2Status();
+    $statusXml = $statusXml['result'];
 ?>
 <div class="content-header">
     <table cellspacing="0">
@@ -33,7 +34,9 @@
 	<h3><?php echo $this->__('AVS/CV2 checking is <code class="%s">%s</code>', strtolower($status), $status); ?>&nbsp;&nbsp;<a title="<?php echo $this->__('Click here to %s AVS/CV2 checking', $statusChange); ?>" id="threeds-status-toggle" href="<?php echo $this->getUrl('*/*/avscvtoggle', array('st'=>$status, '_current'=>true)); ?>"><?php echo $statusChange; ?></a></h3>
 	<h4><?php echo $this->__('AVS/CV2 checking rules are <code class="%s">%s</code>', strtolower($statusRules), $statusRules); ?></h4>
 
-	<?php if($statusRules === 'ON'): $rules = $this->getAvsCv2Rules(); ?>
+	<?php if($statusRules === 'ON'): $rules = $this->getAvsCv2Rules();
+            $rules = $rules['result'];
+            ?>
 		<?php if(!is_string($rules) && get_class($rules) == 'SimpleXMLElement'): ?>
 
 			<div class="grid np">

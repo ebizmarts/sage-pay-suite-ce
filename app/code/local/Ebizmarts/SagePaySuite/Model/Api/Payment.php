@@ -313,7 +313,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
         }
 
-        $this->getSageSuiteSession()->setTokenCvv($data->getTokenCvv());
+        //$this->getSageSuiteSession()->setTokenCvv($data->getTokenCvv());
 
         if ($this->isMobile()) {
             $cct = Mage::getSingleton('sagepaysuite/config')->getTranslateCc();
@@ -353,6 +353,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         $adminQuote = Mage::getSingleton('adminhtml/session_quote')->getQuote();
 
         $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
+
         if ($adminQuote->hasItems() === false && (int) $rqQuoteId) {
             $opQuote->setQuote(Mage::getModel('sales/quote')->loadActive($rqQuoteId));
         }
@@ -614,7 +615,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             }
         }
 
-        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($quoteObj);
+        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($quoteObj,false);
         if(!empty($basket)) {
             if($basket[0] == "<") {
                 $request->setBasketXML($basket);
@@ -821,7 +822,11 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
          * FOREIGN KEY (`item_id`) REFERENCES `sales_flat_quote_item` (`item_id`) ON DELETE CASCADE ON UP)
          */
         $rsOid = str_replace("/", "-", $this->_getReservedOid());
-        return ($rsOid) ? substr($rsOid . '-' . date('Y-m-d-H-i-s'), 0, 40) : substr(date('Y-m-d-H-i-s-') . time(), 0, 40);
+        $prefix = Mage::getStoreConfig('payment/sagepaysuite/vendor_tx_prefix', Mage::app()->getStore()->getId());
+        $prefix = preg_replace("/[^a-zA-Z0-9]+/", "", $prefix);
+        $prefix = substr($prefix, 0, 5);
+
+        return $prefix . (($rsOid) ? substr($rsOid . '-' . date('Y-m-d-H-i-s'), 0, 40) : substr(date('Y-m-d-H-i-s-') . time(), 0, 40));
     }
 
     protected function _getRqParams() {
@@ -962,6 +967,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 //If its fully released
                 //If $order->canInvoice() is TRUE it means that was partially invoiced already
                 if ((int) $trn->getReleased() === 1) {
+
                     if (!$order->canInvoice()) {
                         $this->voidPayment($trn);
                     }
@@ -1016,8 +1022,9 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             Sage_Log::log($statusDetail);
 
             //For expired DEFERRED transactions
-            if(1 === preg_match('/^4039/i', $statusDetail)) {
-                $this->_getAdminSession()->addError($statusDetail);
+            if(1 === preg_match('/^4039/i', $statusDetail) ||
+               1 === preg_match('/^4028/i', $statusDetail)) {
+                $this->_getAdminSession()->addError("Order canceled but an error occurred at SagePay: " . $statusDetail);
             }
             else {
                 Mage::throwException(Mage::helper('sagepaysuite')->__($statusDetail));
@@ -1259,6 +1266,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
         $curlSession = curl_init();
 
+        $sslversion = Mage::getStoreConfig('payment/sagepaysuite/curl_ssl_version');
+        curl_setopt($curlSession, CURLOPT_SSLVERSION, $sslversion);
         curl_setopt($curlSession, CURLOPT_USERAGENT, $userAgent);
         curl_setopt($curlSession, CURLOPT_URL, $url);
         curl_setopt($curlSession, CURLOPT_HEADER, 0);
@@ -1266,6 +1275,10 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         curl_setopt($curlSession, CURLOPT_POSTFIELDS, $rd);
         curl_setopt($curlSession, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curlSession, CURLOPT_TIMEOUT, $timeout);
+
+        if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
+            curl_setopt($curlSession, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));
+        }
 
         $verifyPeerConfig = (int)$this->getConfigData('curl_verifypeer');
         $verifyPeer       = 1 === $verifyPeerConfig ? true : false;
@@ -1774,11 +1787,11 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             $validDescription = preg_match_all("/.*/", $itemDesc, $matchesDescription);
             if($validDescription === 1) {
                 //<description>
-                $node->addChildCData('description', $itemDesc);
+                $node->addChildCData('description', $this->_convertStringToSafeXMLChar($itemDesc));
             }
             else {
                 //<description>
-                $node->addChildCData('description', substr(implode("", $matchesDescription[0]), 0, 100));
+                $node->addChildCData('description', $this->_convertStringToSafeXMLChar(substr(implode("", $matchesDescription[0]), 0, 100)));
             }
 
             $validSku = preg_match_all("/[\p{L}0-9\s\-]+/", $item->getSku(), $matchesSku);
@@ -1827,60 +1840,88 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             /* Item price data */
 
             //<recipientFName>
-            $node->addChildCData('recipientFName', substr(trim($shippingAdd->getFirstname()), 0, 20));
+            $recipientFName = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getFirstname()), 0, 20));
+            if(!empty($recipientFName)){
+                $node->addChildCData('recipientFName', $recipientFName);
+            }
+
 
             //<recipientLName>
-            $node->addChildCData('recipientLName', substr(trim($shippingAdd->getLastname()), 0, 20));
+            $recipientLName = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getLastname()), 0, 20));
+            if(!empty($recipientLName)){
+                $node->addChildCData('recipientLName', $recipientLName);
+            }
 
             //<recipientMName>
-            if($shippingAdd->getMiddlename()) {
-                $node->addChildCData('recipientMName', substr(trim($shippingAdd->getMiddlename()), 0, 1));
+            if($shippingAdd->getMiddlename()){
+                $recipientMName = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getMiddlename()), 0, 1));
+                if(!empty($recipientMName)) {
+                    $node->addChildCData('recipientMName', $recipientMName);
+                }
             }
 
             //<recipientSal>
             if($shippingAdd->getPrefix()) {
-                $node->addChildCData('recipientSal', substr(trim($shippingAdd->getPrefix()), 0, 4));
+                $recipientSal = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getPrefix()), 0, 4));
+                if(!empty($recipientSal)) {
+                    $node->addChildCData('recipientSal', $recipientSal);
+                }
             }
 
             //<recipientEmail>
+
             if($shippingAdd->getEmail()) {
-                $node->addChildCData('recipientEmail', substr(trim($shippingAdd->getEmail()), 0, 45));
+                $recipientEmail = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getEmail()), 0, 45));
+                if(!empty($recipientEmail)) {
+                    $node->addChildCData('recipientEmail', $recipientEmail);
+                }
             }
 
             //<recipientPhone>
-            $node->addChildCData('recipientPhone', substr(trim($shippingAdd->getTelephone()), 0, 20));
+            $recipientPhone = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getTelephone()), 0, 20));
+            if(!empty($recipientPhone)) {
+                $node->addChildCData('recipientPhone', $recipientPhone);
+            }
 
-            $address1 = substr(trim($shippingAdd->getStreet(1)), 0, 100);
             //<recipientAdd1>
-            $node->addChildCData('recipientAdd1', $address1);
+            $address1 = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getStreet(1)), 0, 100));
+            if(!empty($address1)) {
+                $node->addChildCData('recipientAdd1', $address1);
+            }
 
             //<recipientAdd2>
             if($shippingAdd->getStreet(2)) {
-                $node->addChildCData('recipientAdd2', substr(trim($shippingAdd->getStreet(2)), 0, 100));
+                $recipientAdd2 = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getStreet(2)), 0, 100));
+                if(!empty($recipientAdd2)) {
+                    $node->addChildCData('recipientAdd2', $recipientAdd2);
+                }
             }
 
             //<recipientCity>
-            $node->addChildCData('recipientCity', substr(trim($shippingAdd->getCity()), 0, 40));
+            $recipientCity = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getCity()), 0, 40));
+            if(!empty($recipientCity)) {
+                $node->addChildCData('recipientCity', $recipientCity);
+            }
 
             //<recipientState>
             if($shippingAdd->getCountry() == 'US') {
                 if ($quote->getIsVirtual()) {
-                    $node->addChild('recipientState', substr(trim($billingAdd->getRegionCode()), 0, 2));
+                    $node->addChild('recipientState', $this->_convertStringToSafeXMLChar(substr(trim($billingAdd->getRegionCode()), 0, 2)));
                 }
                 else {
-                    $node->addChild('recipientState', substr(trim($shippingAdd->getRegionCode()), 0, 2));
+                    $node->addChild('recipientState', $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getRegionCode()), 0, 2)));
                 }
             }
 
             //<recipientCountry>
-            $node->addChild('recipientCountry', substr(trim($shippingAdd->getCountry()), 0, 2));
+            $node->addChild('recipientCountry', $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getCountry()), 0, 2)));
 
             //<recipientPostCode>
             $_postCode = '000';
             if($shippingAdd->getPostcode()) {
                 $_postCode = $shippingAdd->getPostcode();
             }
-            $node->addChildCData('recipientPostCode', $this->sanitizePostcode(substr(trim($_postCode), 0, 9)));
+            $node->addChildCData('recipientPostCode', $this->_convertStringToSafeXMLChar($this->sanitizePostcode(substr(trim($_postCode), 0, 9))));
 
         }
 
@@ -1930,6 +1971,22 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         $xmlBasket = str_replace("\n", "", trim($basket->asXml()));
 
         return $xmlBasket;
+    }
+
+    private function _convertStringToSafeXMLChar($string){
+
+        $safe_regex = '/([a-zA-Z\s\d\+\'\"\/\\\&\:\,\.\-\{\}\@])/';
+        $safe_string = "";
+
+        for($i = 0;$i<strlen($string);$i++){
+            if(preg_match($safe_regex,substr($string,$i,1)) != FALSE){
+                $safe_string .= substr($string,$i,1);
+            }else{
+                $safe_string .= '-';
+            }
+        }
+
+        return $safe_string;
     }
 
     /**
