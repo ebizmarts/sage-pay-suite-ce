@@ -1,4 +1,4 @@
-iframe#iframeRegCard { height:518px; width:100%; border:1px solid #666; }
+iframe#iframeRegCard { height:518px; width:100%; border:1px solid #666; padding: 0 20px;}
 
 iframe#sagepaydirectpro-iframe-post { height:500px; width:100%; /*border:1px solid #666;*/ border:none; }
 

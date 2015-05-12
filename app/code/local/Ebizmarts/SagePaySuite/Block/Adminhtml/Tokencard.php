@@ -39,8 +39,9 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Tokencard extends Mage_Adminhtml_Bl
     	try{
 
     		$r = Mage::getModel('sagepayreporting/sagepayreporting')->getTokenCount();
-    		$count = (int)$r->totalnumber;
-
+            if($r['ok'] === true){
+                $count = (int)$r['result']->totalnumber;
+            }
     	}catch(Exception $e){
     		Sage_Log::logException($e);
     	}

@@ -14,6 +14,7 @@ class Ebizmarts_SagePaySuite_Log {
      * Alias methods
      */
     public static function log($message, $level = null, $file = '') {
+        $file = str_replace('/', '-', $file);
         self::w($message, $level, $file);
     }
 

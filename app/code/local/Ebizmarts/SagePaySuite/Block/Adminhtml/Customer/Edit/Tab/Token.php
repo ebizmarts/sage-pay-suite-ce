@@ -99,7 +99,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Customer_Edit_Tab_Token
 									iframe: true,
 									height:600,
 									width:600,
-								    className: 'modal',
+								    className: 'modal-sagepaysuite',
 								    fade: true
 								}).open();",
                     'class'   => 'add'

@@ -188,7 +188,7 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
 
                 Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $e->getMessage()));
 
-                $this->_getSession()->addError('<strong>'.$this->__('The payment was made with success however an error occurred, your credit card has been charged. Please enter in contact with our support team.').'</strong>');
+                $this->_getSession()->addError('<strong>'.$this->__('The payment was made with success however an error occurred, your credit card has been charged. Please contact our support team.').'</strong>');
 
                 Mage::helper('sagepaysuite/checkout')->deleteQuote();
 

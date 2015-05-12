@@ -366,8 +366,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
      * @param float $macOrder MAC single order
      */
     public function registerTransaction($params = null, $onlyToken = false, $macOrder = null) {
-        $quoteObj = $this->_getQuote();
 
+        $quoteObj = $this->_getQuote();
         $quoteObj2 = $this->getQuoteDb($quoteObj);
 
         if (is_null($macOrder)) {
@@ -543,8 +543,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
     protected function _buildRequest(Varien_Object $payment) {
 
-
-
         $order = $payment->getOrder();
 
         $vendorTxCode = $this->_getTrnVendorTxCode();
@@ -564,7 +562,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 ->setDescription($this->ss(($payment->getCcOwner() ? $payment->getCcOwner() : '.'), 100))
                 ->setClientIPAddress($this->getClientIp()); //@TODO: Support IPv6 addresses.
 
-        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote());
+
+        //basket
+        $force_xml = false;
+        if ($order->getPayment()->getMethodInstance()->getCode() == 'sagepaypaypal' &&
+            Mage::getStoreConfig('payment/sagepaypaypal/force_basketxml_paypal') == TRUE) {
+            //force XML for paypal
+            $force_xml = true;
+        }
+        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote(),$force_xml);
         if(!empty($basket)) {
             if($basket[0] == "<") {
                 $request->setBasketXML($basket);
@@ -593,36 +599,45 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
         if (!empty($order)) {
 
+            //set billing address
             $billing = $order->getBillingAddress();
             if (!empty($billing)) {
                 $request->setBillingAddress($this->ss($billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
-                                        $billing->getRegion() . ' ' . $billing->getCountry(), 100)
-                        )
-                        ->setBillingSurname($this->ss($billing->getLastname(), 20))
-                        ->setBillingFirstnames($this->ss($billing->getFirstname(), 20))
-                        ->setBillingPostCode($this->sanitizePostcode($this->ss($billing->getPostcode(), 10)))
-                        ->setBillingAddress1($this->ss($billing->getStreet(1), 100))
-                        ->setBillingAddress2($this->ss($billing->getStreet(2), 100))
-                        ->setBillingCity($this->ss($billing->getCity(), 40))
-                        ->setBillingCountry($billing->getCountry())
-                        ->setCustomerName($this->ss($billing->getLastname() . ' ' . $billing->getFirstname(), 100))
-                        ->setContactNumber(substr($this->_cphone($billing->getTelephone()), 0, 20))
-                        ->setContactFax($billing->getFax());
+                        $billing->getRegion() . ' ' . $billing->getCountry(), 100)
+                )
+                    ->setBillingSurname($this->ss($billing->getLastname(), 20))
+                    ->setBillingFirstnames($this->ss($billing->getFirstname(), 20))
+                    ->setBillingPostCode($this->sanitizePostcode($this->ss($billing->getPostcode(), 10)))
+                    ->setBillingAddress1($this->ss($billing->getStreet(1), 100))
+                    ->setBillingAddress2($this->ss($billing->getStreet(2), 100))
+                    ->setBillingCity($this->ss($billing->getCity(), 40))
+                    ->setBillingCountry($billing->getCountry())
+                    ->setCustomerName($this->ss($billing->getFirstname() . ' ' . $billing->getLastname(), 100))
+                    ->setContactNumber(substr($this->_cphone($billing->getTelephone()), 0, 20))
+                    ->setContactFax($billing->getFax());
 
-                if ($billing->getCountry() == 'US') {
-                    $request->setBillingState($billing->getRegionCode());
+                //billing state
+                $billing_state = $billing->getRegionCode();
+                Mage::log($billing_state);
+                if(!is_null($billing_state) && strlen($billing_state) > 2){
+                    $billing_state = substr($billing_state,0,2);
+                }
+                if(!empty($billing_state)){
+                    $request->setBillingState($billing_state);
                 }
 
                 $request->setCustomerEMail($this->ss($billing->getEmail(), 255));
             }
 
-            if(!$order->getIsVirtual()) {
+            //set shipping address
+            if(!$order->getIsVirtual()){
 
                 $shipping = $order->getShippingAddress();
 
-                $request->setDeliveryAddress($shipping->getStreet(1) . ' ' . $shipping->getCity() . ' ' .
-                                $shipping->getRegion() . ' ' . $shipping->getCountry()
-                        )
+                if (!empty($shipping)) {
+                    $request->setDeliveryAddress($shipping->getStreet(1) . ' ' . $shipping->getCity() . ' ' .
+                        $shipping->getRegion() . ' ' . $shipping->getCountry()
+                    )
                         ->setDeliverySurname($this->ss($shipping->getLastname(), 20))
                         ->setDeliveryFirstnames($this->ss($shipping->getFirstname(), 20))
                         ->setDeliveryPostCode($this->sanitizePostcode($this->ss($shipping->getPostcode(), 10)))
@@ -631,26 +646,37 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                         ->setDeliveryCity($this->ss($shipping->getCity(), 40))
                         ->setDeliveryCountry($shipping->getCountry());
 
-                if ($shipping->getCountry() == 'US') {
-                    $request->setDeliveryState($shipping->getRegionCode());
+                    //shipping state
+                    $shipping_state = $shipping->getRegionCode();
+                    if(!is_null($shipping_state) && strlen($shipping_state) > 2){
+                        $shipping_state = substr($shipping_state,0,2);
+                    }
+                    if(!empty($shipping_state)){
+                        $request->setDeliveryState($shipping_state);
+                    }
                 }
             }
             else {
                 #If the cart only has virtual products, I need to put an shipping address to Sage Pay.
                 #Then the billing address will be the shipping address to
                 $request->setDeliveryAddress($billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
-                                $billing->getRegion() . ' ' . $billing->getCountry()
-                        )
-                        ->setDeliverySurname($this->ss($billing->getLastname(), 20))
-                        ->setDeliveryFirstnames($this->ss($billing->getFirstname(), 20))
-                        ->setDeliveryPostCode($this->sanitizePostcode($this->ss($billing->getPostcode(), 10)))
-                        ->setDeliveryAddress1($this->ss($billing->getStreet(1), 100))
-                        ->setDeliveryAddress2($this->ss($billing->getStreet(2), 100))
-                        ->setDeliveryCity($billing->getCity())
-                        ->setDeliveryCountry($billing->getCountry());
+                    $billing->getRegion() . ' ' . $billing->getCountry()
+                )
+                    ->setDeliverySurname($this->ss($billing->getLastname(), 20))
+                    ->setDeliveryFirstnames($this->ss($billing->getFirstname(), 20))
+                    ->setDeliveryPostCode($this->sanitizePostcode($this->ss($billing->getPostcode(), 10)))
+                    ->setDeliveryAddress1($this->ss($billing->getStreet(1), 100))
+                    ->setDeliveryAddress2($this->ss($billing->getStreet(2), 100))
+                    ->setDeliveryCity($billing->getCity())
+                    ->setDeliveryCountry($billing->getCountry());
 
-                if ($billing->getCountry() == 'US') {
-                    $request->setDeliveryState($billing->getRegionCode());
+                //shipping state
+                $shipping_state = $billing->getRegionCode();
+                if(!is_null($shipping_state) && strlen($shipping_state) > 2){
+                    $shipping_state = substr($shipping_state,0,2);
+                }
+                if(!empty($shipping_state)){
+                    $request->setDeliveryState($shipping_state);
                 }
             }
         }
@@ -710,6 +736,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         $customerXML = $this->getCustomerXml($this->_getQuote());
         if (!is_null($customerXML)) {
             $request->setCustomerXML($customerXML);
+        }
+
+        //Skip PostCode and Address Validation for overseas orders
+        if((int)Mage::getStoreConfig('payment/sagepaysuite/apply_AVSCV2') === 1){
+            if($this->_SageHelper()->isOverseasOrder($billing->getCountry())){
+                $request->setData('ApplyAVSCV2', 2);
+            }
         }
 
         return $request;
@@ -1069,6 +1102,20 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
         return $mail->getSentSuccess();
     }
+
+    /* public function getOrderPlaceRedirectUrl()
+      {
+      $tmp = $this->getSageSuiteSession();
+
+      Ebizmarts_SagePaySuite_Log::w($tmp->getAcsurl().'-'.$tmp->getEmede().'-'.$tmp->getPareq());
+
+      if ( $tmp->getAcsurl() && $tmp->getEmede() && $tmp->getPareq()) {
+      #return Mage::getUrl('sagepaydirectpro/payment/redirect', array('_secure' => true));
+      return Mage::getUrl('sagepaydirectpro-3dsecure', array('_secure' => true));
+      } else {
+      return false;
+      }
+      } */
 
     public function getPayPalTitle() {
         return Mage::getStoreConfig('payment/sagepaypaypal/title', Mage::app()->getStore()->getId());

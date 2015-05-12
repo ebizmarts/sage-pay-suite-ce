@@ -46,28 +46,34 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         return $valid;
     }
 
-    public function getSagePayBasket($quote) {
+    public function getSagePayBasket($quote, $force_xml) {
 
         $api = Mage::getModel('sagepaysuite/api_payment');
 
         $basket = "";
 
-        if ($api->getSendBasket()) {
-
-            $basketFormat = (string)$api
-                                    ->getConfigData('basket_format');
-            if('sage' === $basketFormat) {
-                $basket = $api->getSageBasket($quote);
+        if($force_xml == true){
+            $_basket = $api->getBasketXml($quote);
+            if($this->validateBasketXml($_basket)) {
+                $basket = $_basket;
             }
-            else {
-                if('xml' === $basketFormat) {
-                    $_basket = $api->getBasketXml($quote);
-                    if($this->validateBasketXml($_basket)) {
-                        $basket = $_basket;
+        }else{
+            if ($api->getSendBasket()) {
+
+                $basketFormat = (string)$api
+                    ->getConfigData('basket_format');
+                if('sage' === $basketFormat) {
+                    $basket = $api->getSageBasket($quote);
+                }
+                else {
+                    if('xml' === $basketFormat) {
+                        $_basket = $api->getBasketXml($quote);
+                        if($this->validateBasketXml($_basket)) {
+                            $basket = $_basket;
+                        }
                     }
                 }
             }
-
         }
 
         return $basket;
@@ -511,52 +517,53 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     public function validateQuote() {
-        $quote = Mage::getSingleton('sagepaysuite/api_payment')->getQuote();
 
-        if (!$quote->isVirtual()) {
-            $address = $quote->getShippingAddress();
-            $addressValidation = $address->validate();
+        if((int)Mage::getStoreConfig('payment/sagepaysuite/validate_quote') === 1){
+            $quote = Mage::getSingleton('sagepaysuite/api_payment')->getQuote();
+
+            if (!$quote->isVirtual()) {
+                $address = $quote->getShippingAddress();
+                $addressValidation = $address->validate();
+                if ($addressValidation !== true) {
+                    Mage::throwException($this->__("\nPlease check shipping address information. \n%s", implode("\n", $addressValidation)));
+                }
+                $method = $address->getShippingMethod();
+                $rate = $address->getShippingRateByCode($method);
+                if (!$quote->isVirtual() && (!$method || !$rate)) {
+                    Mage::throwException($this->__('Please specify shipping method.'));
+                }
+            }
+
+            $addressValidation = $quote->getBillingAddress()->validate();
             if ($addressValidation !== true) {
-                Mage::throwException($this->__("\nPlease check shipping address information. \n%s", implode("\n", $addressValidation)));
-            }
-            $method = $address->getShippingMethod();
-            $rate = $address->getShippingRateByCode($method);
-            if (!$quote->isVirtual() && (!$method || !$rate)) {
-                Mage::throwException($this->__('Please specify shipping method.'));
-            }
-        }
-
-        $addressValidation = $quote->getBillingAddress()->validate();
-        if ($addressValidation !== true) {
-            Mage::throwException($this->__("\nPlease check billing address information. \n%s", implode("\n", $addressValidation)));
-        }
-
-        if (!($quote->getPayment()->getMethod())) {
-            Mage::throwException($this->__('Please select valid payment method.'));
-        }
-
-        //Stock check, redirect to cart if can't continue
-        if (!$quote->getInventoryProcessed()) {
-
-            $items = $this->_getProductsQty($quote->getAllItems());
-
-            try {
-
-                Mage::getModel('cataloginventory/stock')->registerProductsSale($items);
-                //Set flag
-                $quote->setInventoryProcessed(true);
-
-                //Rollback if all is OKAY
-                Mage::getModel('cataloginventory/stock')->revertProductsSale($items);
-                // Clear flag
-                $quote->setInventoryProcessed(false);
-
-            }catch(Exception $ex) {
-                throw new Exception('REDIRECT_CART');
+                Mage::throwException($this->__("\nPlease check billing address information. \n%s", implode("\n", $addressValidation)));
             }
 
-        }
+            if (!($quote->getPayment()->getMethod())) {
+                Mage::throwException($this->__('Please select valid payment method.'));
+            }
 
+            //Stock check, redirect to cart if can't continue
+            if (!$quote->getInventoryProcessed()) {
+
+                $items = $this->_getProductsQty($quote->getAllItems());
+
+                try {
+
+                    Mage::getModel('cataloginventory/stock')->registerProductsSale($items);
+                    //Set flag
+                    $quote->setInventoryProcessed(true);
+
+                    //Rollback if all is OKAY
+                    Mage::getModel('cataloginventory/stock')->revertProductsSale($items);
+                    // Clear flag
+                    $quote->setInventoryProcessed(false);
+
+                }catch(Exception $ex) {
+                    throw new Exception('REDIRECT_CART');
+                }
+            }
+        }
     }
 
     /**
@@ -634,6 +641,18 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         }
 
         return $this->_states;
+    }
+
+    /**
+     * Skip PostCode and Address Validation for overseas orders
+     */
+
+    public function isOverseasOrder($country) {
+
+        return $country != 'GB' && // United Kingdom
+            $country != 'GG' && //Guernsey
+            $country != 'IM' && //Isle Of Man
+            $country != 'JE'; //Jersey
     }
 
     /**

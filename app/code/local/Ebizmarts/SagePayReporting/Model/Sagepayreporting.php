@@ -192,9 +192,9 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
             //getTransactionIPDetails
             $ipDetails = $this->basicOperation("getTransactionIPDetails", ('<vpstxid>' . $response->getVpstxid() . '</vpstxid>'));
 
-            if((string)$ipDetails->errorcode == '0000') {
-                $response->setClientip((string)$ipDetails->clientip);
-                $response->setIplocation((string)$ipDetails->iplocation);
+            if($ipDetails['ok'] === true) {
+                $response->setClientip((string)$ipDetails['result']->clientip);
+                $response->setIplocation((string)$ipDetails['result']->iplocation);
             }
         }
 
@@ -291,10 +291,13 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
 
         if ((string) $api_response->errorcode !== '0000') {
             $login = '<vendor>: ' . $this->getVendor() . ' <user>: ' . $this->getUsername();
-            Mage::throwException(htmlentities( ((string)$api_response->error) . ' ' . $login));
+            //Mage::throwException(htmlentities( ((string)$api_response->error) . ' ' . $login));
+            $response = array('ok'=>false,'result'=>htmlentities(((string)$api_response->error) . ' ' . $login));
+        }else{
+            $response = array('ok'=>true,'result'=>$api_response);
         }
 
-        return $api_response;
+        return $response;
     }
 
     public function getTransactionList($startDate, $endDate, $startRow = 1, $endRow = 50) {
@@ -318,6 +321,12 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
 
         $curlSession = curl_init();
 
+        $sslversion = Mage::getStoreConfig('payment/sagepaysuite/curl_ssl_version');
+        curl_setopt($curlSession, CURLOPT_SSLVERSION, $sslversion);
+
+        if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
+            curl_setopt($curlSession, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));
+        }
         curl_setopt($curlSession, CURLOPT_URL, $url);
         curl_setopt($curlSession, CURLOPT_HEADER, 0);
         curl_setopt($curlSession, CURLOPT_POST, 1);

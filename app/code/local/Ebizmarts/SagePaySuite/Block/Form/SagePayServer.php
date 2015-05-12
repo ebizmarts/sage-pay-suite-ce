@@ -9,11 +9,11 @@
  */
 
 class Ebizmarts_SagePaySuite_Block_Form_SagePayServer extends Ebizmarts_SagePaySuite_Block_Form_SagePayToken {
-
+    
     protected function _prepareLayout() {
     	
         $_code = 'sagepayserver';
-        
+
         if($this->helper('sagepaysuite')->creatingAdminOrder()) {
             $_code = 'sagepayserver_moto';
         }

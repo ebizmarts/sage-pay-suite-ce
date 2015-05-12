@@ -558,20 +558,20 @@ reviewSave: function(transport){
         var lcont = new Element('div',{
             className: 'lcontainer'
         });
-        var heit = parseInt(SuiteConfig.getConfig('server','iframe_height'));
+        var height_container = parseInt(SuiteConfig.getConfig('server','iframe_height'));
         if(Prototype.Browser.IE){
-            heit = heit-65;
+            height_container = height_container-65;
         }
 
         var wtype = SuiteConfig.getConfig('server','payment_iframe_position').toString();
         if(wtype == 'modal'){
 
             var wm = new Control.Modal('sagepayserver-dummy-link',{
-                className: 'modal',
+                className: 'modal-sagepaysuite',
                 iframe: true,
                 closeOnClick: false,
                 insertRemoteContentAt: lcont,
-                height: SuiteConfig.getConfig('server','iframe_height'),
+                height: parseInt(SuiteConfig.getConfig('server','iframe_height')) + 20,
                 width: SuiteConfig.getConfig('server','iframe_width'),
                 fade: true,
                 afterOpen: function(){
@@ -587,7 +587,7 @@ reviewSave: function(transport){
             });
             wm.container.insert(lcont);
             wm.container.down().setStyle({
-                'height':heit.toString() + 'px'
+                'height':height_container.toString() + 'px'
                 });
             wm.container.down().insert(this.getServerSecuredImage());
             wm.open();
@@ -647,8 +647,9 @@ reviewSave: function(transport){
             var lcontdtd = new Element('div',{
                 className: 'lcontainer'
             });
+
             var dtd = new Control.Modal('sagepaydirectpro-dummy-link',{
-                className: 'modal sagepaymodal',
+                className: 'modal-sagepaysuite sagepaymodal',
                 closeOnClick: false,
                 insertRemoteContentAt: lcontdtd,
                 iframe: true,
@@ -657,6 +658,7 @@ reviewSave: function(transport){
                 fade: true,
                 afterOpen: function(){
 
+                    //do nothing if IE version < 8
                     if(true === Prototype.Browser.IE){
                         var ie_version = parseFloat(navigator.appVersion.split("MSIE")[1]);
                         if(ie_version<8){
@@ -733,7 +735,7 @@ reviewSave: function(transport){
 
                     if(d.response_status=="INVALID"||d.response_status=="MALFORMED"||d.response_status=="ERROR"||d.response_status=="FAIL"){
                         this.getConfig('checkout').accordion.openSection('opc-payment');
-                        this.growlWarn(Translator.translate("An error occurred") + ":\n" + d.response_status_detail.toString());
+                        this.growlWarn(Translator.translate("An error occurred with Sage Pay Direct") + ":\n" + d.response_status_detail.toString());
                     }else if(d.response_status == 'threed'){
                         $('sagepaydirectpro-dummy-link').writeAttribute('href', d.url);
                     }

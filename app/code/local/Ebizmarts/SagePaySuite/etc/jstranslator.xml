@@ -2,5 +2,8 @@
 <jstranslator>
     <error-sagepay translate="message" module="sagepaysuite">
         <message>An error occurred with Sage Pay</message>
+        <message>An error occurred with Sage Pay Direct</message>
+        <message>Card type doesn't match credit card number</message>
+        <message>Credit card number doesn't match credit card type</message>
     </error-sagepay>
 </jstranslator>

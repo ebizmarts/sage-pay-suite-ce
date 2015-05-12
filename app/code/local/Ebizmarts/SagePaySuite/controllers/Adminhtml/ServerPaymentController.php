@@ -159,11 +159,16 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
         $strResponse = 'Status=OK' . $this->eoln;
         $strResponse .= 'StatusDetail=Transaction completed successfully' . $this->eoln;
         $strResponse .= 'RedirectURL=' . $this->_getSuccessRedirectUrl() . '?SID=' . $this->getRequest()->getParam('SID', '') . $this->eoln;
+
+        Sage_Log::log("[MOTO] " . $strResponse, null, 'SagePaySuite_SERVER_RESPONSE.log');
+
         echo $strResponse;
         exit;
     }
 
     private function _returnInvalid($message = 'Unable to find the transaction in our database.') {
+
+
         header('Content-type: text/plain');
         $response = 'Status=INVALID' . $this->eoln;
         $response .= 'RedirectURL=' . $this->_getFailedRedirectUrl() . '?SID=' . $this->getRequest()->getParam('SID', '') . $this->eoln;
@@ -172,6 +177,8 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
         Sage_Log::log($message);
         Sage_Log::log($this->getRequest()->getPost());
         Sage_log::log($this->_getSagePayServerSession()->getData());
+
+        Sage_Log::log("[MOTO] " . $response, null, 'SagePaySuite_SERVER_RESPONSE.log');
 
         echo $response;
         exit;
@@ -378,11 +385,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
     }
 
     public function failedAction() {
-        $this->getResponse()->setBody($this->getLayout()->createBlock('sagepaysuite/checkout_serverfail')->toHtml());
+        $this->getResponse()->setBody($this->getLayout()->createBlock('sagepaysuite/checkout_serverfailmoto')->toHtml());
     }
 
     public function failureAction() {
-        $this->getResponse()->setBody($this->getLayout()->createBlock('sagepaysuite/checkout_serverfail')->toHtml());
+        $this->getResponse()->setBody($this->getLayout()->createBlock('sagepaysuite/checkout_serverfailmoto')->toHtml());
     }
 
     public function successAction() {

@@ -9,8 +9,10 @@
  	$sagepay = $this->getInfo()->getOrder()->getSagepayInfo();
  }
 
+
+
  #$sagepay = (is_object($this->getInfo()->getOrder()) ? $this->getInfo()->getOrder()->getSagepayInfo() : new Varien_Object());
- if($this->getInfo()->getCcLast4()){
+ if($this->getInfo()->getCcLast4() && !is_null($this->getInfo()->getCcLast4())){
  	$sagepay->setCardType($this->getInfo()->getCcType())
  	->setLastFourDigits($this->getInfo()->getCcLast4());
  }else if(is_null($sagepay->getCardType()) && ($sagepay = $this->getTokenCard())){
@@ -59,27 +61,25 @@
        <?php endif; ?>
 
 <?php endif; ?>
-
 	<p><?php echo $this->getMethod()->getTitle(); ?></p>
-
-<?php if($sagepay->getLastFourDigits()): ?>
-	<table>
-		<tr>
-			<td><?php echo $this->__('CC Type:'); ?></td>
-			<td><?php echo $this->getCcTypeName($sagepay->getCardType()); ?></td>
-		</tr>
-		<tr>
-			<td><?php echo $this->__('CC Number:'); ?></td>
-			<td>**********<?php echo $sagepay->getLastFourDigits(); ?></td>
-		</tr>
-		<?php if($sagepay->getCardExpiryDate()): ?>
-		<tr>
-			<td><?php echo $this->__('CC Exp. Date:'); ?></td>
-			<td><?php echo $sagepay->getCardExpiryDate(); ?></td>
-		</tr>
-		<?php endif; ?>
-	</table>
-<?php endif; ?>
+    <?php if($sagepay->getLastFourDigits()): ?>
+        <table>
+            <tr>
+                <td><p><?php echo $this->__('CC Type:'); ?></p></td>
+                <td><?php echo $this->getCcTypeName($sagepay->getCardType()); ?></td>
+            </tr>
+            <tr>
+                <td><p><?php echo $this->__('CC Number:'); ?></p></td>
+                <td><p>**********<?php echo $sagepay->getLastFourDigits(); ?></p></td>
+            </tr>
+            <?php if($sagepay->getCardExpiryDate()): ?>
+                <tr>
+                    <td><p><?php echo $this->__('CC Exp. Date:'); ?></p></td>
+                    <td><p><?php echo $sagepay->getCardExpiryDate(); ?></p></td>
+                </tr>
+            <?php endif; ?>
+        </table>
+    <?php endif; ?>
 
 <?php if(Mage::getSingleton('core/translate')->getTranslateInline() === true && $this->getIsSecureMode() != true && !Mage::app()->getRequest()->isXmlHttpRequest()): ?>
 	<?php echo $this->getChildHtml(); ?>

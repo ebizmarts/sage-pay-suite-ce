@@ -87,7 +87,7 @@ orderSave: function() {
 
                 $('sagepayserver-dummy-link').writeAttribute('href', response.next_url);
                 new Control.Modal('sagepayserver-dummy-link',{
-                    className: 'modal sagepaymodal',
+                    className: 'modal-sagepaysuite sagepaymodal',
                     closeOnClick: false,
                     iframe: true,
                     height: SuiteConfig.getConfig('server','iframe_height'),

@@ -13,7 +13,7 @@ iframe#sagepaysuite-server-incheckout-iframe { border:none;height:840px;width:10
 	background-color:#000;
 }
 
-.modal {
+.modal-sagepaysuite {
     -webkit-border-radius: 8px 8px 8px 8px;  /* Safari, Chrome (before WebKit version 533) */
 	-moz-border-radius: 8px 8px 8px 8px; /* Firefox up to version 3.6 */
 	background: url(../images/border-bg.png) repeat scroll 0 0 transparent;
@@ -62,7 +62,7 @@ h5.tdnote {
 
 div.surcharge-list {
     border: 1px solid #F18200;
-    margin-left: 23px;
+    margin-left: 0px;
     margin-top: 5px;
     padding: 6px;
     width: 430px;

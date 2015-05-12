@@ -245,7 +245,14 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
 
                 if ($this->getRequest()->getParam('vpstxid')) {
                     $response = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionDetails(null, urldecode($id));
-                    Mage::register('sagepay_related_transactions', Mage::getModel('sagepayreporting/sagepayreporting')->getRelatedTransactions(urldecode($id)));
+                    $relatedTrns = Mage::getModel('sagepayreporting/sagepayreporting')->getRelatedTransactions(urldecode($id));
+                    if($relatedTrns['ok'] === true){
+                        Mage::register('sagepay_related_transactions', $relatedTrns['result']);
+                    }else{
+                        $response = new Varien_Object;
+                        $response->setError($relatedTrns['result']);
+                        $response->setErrorcode('-1');
+                    }
                 }
                 else {
                     Mage::register('sagepay_related_transactions', new Varien_Object);
@@ -262,7 +269,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
             if ($response->getErrorcode() == '0000') {
                 Mage::register('sagepay_detail', $response);
             } else {
-                $this->_getSession()->addError($response->getError());
+                $this->_getSession()->addError(Mage::helper('sagepayreporting/error')->parseError($response->getError(),
+                    Mage::getStoreConfig('sagepayreporting/account/vendor')));
             }
         } else {
             Mage::register('sagepay_detail', null);
@@ -308,7 +316,11 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 }
 
                 $result = Mage::getModel('sagepayreporting/sagepayreporting')->setAVSCV2Status($newStatus);
-                $this->_getSession()->addSuccess(Mage::helper('sagepayreporting')->__('Status changed successfully'));
+                if($result['ok'] === true ){
+                    $this->_getSession()->addSuccess(Mage::helper('sagepayreporting')->__('Status changed successfully'));
+                }else{
+                    $this->_getSession()->addError($result['result']);
+                }
             } catch (Exception $e) {
                 $this->_getSession()->addError($e->getMessage());
             }
@@ -330,8 +342,12 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                     Mage::register('reporting_store_id', $paramStore);
                 }
 
-                Mage::getModel('sagepayreporting/sagepayreporting')->set3dSecureStatus($newStatus);
-                $this->_getSession()->addSuccess(Mage::helper('sagepayreporting')->__('Status changed successfully'));
+                $result = Mage::getModel('sagepayreporting/sagepayreporting')->set3dSecureStatus($newStatus);
+                if($result['ok'] == true){
+                    $this->_getSession()->addSuccess(Mage::helper('sagepayreporting')->__('Status changed successfully'));
+                }else{
+                    $this->_getSession()->addError($result['result']);
+                }
             } catch (Exception $e) {
                 $this->_getSession()->addError($e->getMessage());
             }
@@ -350,4 +366,65 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         return;
     }
 
+    public function massThirdmanCheckAction(){
+
+        $logPrefix = "[MANUAL] ";
+        Sage_Log::log($logPrefix . "Starting fraud checks... ", null, 'SagePaySuite_Thirdman.log');
+
+        $fraudTblName = Mage::getSingleton('core/resource')->getTableName('sagepayreporting_fraud');
+        $transactions = Mage::getResourceModel('sagepaysuite2/sagepaysuite_transaction_collection');
+        $transactions->addFieldToSelect(array('order_id', 'vendor_tx_code', 'vps_tx_id'));
+
+        $transactions
+            ->getSelect()
+            ->where("`main_table`.`order_id` IS NOT NULL AND (`main_table`.`order_id` NOT IN (SELECT `order_id` FROM ". $fraudTblName ."))")
+            ->order("main_table.created_at DESC")
+            ->limit(15);
+
+        $transactionsChecked = array();
+        $transactionsNOTChecked = array();
+
+        foreach($transactions as $_trn) {
+
+            $update = $_trn->updateFromApi();
+
+            if (!$update->getFraud()) {
+                Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": UNABLE TO GET FRAUD SCORE", null, 'SagePaySuite_Thirdman.log');
+                $transactionsNOTChecked[] = $_trn->getVendorTxCode();
+                continue;
+            }
+
+            try {
+
+                $rs             = $update->getFraud();
+                $noresult       = ((string)$rs->getThirdmanAction() == 'NORESULT');
+
+                $transactionsChecked[] = $_trn->getVendorTxCode();
+                Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": " . (string)$rs->getThirdmanAction(), null, 'SagePaySuite_Thirdman.log');
+
+            } catch (Exception $e) {
+                Sage_Log::logException($e);
+            }
+        }
+
+        //user messages
+        if(count($transactionsChecked) > 0){
+            $msg = "Transactions successfully checked: ";
+            for($i=0;$i<count($transactionsChecked);$i++){
+                $msg .= $i > 0 ? "  " : "";
+                $msg .= $transactionsChecked[$i];
+            }
+            Mage::getSingleton('adminhtml/session')->addSuccess($msg);
+        }
+        if(count($transactionsNOTChecked) > 0){
+            $msg = "An error occurred while checking some transactions: ";
+            for($i=0;$i<count($transactionsNOTChecked);$i++){
+                $msg .= $i > 0 ? "  " : "";
+                $msg .= $transactionsNOTChecked[$i];
+            }
+            Mage::getSingleton('adminhtml/session')->addError($msg);
+        }
+
+        $this->_redirect('sagepayreporting/adminhtml_sagepayreporting_fraud');
+    }
 }

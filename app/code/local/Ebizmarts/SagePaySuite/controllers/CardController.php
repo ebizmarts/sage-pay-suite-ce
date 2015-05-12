@@ -183,7 +183,10 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 																window.parent.location.href="' . Mage::getUrl('sgps/card/closeserverform') . '";
 															}else{
 															    var successCallback = function(){window.parent.location.reload();};
-															    window.parent.updateNickname('.$this->getRequest()->getParam('token_id').',window.parent.$("sagepaytoken_cc_nickname").value,successCallback,null);
+															    var token_id = "'.$this->getRequest()->getParam('token_id').'";
+															    if(token_id && token_id != ""){
+															        window.parent.updateNickname(token_id,window.parent.$("sagepaytoken_cc_nickname").value,successCallback,null);
+															    }
 															}
 														</script>
                                                     </body>

@@ -91,9 +91,11 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
      */
     public function updateFromApi()
     {
+
         if($this->getId()){
 
             try{
+
                 $details = Mage::getModel('sagepayreporting/sagepayreporting')
                         ->getTransactionDetails($this->getVendorTxCode(), $this->getVpsTxId());
 
@@ -133,12 +135,19 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
 
                 }
                 else {
-					$this->setApiError((string)$details->getError());
+                    //Mage::log((string)$details->getError());
+					$this->setApiError(Mage::helper('sagepayreporting/error')->parseError((string)$details->getError(),
+                        Mage::getStoreConfig('sagepayreporting/account/vendor')));
 				}
 
             }catch(Exception $e){
 				Mage::logException($e);
 				$this->setApiError($e->getMessage());
+
+                //set as status 0 (not found)
+                if(is_null($this->getTxStateId())){
+                    $this->setTxStateId(0)->save();
+                }
 			}
 
         }

@@ -187,6 +187,12 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                 do {
 
                     $APIReturn = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionList($startDate, $endDate, $rowCount + 1, $rowCount + 50);
+                    if($APIReturn['ok'] === true){
+                        $APIReturn = $APIReturn['result'];
+                    }else{
+                        $this->_errors[] = $APIReturn['result'];
+                        return null;
+                    }
 
                     $totalRows = (int) $APIReturn->transactions->totalrows;
                     $rowCount = (int) $APIReturn->transactions->endrow;
@@ -311,6 +317,12 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
             try {
                 $settlements = Mage::getModel('sagepayreporting/sagepayreporting')
                             ->getBatchList($this->startDate, $this->endDate);
+                if($settlements['ok'] === true){
+                    $settlements = $settlements['result'];
+                }else{
+                    $settlements = new stdClass;
+                    $settlements->errorcode = '9999';
+                }
             }catch(Exception $e) {
                 $settlements = new stdClass;
                 $settlements->errorcode = '9999';

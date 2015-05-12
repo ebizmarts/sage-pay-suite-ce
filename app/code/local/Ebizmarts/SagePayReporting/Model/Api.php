@@ -42,10 +42,13 @@ class Ebizmarts_SagePayReporting_Model_Api extends Ebizmarts_SagePaySuite_Model_
 
         $transaction = $this->info($vpsTxId);
 
-        $breakdown = Mage::getModel('sagepayreporting/sagepayreporting');
         try {
         	$thirdmanId = $transaction['t3mid'];
-			$breakdown->getT3MDetail($thirdmanId);
+            $breakdown = Mage::getModel('sagepayreporting/sagepayreporting')->getT3MDetail($thirdmanId);
+            if($breakdown['ok'] !== true){
+                $this->_fault('api_error', $breakdown['result']);
+            }
+            $breakdown = $breakdown['result'];
         }catch(Exception $e){
         	$this->_fault('api_error', $e->getMessage());
        	}

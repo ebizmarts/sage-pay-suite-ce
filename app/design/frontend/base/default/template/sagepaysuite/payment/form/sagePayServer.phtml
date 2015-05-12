@@ -50,7 +50,7 @@
             }
         };
 
-        if(typeof $('remembertoken-<?php echo $_code; ?>') != 'undefined' && $('remembertoken-sagepayserver') != null){
+        if($('remembertoken-<?php echo $_code; ?>') != null && typeof $('remembertoken-<?php echo $_code; ?>') != 'undefined' && $('remembertoken-sagepayserver') != null){
             Event.observe($('remembertoken-<?php echo $_code; ?>'), 'change', saveTokenChecked<?php echo $_code ?>);
         }
 

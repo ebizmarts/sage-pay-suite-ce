@@ -186,6 +186,11 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             $helper->saveShippingMethod($shipping_method);
         }
 
+
+
+        //Commented, it breaks totals
+        //$this->getOnepage()->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
+
         $requestParams = $this->getRequest()->getParams();
         if (array_key_exists('onestepcheckout_comments', $requestParams)
                 && !empty($requestParams['onestepcheckout_comments'])) {
