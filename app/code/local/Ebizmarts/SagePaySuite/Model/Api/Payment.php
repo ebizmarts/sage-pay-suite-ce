@@ -956,25 +956,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         if($trn->getEuroPaymentsStatus() === null || $trn->getEuroPaymentsStatus() == "OK"){
             //if it's not an euro payment I try to cancel the sagepay transaction
 
-            $t = strtoupper($trn->getTxType());
+            $this->voidPayment($trn);
 
-            if ($t == self::REQUEST_TYPE_AUTHENTICATE) {
-                $this->_cancel($trn);
-            } else if ($t == 'PAYMENT') {
-                $this->voidPayment($trn);
-            } else if ($t == 'DEFERRED') {
-
-                //If its fully released
-                //If $order->canInvoice() is TRUE it means that was partially invoiced already
-                if ((int) $trn->getReleased() === 1) {
-
-                    if (!$order->canInvoice()) {
-                        $this->voidPayment($trn);
-                    }
-                } else {
-                    $this->abortPayment($trn);
-                }
-            }
         }else{
             $trn->setAborted(1)->save();
 
