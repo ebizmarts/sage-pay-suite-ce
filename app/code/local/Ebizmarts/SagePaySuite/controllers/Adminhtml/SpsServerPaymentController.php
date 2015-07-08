@@ -7,7 +7,7 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Adminhtml_Controller_Action {
+class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_Adminhtml_Controller_Action {
     /*
      * Define end of line character used to correctly format response to Sage Pay Server
      * @access public
@@ -134,7 +134,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
 
     protected function _getSuccessRedirectUrl() {
 
-        $url = Mage :: getModel('adminhtml/url')->getUrl('sgpsSecure/adminhtml_serverPayment/success', array(
+        $url = Mage :: getModel('adminhtml/url')->getUrl('adminhtml/spsServerPayment/success', array(
             '_secure' => true,
                 ));
 
@@ -143,7 +143,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_ServerPaymentController extends Mage_Admi
 
     protected function _getFailedRedirectUrl() {
 
-        $url = Mage :: getModel('adminhtml/url')->getUrl('sgpsSecure/adminhtml_serverPayment/failed', array(
+        $url = Mage :: getModel('adminhtml/url')->getUrl('adminhtml/spsServerPayment/failed', array(
             '_secure' => true,
                 ));
 

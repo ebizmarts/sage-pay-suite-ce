@@ -32,7 +32,7 @@
             </action>
         </reference>
     </adminhtml_customer_edit>
-    <sagepaysuite_adminhtml_dashboard_index>
+    <adminhtml_spsdashboard_index>
         <reference name="head">
             <action method="addItem">
                     <type>skin_css</type>
@@ -60,8 +60,8 @@
         <reference name="content">
                 <block type="sagepaysuite/adminhtml_dashboard" name="sagepaysuite.dash" template="sagepaysuite/dashboard.phtml" />
         </reference>
-    </sagepaysuite_adminhtml_dashboard_index>
-	<sagepaysuite_adminhtml_transaction_orphan>
+    </adminhtml_spsdashboard_index>
+	<adminhtml_spstransaction_orphan>
 		<reference name="head">
 			<action method="addItem">
 				<type>skin_css</type>
@@ -80,16 +80,16 @@
 				<name>sagepaysuite/livepipe/window.js</name>
 			</action>
 		</reference>
-	</sagepaysuite_adminhtml_transaction_orphan>
-	<sagepaysuite_adminhtml_transaction_edit>
+	</adminhtml_spstransaction_orphan>
+	<adminhtml_spstransaction_edit>
         <reference name="left">
             <block type="sagepaysuite/adminhtml_transaction_edit_tabs" name="adminhtml.sagepay.transaction.edit.tabs"/>
         </reference>
         <reference name="content">
             <block type="sagepaysuite/adminhtml_transaction_edit" name="adminhtml.sagepay.transaction.edit"/>
         </reference>
-	</sagepaysuite_adminhtml_transaction_edit>
-	<sagepaysuite_adminhtml_log_index>
+	</adminhtml_spstransaction_edit>
+	<adminhtml_spslog_index>
 		<reference name="head">
 			<action method="addItem">
 				<type>skin_css</type>
@@ -106,8 +106,8 @@
 				template="sagepaysuite/sales/sagepay/logs.phtml">
 			</block>
 		</reference>
-	</sagepaysuite_adminhtml_log_index>
-	<sagepayreporting_adminhtml_sagepayreporting_transactiondetailmodal>
+	</adminhtml_spslog_index>
+	<adminhtml_sagepayreporting_transactiondetailmodal>
 		<reference name="head">
 			<action method="addItem">
 				<type>skin_css</type>
@@ -126,23 +126,23 @@
 				name="sagepayreporting.details.tabs">
 			</block>
 		</reference>
-	</sagepayreporting_adminhtml_sagepayreporting_transactiondetailmodal>
-	<sagepayreporting_adminhtml_sagepayreporting_avscvstatus>
+	</adminhtml_sagepayreporting_transactiondetailmodal>
+	<adminhtml_sagepayreporting_avscvstatus>
 		<reference name="head">
 			<action method="addItem">
 				<type>skin_css</type>
 				<name>sagepaysuite/css/sagePaySuite.css</name>
 			</action>
 		</reference>
-	</sagepayreporting_adminhtml_sagepayreporting_avscvstatus>
-	<sagepayreporting_adminhtml_sagepayreporting_threedstatus>
+	</adminhtml_sagepayreporting_avscvstatus>
+	<adminhtml_sagepayreporting_threedstatus>
 		<reference name="head">
 			<action method="addItem">
 				<type>skin_css</type>
 				<name>sagepaysuite/css/sagePaySuite.css</name>
 			</action>
 		</reference>
-	</sagepayreporting_adminhtml_sagepayreporting_threedstatus>
+	</adminhtml_sagepayreporting_threedstatus>
 	<default>
 		<reference name="notifications">
 			<block type="core/template"

@@ -186,6 +186,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 															    var token_id = "'.$this->getRequest()->getParam('token_id').'";
 															    if(token_id && token_id != ""){
 															        window.parent.updateNickname(token_id,window.parent.$("sagepaytoken_cc_nickname").value,successCallback,null);
+															    }else{
+															        window.parent.location.reload();
 															    }
 															}
 														</script>
@@ -219,6 +221,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 
         $post = $this->getRequest()->getPost();
 
+        $paramCustomerId = $this->getRequest()->getParam('cid','');
+
         $response = '';
 
         if ($post['Status'] == 'OK') {
@@ -240,7 +244,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                 'CardNumber'   => $post['Last4Digits'],
             );
 
-            $save = Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
+            $save = Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData, $paramCustomerId);
 
             if(isset($save) && $save !== FALSE) {
                 Mage::getSingleton('sagepaysuite/session')->setLastSavedTokenccid($save->getId());

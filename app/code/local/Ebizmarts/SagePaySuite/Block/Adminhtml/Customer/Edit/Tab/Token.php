@@ -79,7 +79,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Customer_Edit_Tab_Token
 
 	protected function _getNewTokenUrl()
 	{
-		return $this->getUrl('sgpsSecure/adminhtml_token/new', array('customer_id' => Mage::registry('current_customer')->getId()));
+		return $this->getUrl('adminhtml/spsToken/new', array('customer_id' => Mage::registry('current_customer')->getId()));
 	}
 
 	/**

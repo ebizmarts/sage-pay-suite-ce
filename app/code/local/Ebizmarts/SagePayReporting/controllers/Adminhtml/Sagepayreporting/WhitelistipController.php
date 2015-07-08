@@ -21,7 +21,7 @@ class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipControlle
 
     public function saveAction() {
         if (!$this->getRequest()->isPost()) {
-            $this->_redirect('sagepayreporting/adminhtml_sagepayreporting_whitelistip/whitelistIp');
+            $this->_redirect('adminhtml/sagepayreporting_whitelistip/whitelistIp');
             return;
         }
 

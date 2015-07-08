@@ -51,6 +51,13 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
                 $response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_REGISTERED) {
 
                 $op = Mage :: getSingleton('checkout/type_onepage');
+
+                if (Mage::getSingleton('customer/session')->getCreateAccount()) {
+                    $op->getQuote()->setCustomerEmail($op->getQuote()->getBillingAddress()->getEmail());
+                    $op->getQuote()->setCustomerFirstname($op->getQuote()->getBillingAddress()->getFirstname());
+                    $op->getQuote()->setCustomerLastname($op->getQuote()->getBillingAddress()->getLastname());
+                }
+
                 $op->getQuote()->collectTotals();
 
                 Mage::helper('sagepaysuite')->ignoreAddressValidation($op->getQuote());

@@ -7,7 +7,7 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_DeferredController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsDeferredController extends Mage_Adminhtml_Controller_Action
 {
 	protected $_publicActions = array (
 		'view'

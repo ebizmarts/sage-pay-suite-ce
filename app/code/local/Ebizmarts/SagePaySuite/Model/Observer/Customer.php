@@ -28,5 +28,37 @@ class Ebizmarts_SagePaySuite_Model_Observer_Customer
                 }
             }
         }
+
+        //remove old tokens
+        $customer_tokens = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')
+            ->getCollection()
+            ->addFieldToFilter("customer_id",$customer->getId());
+
+        foreach ($customer_tokens as $token){
+
+            $expiry_date = $token->getExpiryDate();
+
+            if(!empty($expiry_date) && strlen($expiry_date) == 4){
+                $expiry_month = substr($expiry_date,0,2);
+                $expiry_year = substr($expiry_date,2);
+                $current_month = date("m");
+                $current_year = date("y");
+
+                $delete = false;
+
+                if((int)$expiry_year < (int)$current_year){
+                    $delete = true;
+                }elseif((int)$expiry_year == (int)$current_year){
+                    if((int)$expiry_month <= (int)$current_month){
+                        $delete = true;
+                    }
+                }
+
+                if($delete == true){
+                    //delete token
+                    $token->delete();
+                }
+            }
+        }
     }
 }

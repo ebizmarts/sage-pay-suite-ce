@@ -126,30 +126,30 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
                     ),*/
                     array(
                         'caption' => Mage::helper('sagepaysuite')->__('Edit'),
-                        'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/edit'),
+                        'url'     => array('base'=>'adminhtml/spsTransaction/edit'),
                         'field'   => 'id',
                     ),
                     array(
                         'caption' => Mage::helper('sagepaysuite')->__('Recover'),
-                        'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/recover'),
+                        'url'     => array('base'=>'adminhtml/spsTransaction/recover'),
                         'field'   => 'vendortxcode',
                         'confirm' => Mage::helper('sagepaysuite')->__("Are you sure?\nA new order will be created and payment will be associated."),
                     ),
                     array(
                         'caption' => Mage::helper('sagepaysuite')->__('VOID'),
-                        'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/void'),
+                        'url'     => array('base'=>'adminhtml/spsTransaction/void'),
                         'field'   => 'vendortxcode',
                         'confirm' => Mage::helper('sagepaysuite')->__('Are you sure?')
                     ),
                     array(
                         'caption' => Mage::helper('sagepaysuite')->__('Delete'),
-                        'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/delete'),
+                        'url'     => array('base'=>'adminhtml/spsTransaction/delete'),
                         'field'   => 'vendortxcode',
                         'confirm' => Mage::helper('sagepaysuite')->__("Are you sure?\nThis operation will just delete the record from your local database.")
                     ),
                     array(
                         'caption' => Mage::helper('sagepaysuite')->__('Sync from API'),
-                        'url'     => array('base'=>'sgpsSecure/adminhtml_transaction/sync'),
+                        'url'     => array('base'=>'adminhtml/spsTransaction/sync'),
                         'field'   => 'vendortxcode'
                     )
                 ),
@@ -169,12 +169,12 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
 
         $this->getMassactionBlock()->addItem('delete', array(
              'label'=> Mage::helper('sagepaysuite')->__('Delete'),
-             'url'  => $this->getUrl('sgpsSecure/adminhtml_transaction/delete'),
+             'url'  => $this->getUrl('adminhtml/spsTransaction/delete'),
         ));
 
         $this->getMassactionBlock()->addItem('syncFromApi', array(
             'label'=> Mage::helper('sagepaysuite')->__('Sync from API'),
-            'url'  => $this->getUrl('sgpsSecure/adminhtml_transaction/sync'),
+            'url'  => $this->getUrl('adminhtml/spsTransaction/sync'),
         ));
 
         return $this;
@@ -183,7 +183,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Transaction_Grid extends Mage_Admin
     public function getRowUrl($row)
     {
         //return false;
-        return $this->getUrl('sagepayreporting/adminhtml_sagepayreporting/transactionDetailModal', array('vendortxcode' => $row->getVendorTxCode()));
+        return $this->getUrl('adminhtml/sagepayreporting/transactionDetailModal', array('vendortxcode' => $row->getVendorTxCode()));
     }
 
     public function getGridUrl()

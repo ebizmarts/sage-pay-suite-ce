@@ -14,13 +14,13 @@ class Ebizmarts_SagePayReporting_Model_Cron {
 
 		$fraudTblName = Mage::getSingleton('core/resource')->getTableName('sagepayreporting_fraud');
 		$transactions = Mage::getResourceModel('sagepaysuite2/sagepaysuite_transaction_collection');
-		$transactions->addFieldToSelect(array('order_id', 'vendor_tx_code', 'vps_tx_id'));
+		$transactions->addFieldToSelect(array('order_id', 'vendor_tx_code', 'vps_tx_id', 'tx_type'));
 
 		$transactions
 		->getSelect()
 		->where("`main_table`.`order_id` IS NOT NULL AND (`main_table`.`order_id` NOT IN (SELECT `order_id` FROM ". $fraudTblName ."))")
 		->order("main_table.created_at DESC")
-		->limit(15);
+		->limit(20);
 
 		$now = strtotime("now");
 
@@ -30,7 +30,7 @@ class Ebizmarts_SagePayReporting_Model_Cron {
 			$update = $_trn->updateFromApi();
 
 			if (!$update->getFraud()) {
-                Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": NO RESULT", null, 'SagePaySuite_Thirdman.log');
+                //Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": NO RESULT", null, 'SagePaySuite_Thirdman.log');
 				continue;
 			}
 
@@ -40,7 +40,7 @@ class Ebizmarts_SagePayReporting_Model_Cron {
 				$noresult       = ((string)$rs->getThirdmanAction() == 'NORESULT');
 				$orderPlusOneDay = strtotime("+1 day", strtotime($_trn->getCreatedAt()));
 
-                		Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": " . (string)$rs->getThirdmanAction(), null, 'SagePaySuite_Thirdman.log');
+                Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": " . (string)$rs->getThirdmanAction(), null, 'SagePaySuite_Thirdman.log');
 
 				
 

@@ -6,7 +6,7 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_FraudController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsFraudController extends Mage_Adminhtml_Controller_Action
 {
 
     protected function _initAction()

@@ -4,7 +4,7 @@
 
     if(true === $canShow):
 
-    $goOrphan = $this->helper('sagepaysuite')->__('Click here to go to <a href="%s">Orphan Transactions List</a>.', $this->helper('adminhtml')->getUrl('sgpsSecure/adminhtml_transaction/orphan'));
+    $goOrphan = $this->helper('sagepaysuite')->__('Click here to go to <a href="%s">Orphan Transactions List</a>.', $this->helper('adminhtml')->getUrl('adminhtml/spsTransaction/orphan'));
     $whatsThis = $this->helper('sagepaysuite')->__('<a target="_blank" href="%s">What\'s this?</a>', 'http://ebizmarts.com/blog/2013/07/sage-pay-orphan-transactions');
     $_orphans = $this->helper('sagepaysuite')->orphanTransactionsFlag();
 ?>

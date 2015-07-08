@@ -17,14 +17,15 @@
  	->setLastFourDigits($this->getInfo()->getCcLast4());
  }else if(is_null($sagepay->getCardType()) && ($sagepay = $this->getTokenCard())){
  	$sagepay->setLastFourDigits($sagepay->getLastFour());
+ }else{
+     $reg = Mage::registry('sageserverpost');
+     if( !is_null($reg)){
+         $sagepay->setCardType($reg->getData('CardType'))
+             ->setLastFourDigits($reg->getData('Last4Digits'));
+     }
  }
  $_code = $this->getMethod()->getCode();
 
- $reg = Mage::registry('sageserverpost');
- if(!is_null($reg)){
- 	$sagepay->setCardType($reg->getData('CardType'))
- 	->setLastFourDigits($reg->getData('Last4Digits'));
- }
 
  if(!$sagepay->getLastFourDigits() && ($_code == 'sagepayserver' || $_code == 'sagepayserver_moto' || $_code == 'sagepaypaypal') && is_object($this->getInfo()->getOrder())){
  	$sagepay = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')

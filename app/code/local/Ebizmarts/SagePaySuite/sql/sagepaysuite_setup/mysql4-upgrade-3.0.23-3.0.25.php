@@ -5,6 +5,6 @@ $connection = $installer->getConnection();
 
 $installer->startSetup();
 
-$installer->run("ALTER TABLE `{$this->getTable('sagepaysuite_transaction')}` MODIFY `bank_auth_code` VARCHAR(100);");
+$connection->addColumn($this->getTable('sagepaysuite_transaction'), 'server_notify_arrived', 'TINYINT(1) null');
 
 $installer->endSetup();

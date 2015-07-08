@@ -40,14 +40,20 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
     }
 
     public function getSessionCustomerId() {
+
         return $this->getCustomerQuoteId();
     }
 
     /**
      * Save registered token in local DB
      */
-    public function persistCard(array $info) {
+    public function persistCard(array $info, $customer_id = null) {
+
         $sessId = $this->getSessionCustomerId();
+
+        if(empty($sessId) && !empty($customer_id)){
+            $sessId = (int)$customer_id;
+        }
 
         //Register checkout
         if(is_string($sessId)) {
@@ -74,11 +80,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
             return FALSE;
         }
 
+        $nickname = "";
+        if(array_key_exists('Nickname', $info)){
+            $nickname = $info['Nickname'];
+        }
+
         $save = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')
                 ->setToken($info['Token'])
                 ->setStatus($info['Status'])
                 ->setVendor($info['Vendor'])
-                ->setNickname($info['Nickname'])
+                ->setNickname($nickname)
                 ->setCardType($info['CardType'])
                 ->setExpiryDate($info['ExpiryDate'])
                 ->setStatusDetail($info['StatusDetail'])
@@ -118,8 +129,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
     protected function _getNotificationUrl() {
         $adminId = Mage::registry('admin_tokenregister');
 
-        $frontendUrl = Mage::getUrl('sgps/card/registerPost', array('_secure' => true, '_nosid' => true)) . '?' . $this->getSidParam();
-        $backendUrl = Mage::getModel('adminhtml/url')->addSessionParam()->getUrl('sgpsSecure/adminhtml_token/registerPost', array('cid' => $adminId, 'form_key' => Mage::getSingleton('core/session')->getFormKey()));
+        $frontendUrl = Mage::getUrl('sgps/card/registerPost', array('_secure' => true, '_nosid' => true)) . '?' . $this->getSidParam() . '&cid=' . (is_null($this->getSessionCustomerId()) ? "" : $this->getSessionCustomerId());
+        $backendUrl = Mage::getModel('adminhtml/url')->addSessionParam()->getUrl('adminhtml/spsToken/registerPost', array('cid' => $adminId, 'form_key' => Mage::getSingleton('core/session')->getFormKey()));
 
         return ($adminId ? $backendUrl : $frontendUrl);
     }

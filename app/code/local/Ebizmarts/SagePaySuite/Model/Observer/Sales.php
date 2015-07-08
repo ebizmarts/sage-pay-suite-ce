@@ -173,7 +173,9 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
             //Commented because casues invoices not to be generated on MAC
             //$this->getSession()->unsetData('invoice_payment');
             //Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
-            Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
+            if ((int)Mage::getStoreConfig('payment/sagepaysuite/prevent_invoicing') === 0) {
+                Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
+            }
         }
     }
 
@@ -327,7 +329,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
                 //Sage Pay - Sync from Api
                 $block->addButton('update_from_api', array(
                     'label' => Mage::helper('sagepaysuite')->__('Sage Pay - Sync from Api'),
-                    'onclick' => 'setLocation(\'' . $block->getUrl('sgpsSecure/adminhtml_transaction/sync', array('_secure' => true, 'trn_id' => $sagePayData->getId())) . '\')',
+                    'onclick' => 'setLocation(\'' . $block->getUrl('adminhtml/spsTransaction/sync', array('_secure' => true, 'trn_id' => $sagePayData->getId())) . '\')',
                     'class' => 'go'
                 ));
             }
