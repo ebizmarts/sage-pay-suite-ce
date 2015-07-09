@@ -38,7 +38,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Paymentransaction_Grid extends Mage
 
         $this->getMassactionBlock()->addItem('dlete', array(
             'label' => Mage::helper('sagepaysuite')->__('Delete'),
-            'url' => $this->getUrl('sgpsSecure/adminhtml_transaction/removetrn'),
+            'url' => $this->getUrl('adminhtml/spsTransaction/removetrn'),
             'confirm' => Mage::helper('sagepaysuite')->__('Are you sure?')
         ));
         return $this;
@@ -55,9 +55,9 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Paymentransaction_Grid extends Mage
 
     public function getGridUrl() {
         if (FALSE === $this->_shortgrid()) {
-            return $this->getUrl('sgpsSecure/adminhtml_transaction/paymentsGrid', array('_current' => true));
+            return $this->getUrl('adminhtml/spsTransaction/paymentsGrid', array('_current' => true));
         } else {
-            return $this->getUrl('sgpsSecure/adminhtml_repeatpayment/grid', array('_current' => true));
+            return $this->getUrl('adminhtml/spsRepeatpayment/grid', array('_current' => true));
         }
     }
 
@@ -193,7 +193,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Paymentransaction_Grid extends Mage
                 ),
                 array(
                     'caption' => Mage::helper('sagepaysuite')->__('Add API data'),
-                    'url' => array('base' => 'sgpsSecure/adminhtml_transaction/addApiData'),
+                    'url' => array('base' => 'adminhtml/spsTransaction/addApiData'),
                     'field' => 'order_id',
                 )
             ),

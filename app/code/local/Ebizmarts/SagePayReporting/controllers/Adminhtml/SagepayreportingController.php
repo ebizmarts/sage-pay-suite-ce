@@ -373,7 +373,7 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
 
         $fraudTblName = Mage::getSingleton('core/resource')->getTableName('sagepayreporting_fraud');
         $transactions = Mage::getResourceModel('sagepaysuite2/sagepaysuite_transaction_collection');
-        $transactions->addFieldToSelect(array('order_id', 'vendor_tx_code', 'vps_tx_id'));
+        $transactions->addFieldToSelect(array('order_id', 'vendor_tx_code', 'vps_tx_id', 'tx_type'));
 
         $transactions
             ->getSelect()
@@ -425,6 +425,12 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
             Mage::getSingleton('adminhtml/session')->addError($msg);
         }
 
-        $this->_redirect('sagepayreporting/adminhtml_sagepayreporting_fraud');
+        $this->_redirect('adminhtml/sagepayreporting_fraud');
     }
+
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/sagepayreporting';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

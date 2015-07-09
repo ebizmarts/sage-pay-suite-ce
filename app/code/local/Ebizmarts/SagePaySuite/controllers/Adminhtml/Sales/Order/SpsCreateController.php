@@ -7,7 +7,7 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_CreateController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends Mage_Adminhtml_Controller_Action
 {
 
     /**
@@ -238,4 +238,10 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_CreateController extends Mage
             $this->_redirect('adminhtml/sales_order_create/index');
         }
     }
+
+    protected function _isAllowed() {
+            $acl = 'sales/order/actions/create';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

@@ -499,7 +499,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 ->setVendor($this->getConfigData('vendor'))
                 ->setVendorTxCode($vendorTxCode);
 
-        $request->setClientIPAddress($this->getClientIp()); //@TODO: Support IPv6 addresses.
+        $request->setClientIPAddress($this->getClientIp());
 
         if ($payment->getIntegra()) { //Server
 
@@ -723,6 +723,12 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         if(count($all_ips)>1){
             $remote_ip = $all_ips[count($all_ips)-1];
         }
+
+        //Workaround for SagePay not supporting IPv6
+        if(filter_var($remote_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $remote_ip = "0.0.0.0";
+        }
+
         return $remote_ip;
     }
 
@@ -956,8 +962,25 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         if($trn->getEuroPaymentsStatus() === null || $trn->getEuroPaymentsStatus() == "OK"){
             //if it's not an euro payment I try to cancel the sagepay transaction
 
-            $this->voidPayment($trn);
+            $t = strtoupper($trn->getTxType());
 
+            if ($t == self::REQUEST_TYPE_AUTHENTICATE) {
+                $this->_cancel($trn);
+            } else if ($t == 'PAYMENT') {
+                $this->voidPayment($trn);
+            } else if ($t == 'DEFERRED') {
+
+                //If its fully released
+                //If $order->canInvoice() is TRUE it means that was partially invoiced already
+                if ((int) $trn->getReleased() === 1) {
+
+                    if (!$order->canInvoice()) {
+                        $this->voidPayment($trn);
+                    }
+                } else {
+                    $this->abortPayment($trn);
+                }
+            }
         }else{
             $trn->setAborted(1)->save();
 
@@ -1098,7 +1121,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         if ($this->_getIsAdmin()) {
 
             return Mage::getSingleton('adminhtml/url')
-                ->getUrl('sgpsSecure/adminhtml_serverPayment/notifyAdminOrder', array('_secure' => true,
+                ->getUrl('adminhtml/spsServerPayment/notifyAdminOrder', array('_secure' => true,
                                                                                       '_nosid' => true,
                                                                                       'form_key' => Mage::getSingleton('core/session')->getFormKey(),
                                                                                       '_nosecret' => true)) . '?' . $this->getSidParam();
@@ -1137,7 +1160,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
     public function getRedirectUrl() {
         if ($this->_getIsAdmin()) {
-            return Mage :: getModel('adminhtml/url')->getUrl('sgpsSecure/adminhtml_serverPayment/redirect', array(
+            return Mage :: getModel('adminhtml/url')->getUrl('adminhtml/spsServerPayment/redirect', array(
                 '_secure' => true,
                 '_nosid' => true
             )) . '?' . $this->getSidParam();
@@ -1149,7 +1172,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
     public function getFailureUrl() {
         if ($this->_getIsAdmin()) {
-            return Mage :: getModel('adminhtml/url')->getUrl('sgpsSecure/adminhtml_serverPayment/failure', array(
+            return Mage :: getModel('adminhtml/url')->getUrl('adminhtml/spsServerPayment/failure', array(
                 '_secure' => true,
                 #'form_key' => Mage::getSingleton('core/session')->getFormKey(),
                 '_nosid' => true

@@ -460,7 +460,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                 $label = $this->__('Last 24 hours');
             }
 
-            $url   = $this->getUrl('sgpsSecure/adminhtml_dashboard', array('_current' => true, 'daysago' => $array[$i]));
+            $url   = $this->getUrl('adminhtml/spsDashboard', array('_current' => true, 'daysago' => $array[$i]));
 
             $html .= '<option' . ($array[$i] === $this->daysAgo ? ' selected="selected"' : '') . ' value="' . $url . '">' . $label . '</option>';
         }

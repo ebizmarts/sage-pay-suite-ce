@@ -7,7 +7,7 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Adminhtml_TransactionController extends Mage_Adminhtml_Controller_Action {
+class Ebizmarts_SagePaySuite_Adminhtml_SpsTransactionController extends Mage_Adminhtml_Controller_Action {
 
     /**
      * Init layout, menu and breadcrumb

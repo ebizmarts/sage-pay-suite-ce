@@ -6,7 +6,7 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Adminhtml_LogController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_SagePaySuite_Adminhtml_SpsLogController extends Mage_Adminhtml_Controller_Action
 {
 
     protected function _initAction()
@@ -72,12 +72,17 @@ class Ebizmarts_SagePaySuite_Adminhtml_LogController extends Mage_Adminhtml_Cont
     }
     fclose ($handle);
 
-    $dlFile = '<a href="' . Mage::helper('adminhtml')->getUrl('sgpsSecure/adminhtml_log/downloadFile', array('f'=>$r->getParam('file'))) . '">' . $this->__('Download file') . '</a>';
+    $dlFile = '<a href="' . Mage::helper('adminhtml')->getUrl('adminhtml/spsLog/downloadFile', array('f'=>$r->getParam('file'))) . '">' . $this->__('Download file') . '</a>';
 
     return $this->getResponse()->setBody('<html><head><title></title><meta http-equiv="refresh" content="10"></head><body><pre>' . $dlFile ."\r\n\n". implode('',$text).'</pre></body></html>');
 
 
 
 	}
+
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/logs';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
 
 }

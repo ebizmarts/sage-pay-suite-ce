@@ -21,7 +21,7 @@ class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipControlle
 
     public function saveAction() {
         if (!$this->getRequest()->isPost()) {
-            $this->_redirect('sagepayreporting/adminhtml_sagepayreporting_whitelistip/whitelistIp');
+            $this->_redirect('adminhtml/sagepayreporting_whitelistip/whitelistIp');
             return;
         }
 
@@ -45,5 +45,11 @@ class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipControlle
         $this->_redirectReferer();
         return;
     }
+
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/sagepayreporting/add_ip_to_whitelist';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 
 }

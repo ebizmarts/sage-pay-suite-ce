@@ -150,7 +150,7 @@
 <?php endif; if(!$fraud->getThirdmanScore()): ?>
 <div id="t3m-button">
     <p>
-        <button onclick="setLocation('<?php echo $this->helper('adminhtml')->getUrl('sagepayreporting/adminhtml_sagepayreporting_fraud/fraudCheck', array('order_id'=>$orderId, '_secure' => true)); ?>');" type="button">
+        <button onclick="setLocation('<?php echo $this->helper('adminhtml')->getUrl('adminhtml/sagepayreporting_fraud/fraudCheck', array('order_id'=>$orderId, '_secure' => true)); ?>');" type="button">
             <span><?php echo $this->__('Check 3rd Man'); ?></span>
         </button>
     </p>

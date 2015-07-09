@@ -6,6 +6,7 @@
 		</Ebizmarts_SagePayReporting>
 	</modules>
 	<frontend>
+        <!--
 		<routers>
 			<sagepayreporting>
 				<use>standard</use>
@@ -15,6 +16,7 @@
 				</args>
 			</sagepayreporting>
 		</routers>
+		-->
 		<layout>
 			<updates>
 				<sagepayreporting>
@@ -33,6 +35,7 @@
         </translate>
 	</frontend>
 	<admin>
+        <!--
 		<routers>
 			<sagepayreporting>
 				<use>admin</use>
@@ -42,6 +45,16 @@
 				</args>
 			</sagepayreporting>
 		</routers>
+		-->
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <sagepayreporting before="Mage_Adminhtml">Ebizmarts_SagePayReporting_Adminhtml</sagepayreporting>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
 	</admin>
 	<adminhtml>
         <translate>

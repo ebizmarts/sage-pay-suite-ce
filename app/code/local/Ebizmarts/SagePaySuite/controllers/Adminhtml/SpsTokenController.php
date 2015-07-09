@@ -8,7 +8,7 @@
  * @author     Ebizmarts <info@ebizmarts.com>
  */
 
-class Ebizmarts_SagePaySuite_Adminhtml_TokenController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_SagePaySuite_Adminhtml_SpsTokenController extends Mage_Adminhtml_Controller_Action
 {
 	protected $_eoln = Ebizmarts_SagePaySuite_Model_Api_Payment::RESPONSE_DELIM_CHAR;
 
@@ -86,13 +86,13 @@ class Ebizmarts_SagePaySuite_Adminhtml_TokenController extends Mage_Adminhtml_Co
 	     ->save();
 
 	     $response .= 'Status=OK' . $this->_eoln;
-	     $response .= 'RedirectURL=' . Mage::helper('adminhtml')->getUrl('sgpsSecure/adminhtml_token/registerSuccess') . $this->_eoln;
+	     $response .= 'RedirectURL=' . Mage::helper('adminhtml')->getUrl('adminhtml/spsToken/registerSuccess') . $this->_eoln;
          $response .= 'StatusDetail=Card successfully registered.' . $this->_eoln;
 
 	   }else if($post['Status'] == 'ABORT') {
 
 			$response .= 'Status=OK' . $this->_eoln;
-	     	$response .= 'RedirectURL=' . Mage::helper('adminhtml')->getUrl('sgpsSecure/adminhtml_token/registerAbort') . $this->_eoln;
+	     	$response .= 'RedirectURL=' . Mage::helper('adminhtml')->getUrl('adminhtml/spsToken/registerAbort') . $this->_eoln;
          	$response .= 'StatusDetail=Card registering was aborted. ' . $post['StatusDetail'] . $this->_eoln;
 
 	   }
@@ -188,4 +188,10 @@ class Ebizmarts_SagePaySuite_Adminhtml_TokenController extends Mage_Adminhtml_Co
 		$this->_redirectReferer();
 		return;
 	}
+
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/token_cards';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

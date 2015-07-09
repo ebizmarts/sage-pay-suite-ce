@@ -7,7 +7,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Sagepay_Logs extends Mage_Cor
 	{
 		$params ['_secure'] = true;
 
-		return $this->helper('adminhtml')->getUrl('sgpsSecure/adminhtml_log/tail', $params);
+		return $this->helper('adminhtml')->getUrl('adminhtml/spsLog/tail', $params);
 	}
 
 	protected function _getLogPath()

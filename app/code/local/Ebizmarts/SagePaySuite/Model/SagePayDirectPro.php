@@ -560,7 +560,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 ->setVendor(($payment->getRequestVendor() ? $payment->getRequestVendor() : $this->getConfigData('vendor')))
                 ->setVendorTxCode($vendorTxCode)
                 ->setDescription($this->ss(($payment->getCcOwner() ? $payment->getCcOwner() : '.'), 100))
-                ->setClientIPAddress($this->getClientIp()); //@TODO: Support IPv6 addresses.
+                ->setClientIPAddress($this->getClientIp());
 
 
         //basket
@@ -625,6 +625,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 if(!empty($billing_state)){
                     $request->setBillingState($billing_state);
                 }
+                //Mage::log($billing_state);
 
                 $request->setCustomerEMail($this->ss($billing->getEmail(), 255));
             }

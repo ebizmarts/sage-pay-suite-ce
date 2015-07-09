@@ -85,7 +85,7 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
     }
 
     protected function _getDetailUrl($vpsTxId) {
-        return $this->helper('adminhtml')->getUrl('sagepayreporting/adminhtml_sagepayreporting/transactionDetailModal/', array('vpstxid' => $vpsTxId));
+        return $this->helper('adminhtml')->getUrl('adminhtml/sagepayreporting/transactionDetailModal/', array('vpstxid' => $vpsTxId));
     }
 
     public function getStoppedLabel($trn) {

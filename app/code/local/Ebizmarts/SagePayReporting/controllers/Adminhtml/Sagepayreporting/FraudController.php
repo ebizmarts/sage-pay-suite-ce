@@ -141,4 +141,9 @@ class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_FraudController exte
 		return Mage::getModel('sagepayreporting/sagepayreporting');
 	}
 
+    protected function _isAllowed() {
+        $acl = 'sales/sagepay/sagepayreporting/fraud_info_orders';
+        return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

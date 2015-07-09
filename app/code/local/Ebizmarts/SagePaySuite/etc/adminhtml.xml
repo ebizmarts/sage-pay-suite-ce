@@ -20,32 +20,32 @@
                         <dashboard translate="title" module="sagepaysuite">
                             <title>Dashboard</title>
                             <sort_order>10</sort_order>
-                            <action>sgpsSecure/adminhtml_dashboard</action>
+                            <action>adminhtml/spsDashboard</action>
                         </dashboard>
                         <token_cards translate="title" module="sagepaysuite">
                             <title>Token Cards</title>
                             <sort_order>20</sort_order>
-                            <action>sgpsSecure/adminhtml_token</action>
+                            <action>adminhtml/spsToken</action>
                         </token_cards>
                         <deferred_orders translate="title" module="sagepaysuite">
                             <title>Deferred Orders</title>
                             <sort_order>30</sort_order>
-                            <action>sgpsSecure/adminhtml_sales_order_deferred</action>
+                            <action>adminhtml/sales_order_spsDeferred</action>
                         </deferred_orders>
                         <orphans translate="title" module="sagepaysuite">
                             <title>Orphan Transactions</title>
                             <sort_order>40</sort_order>
-                            <action>sgpsSecure/adminhtml_transaction/orphan</action>
+                            <action>adminhtml/spsTransaction/orphan</action>
                         </orphans>
                         <payments translate="title" module="sagepaysuite">
                             <title>Payment Transactions</title>
                             <sort_order>50</sort_order>
-                            <action>sgpsSecure/adminhtml_transaction/payments</action>
+                            <action>adminhtml/spsTransaction/payments</action>
                         </payments>
                         <logs translate="title" module="sagepaysuite">
                             <title>Logs</title>
                             <sort_order>60</sort_order>
-                            <action>sgpsSecure/adminhtml_log</action>
+                            <action>adminhtml/spsLog</action>
                         </logs>
                         <sagepayreporting translate="title" module="sagepayreporting">
                             <title><![CDATA[Admin & Access API]]>
@@ -55,35 +55,35 @@
                                 <transaction_detail translate="title" module="sagepayreporting">
                                     <title>Transaction Detail</title>
                                     <sort_order>1</sort_order>
-                                    <action>sagepayreporting/adminhtml_sagepayreporting/transactionDetail</action>
+                                    <action>adminhtml/sagepayreporting/transactionDetail</action>
                                 </transaction_detail>
                                 <fraud_info_orders translate="title" module="sagepayreporting">
                                     <title>Fraud Information</title>
                                     <sort_order>2</sort_order>
-                                    <action>sagepayreporting/adminhtml_sagepayreporting_fraud</action>
+                                    <action>adminhtml/sagepayreporting_fraud</action>
                                 </fraud_info_orders>
                                 <add_ip_to_whitelist translate="title" module="sagepayreporting">
                                     <title>White list IP address</title>
                                     <sort_order>3</sort_order>
-                                    <action>sagepayreporting/adminhtml_sagepayreporting_whitelistip/whitelistIp</action>
+                                    <action>adminhtml/sagepayreporting_whitelistip/whitelistIp</action>
                                 </add_ip_to_whitelist>
                                 <threed_status translate="title" module="sagepayreporting">
                                     <title><![CDATA[3D Secure Administration]]>
                                     </title>
                                     <sort_order>4</sort_order>
-                                    <action>sagepayreporting/adminhtml_sagepayreporting/threedstatus</action>
+                                    <action>adminhtml/sagepayreporting/threedstatus</action>
                                 </threed_status>
                                 <avscv2_status translate="title" module="sagepayreporting">
                                     <title><![CDATA[AVS/CV2 Administration]]>
                                     </title>
                                     <sort_order>5</sort_order>
-                                    <action>sagepayreporting/adminhtml_sagepayreporting/avscvstatus</action>
+                                    <action>adminhtml/sagepayreporting/avscvstatus</action>
                                 </avscv2_status>
                                 <showpost translate="title" module="sagepayreporting">
                                     <title><![CDATA[Perform Show POST]]>
                                     </title>
                                     <sort_order>6</sort_order>
-                                    <action>sagepayreporting/adminhtml_sagepayreporting/showpost</action>
+                                    <action>adminhtml/sagepayreporting/showpost</action>
                                 </showpost>
                             </children>
                         </sagepayreporting>
@@ -171,6 +171,9 @@
                                             </showpost>
                                         </children>
                                     </sagepayreporting>
+                                    <configuration translate="title">
+                                        <title>SagePay Suite configuration</title>
+                                    </configuration>
                                 </children>
                             </sagepay>
                         </children>

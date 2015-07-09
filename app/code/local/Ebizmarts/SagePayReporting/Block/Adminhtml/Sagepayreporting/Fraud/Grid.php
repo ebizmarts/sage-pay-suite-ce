@@ -230,11 +230,11 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
                 'type'      => 'action',
                 'getter'     => 'getId',
                 'actions'   => array(
-			array(
+		array(
                         'caption' => Mage::helper('sagepaysuite')->__('Check 3rd Man'),
                         'url'     => array('base'=>'*/*/fraudCheck'),
                         'field'   => 'order_id'
-			)
+		)
 		),
                 'filter'    => false,
                 'sortable'  => false,
@@ -255,7 +255,6 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud_Grid ext
              'label'=> Mage::helper('sagepaysuite')->__('Check 3rd Man'),
              'url'  => $this->getUrl('*/*/fraudCheck'),
 		));
-
 		return $this;
 	}
 

@@ -23,7 +23,6 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serverfail extends Mage_Core_Block_T
 
         Mage::getSingleton('checkout/session')->addError(Mage::helper('sagepaysuite/error')->parseTransactionFailedError($message));
 
-
         $server_mode = (string)Mage::getModel('sagepaysuite/sagePayServer')->getConfigData('payment_iframe_position');
         //Redirect to cart
         if($server_mode == 'full_redirect') {
@@ -92,14 +91,28 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serverfail extends Mage_Core_Block_T
             $alert = 'alert("' . $message . '");';
         }
 
-        $fullRedirection = '';
+        $fullRedirection       = '';
+        $checkoutUrl           = $this->getUrl('checkout/cart', array('_secure'=>true));
+        $fullRedirectionAction = "window.location.href = \"{$checkoutUrl}\";";
 
         $pos = (string)Mage::getModel('sagepaysuite/sagePayServer')->getConfigData('payment_iframe_position');
 
         //Redirect to cart
         if($pos == 'full_redirect') {
-            $checkoutUrl     = $this->getUrl('checkout/cart', array('_secure'=>true));
-            $fullRedirection = "window.location.href = \"{$checkoutUrl}\";";
+            $fullRedirection = $fullRedirectionAction;
+        }
+
+        //For modal when in mobile
+        if( empty($fullRedirection) ) {
+            $fullRedirection = "var _is_mobile = (navigator.userAgent.match(/BlackBerry/i) ||
+                navigator.userAgent.match(/webOS/i) ||
+                                    navigator.userAgent.match(/Android/i) ||
+                                    navigator.userAgent.match(/iPhone/i) ||
+                                    navigator.userAgent.match(/iPod/i) ||
+                                    navigator.userAgent.match(/iPad/i));
+                                    if(_is_mobile){
+                                    ".$fullRedirectionAction."
+                                    }";
         }
 
         $html = '<html><body>';

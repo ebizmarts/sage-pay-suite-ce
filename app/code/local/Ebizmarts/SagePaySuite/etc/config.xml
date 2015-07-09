@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.23.1</version>
+            <version>3.0.25</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -23,7 +23,7 @@
             </updates>
         </layout>
 		<events>
-	      <controller_action_predispatch_adminhtml_dashboard_index>
+	      <controller_action_predispatch_adminhtml_spsDashboard_index>
 	          <observers>
 	              <sagepaysuite_up>
 	                  <type>model</type>
@@ -31,7 +31,7 @@
 	                  <method>check</method>
 	              </sagepaysuite_up>
 	          </observers>
-	      </controller_action_predispatch_adminhtml_dashboard_index>
+	      </controller_action_predispatch_adminhtml_spsDashboard_index>
             <core_block_abstract_to_html_before>
                 <observers>
                     <order_export_addmassbutton>
@@ -627,6 +627,16 @@
     </frontend>
     <admin>
         <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <sagepaysuite before="Mage_Adminhtml">Ebizmarts_SagePaySuite_Adminhtml</sagepaysuite>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+        <!--
+        <routers>
             <sagepaysuite>
                 <use>admin</use>
                 <args>
@@ -635,6 +645,7 @@
                 </args>
             </sagepaysuite>
         </routers>
+        -->
     </admin>
     <crontab>
         <jobs>

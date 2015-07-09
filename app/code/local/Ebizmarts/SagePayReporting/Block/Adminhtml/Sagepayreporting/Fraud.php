@@ -15,7 +15,7 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Fraud extends 
 
         $this->_addButton('check_thirdman_manually', array(
         'label'     => 'Check 3rd man',
-        'onclick' => 'setLocation(\'' . $this->getUrl('sagepayreporting/adminhtml_sagepayreporting/massThirdmanCheck', array()) . '\');',
+        'onclick' => 'setLocation(\'' . $this->getUrl('adminhtml/sagepayreporting/massThirdmanCheck', array()) . '\');',
         'class'     => 'go'
     ), 0, 100, 'header', 'header');
 	}
