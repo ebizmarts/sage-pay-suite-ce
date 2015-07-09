@@ -46,4 +46,10 @@ class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipControlle
         return;
     }
 
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/sagepayreporting/add_ip_to_whitelist';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
+
 }

@@ -56,4 +56,10 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsDeferredController extends
 		$this->loadLayout();
 		$this->getResponse()->setBody($this->getLayout()->createBlock('sagepaysuite/adminhtml_sales_order_deferred_grid')->toHtml());
 	}
+
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/deferred_orders';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

@@ -7,4 +7,9 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsDashboardController extends Mage_Admin
         $this->loadLayout()->renderLayout();
     }
 
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/dashboard';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

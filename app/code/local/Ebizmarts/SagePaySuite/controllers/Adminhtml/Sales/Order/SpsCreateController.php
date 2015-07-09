@@ -238,4 +238,10 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
             $this->_redirect('adminhtml/sales_order_create/index');
         }
     }
+
+    protected function _isAllowed() {
+            $acl = 'sales/order/actions/create';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

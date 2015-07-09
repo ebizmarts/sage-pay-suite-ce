@@ -80,4 +80,9 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsLogController extends Mage_Adminhtml_C
 
 	}
 
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/logs';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

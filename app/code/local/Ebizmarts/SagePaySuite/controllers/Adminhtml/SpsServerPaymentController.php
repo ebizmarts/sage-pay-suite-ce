@@ -477,4 +477,9 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
         }
     }
 
+    protected function _isAllowed() {
+            $acl = 'sales/order/actions/create';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }

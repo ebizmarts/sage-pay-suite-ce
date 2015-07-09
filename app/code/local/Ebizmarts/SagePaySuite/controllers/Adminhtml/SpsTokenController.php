@@ -188,4 +188,10 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsTokenController extends Mage_Adminhtml
 		$this->_redirectReferer();
 		return;
 	}
+
+    protected function _isAllowed() {
+            $acl = 'sales/sagepay/token_cards';
+            return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
 }
