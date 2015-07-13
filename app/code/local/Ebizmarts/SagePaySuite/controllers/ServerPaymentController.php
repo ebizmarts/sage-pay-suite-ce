@@ -475,7 +475,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         $customer_id = null;
                         if($this->getOnepage()->getQuote()->getId() == null){
                             $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
-                            $this->getOnepage()->setQuote(Mage::getModel('sales/quote')->loadActive($rqQuoteId));
+                            $quote = Mage::getModel('sales/quote')->loadActive($rqQuoteId);
+                            $this->getOnepage()->setQuote($quote);
+                            Mage::app()->getStore()->setCurrentCurrencyCode($quote->getQuoteCurrencyCode()); //Thanks to Ross Kinsman for his input on this.
                             //Sage_Log::log("Notified: Checkout quote reloaded with id: " . $rqQuoteId, null, 'SagePaySuite_SERVER_RESPONSE.log');
                             $customer_id = $this->getOnepage()->getQuote()->getData('customer_id');
                             if(!is_null($customer_id)){
@@ -646,7 +648,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         $customer_id = null;
                         if($this->getOnepage()->getQuote()->getId() == null){
                             $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
-                            $this->getOnepage()->setQuote(Mage::getModel('sales/quote')->loadActive($rqQuoteId));
+                            $quote = Mage::getModel('sales/quote')->loadActive($rqQuoteId);
+                            $this->getOnepage()->setQuote($quote);
+                            Mage::app()->getStore()->setCurrentCurrencyCode($quote->getQuoteCurrencyCode()); //Thanks to Ross Kinsman for his input on this.
                             $customer_id = $this->getOnepage()->getQuote()->getData('customer_id');
                             if(!is_null($customer_id)){
                                 $customer = Mage::getModel('customer/customer')->load($customer_id);
