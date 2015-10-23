@@ -965,10 +965,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
     }
 
     /**
-     * Cancel payment
-     *  - DEFERRED  -> ABORT
-     *  - PAYMENT or RELEASE -> VOID
-     *  - REGISTERED or AUTHENTICATE -> CANCEL
+     * Cancel payment (VOID)
      * @param   Varien_Object $invoicePayment
      * @return  Ebizmarts_SagePaySuite_Model_Api_Payment
      */
@@ -989,25 +986,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         if($trn->getEuroPaymentsStatus() === null || $trn->getEuroPaymentsStatus() == "OK"){
             //if it's not an euro payment I try to cancel the sagepay transaction
 
-            $t = strtoupper($trn->getTxType());
-
-            if ($t == self::REQUEST_TYPE_AUTHENTICATE) {
-                $this->_cancel($trn);
-            } else if ($t == 'PAYMENT') {
                 $this->voidPayment($trn);
-            } else if ($t == 'DEFERRED') {
 
-                //If its fully released
-                //If $order->canInvoice() is TRUE it means that was partially invoiced already
-                if ((int) $trn->getReleased() === 1) {
-
-                    if (!$order->canInvoice()) {
-                        $this->voidPayment($trn);
-                    }
-                } else {
-                    $this->abortPayment($trn);
-                }
-            }
         }else{
             $trn->setAborted(1)->save();
 
@@ -1112,36 +1092,6 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         $this->saveAction($trn->getOrderId(), $data, $result);
 
         $trn->setVoided(1)->save();
-    }
-
-    private function _cancel($trn) {
-
-        /**
-         * SecurityKey from the "Admin & Access API"
-         */
-        if (!$trn->getSecurityKey() && strtoupper($trn->getIntegration()) == 'FORM') {
-            $this->_addSecurityKey($trn);
-        }
-
-        $data = array();
-        $data['VPSProtocol'] = $trn->getVpsProtocol();
-        $data['TxType'] = self::REQUEST_TYPE_CANCEL;
-        $data['ReferrerID'] = $this->getConfigData('referrer_id');
-        $data['Vendor'] = $trn->getVendorname();
-        $data['VendorTxCode'] = $trn->getVendorTxCode();
-        $data['VPSTxId'] = $trn->getVpsTxId();
-        $data['SecurityKey'] = $trn->getSecurityKey();
-
-        $result = $this->requestPost($this->getUrl('cancel', false, $this->_getIntegrationCode($trn->getIntegration()), $trn->getMode()), $data);
-
-        if ($result['Status'] != 'OK') {
-            Sage_Log::log($result['StatusDetail']);
-            Mage::throwException(Mage::helper('sagepaysuite')->__($result['StatusDetail']));
-        }
-
-        $this->saveAction($trn->getOrderId(), $data, $result);
-
-        $trn->setCanceled(1)->save();
     }
 
     protected function _getAdminQuote() {
