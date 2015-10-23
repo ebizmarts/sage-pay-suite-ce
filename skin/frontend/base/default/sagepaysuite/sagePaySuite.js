@@ -200,7 +200,11 @@ registerCard = function(url){
             if(rsp.url == 'ERROR'){
                 alert(rsp.text);
             }else{
-                new Insertion.After('link-regcard', rsp.text);
+                if(rsp.text == 'full_redirect') {
+                    setLocation(rsp.url);
+                }else {
+                    new Insertion.After('link-regcard', rsp.text);
+                }
             }
 
             $('sageTokenCardLoading').hide();

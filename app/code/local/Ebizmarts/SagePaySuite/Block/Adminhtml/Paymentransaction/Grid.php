@@ -46,7 +46,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Paymentransaction_Grid extends Mage
 
     public function getRowUrl($row) {
 
-        if(Mage::getSingleton('admin/session')->isAllowed('sales/sagepay/payments/edit_transaction')) {
+        if(FALSE === $this->_shortgrid() && Mage::getSingleton('admin/session')->isAllowed('sales/sagepay/payments/edit_transaction')) {
             return $this->getUrl('*/*/edit', array('id' => $row->getVendorTxCode()));
         }
 
@@ -204,7 +204,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Paymentransaction_Grid extends Mage
     }
 
     protected function _shortgrid() {
-        return (bool) ($this->getRequest()->getControllerName() == 'adminhtml_repeatpayment');
+        return (bool) ($this->getRequest()->getControllerName() == 'spsRepeatpayment');
     }
 
 }

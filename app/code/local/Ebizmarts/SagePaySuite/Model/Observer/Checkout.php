@@ -89,6 +89,24 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
 
     public function controllerOnePageSuccess($o) {
 
+        //check if session is there
+        $sessionCheckout = $this->getOnepage()->getCheckout();
+        if(!$sessionCheckout->getLastSuccessQuoteId() && !is_null(Mage::app()->getRequest()->getParam('qide'))
+            && !is_null(Mage::app()->getRequest()->getParam('incide'))
+            && !is_null(Mage::app()->getRequest()->getParam('oide'))) {
+
+            $sessionCheckout
+                ->setLastSuccessQuoteId(Mage::app()->getRequest()->getParam('qide'))
+                ->setLastQuoteId(Mage::app()->getRequest()->getParam('qide'))
+                ->setLastOrderId(Mage::app()->getRequest()->getParam('oide'))
+                ->setLastRealOrderId(Mage::app()->getRequest()->getParam('incide'));
+
+            $autoInvoice = (int)Mage::app()->getRequest()->getParam('inv');
+            if($autoInvoice) {
+                Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice);
+            }
+        }
+
         //Capture data from Sage Pay API
         $orderId = $this->_getLastOrderId();
 
@@ -124,6 +142,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         }
 
         if($this->getSession()->getCreateInvoicePayment(true)) {
+            //Sage_Log::log("Checkout observer, invoicing order " . $orderId , null, 'SagePaySuite_SERVER_RESPONSE.log');
             Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderId));
         }
 
@@ -160,32 +179,34 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
      * @return $this
      */
     public function serverRegisterRecoverSession($observer) {
-        $quote = $observer->getEvent()->getQuote();
-        $order = $observer->getEvent()->getOrder();
 
-        $isMage19OrUp    = version_compare(Mage::getVersion(), '1.9.0.0', '>=');
-
-        $isSagePayServer = ($order->getPayment()->getMethod() == 'sagepayserver');
-        $isRegister      = ($quote->getData('checkout_method') == 'register');
-
-
-        if($isSagePayServer) {
-
-            Mage::register('sagepay_last_real_order_id', $order->getIncrementId(), true);
-            Mage::register('sagepay_last_order_id', $order->getId(), true);
-            Mage::register('sagepay_last_quote_id', $quote->getId(), true);
-
-            if($isRegister){
-                Mage::register('sagepay_customer_id', $quote->getData('customer_id'), true);
-
-                //sweet tooth fix
-                if(Mage::registry('rewards_createPointsTransfers_run')){
-                    Mage::unregister('rewards_createPointsTransfers_run');
-                    Mage::dispatchEvent('sales_order_save_commit_after', array('order'=>$order));
-                }
-            }
-        }
-
-        return $this;
+//        Sage_Log::log("CHECKOUT OBS: serverRegisterRecoverSession", null, 'SagePaySuite_SERVER_RESPONSE.log');
+//
+//        $quote = $observer->getEvent()->getQuote();
+//        $order = $observer->getEvent()->getOrder();
+//
+//        $isSagePayServer = ($order->getPayment()->getMethod() == 'sagepayserver');
+//        $isRegister      = ($quote->getData('checkout_method') == 'register');
+//
+//        if($isSagePayServer) {
+//
+//            Sage_Log::log("CHECKOUT OBS: Registering vars", null, 'SagePaySuite_SERVER_RESPONSE.log');
+//
+//            Mage::register('sagepay_last_real_order_id', $order->getIncrementId(), true);
+//            Mage::register('sagepay_last_order_id', $order->getId(), true);
+//            Mage::register('sagepay_last_quote_id', $quote->getId(), true);
+//
+//            if($isRegister){
+//                Mage::register('sagepay_customer_id', $quote->getData('customer_id'), true);
+//
+//                //sweet tooth fix
+//                if(Mage::registry('rewards_createPointsTransfers_run')){
+//                    Mage::unregister('rewards_createPointsTransfers_run');
+//                    Mage::dispatchEvent('sales_order_save_commit_after', array('order'=>$order));
+//                }
+//            }
+//        }
+//
+//        return $this;
     }
 }

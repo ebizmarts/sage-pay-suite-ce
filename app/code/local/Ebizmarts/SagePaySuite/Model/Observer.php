@@ -122,7 +122,7 @@ class Ebizmarts_SagePaySuite_Model_Observer
 
 	protected function _canProfile($controllerAction)
 	{
-		$sagepay = (bool)('Ebizmarts_SagePaySuite' == $controllerAction->getRequest()->getControllerModule());
+		$sagepay = (bool)('Ebizmarts_SagePaySuite' == $controllerAction->getRequest()->getControllerModule() || 'Ebizmarts_SagePaySuite_Adminhtml' == $controllerAction->getRequest()->getControllerModule());
 		$config  = (bool)Mage::getStoreConfig('payment/sagepaysuite/profile_request', Mage::app()->getStore());
 
 		return ($sagepay && $config);

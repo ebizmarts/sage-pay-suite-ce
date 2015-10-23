@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Ebizmarts_SagePayReporting>
-			<version>0.1.2</version>
+			<version>0.1.3</version>
 		</Ebizmarts_SagePayReporting>
 	</modules>
 	<frontend>

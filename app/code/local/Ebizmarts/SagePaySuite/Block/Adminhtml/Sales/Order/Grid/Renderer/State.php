@@ -45,7 +45,7 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Sales_Order_Grid_Renderer_State ext
             $red = (string)$transaction->getRedFraudResponse();
             if(!empty($red)) {
                 $redTitle = $this->__("ReD Status: %s.", $red);
-                $result .= '&nbsp;&nbsp;<img src="' . $this->_redFraudIcon($fraud->getThirdmanScore()) . '" title="' . $redTitle . '" />';
+                $result .= '&nbsp;&nbsp;<img src="' . $this->_redFraudIcon($red) . '" title="' . $redTitle . '" />';
             }
 
         }

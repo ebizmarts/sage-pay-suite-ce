@@ -248,9 +248,11 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
         $request = $this->getRequest();
         $dbtrn   = $this->_trn();
+        $quote = null;
 
 //        if($dbtrn->getId() && $dbtrn->getData("server_notify_arrived") == true){
-//            Sage_Log::log("Notified: Retry.", null, 'SagePaySuite_SERVER_RESPONSE.log');
+//            Sage_Log::log("Notified: Retry sleeping.", null, 'SagePaySuite_SERVER_RESPONSE.log');
+//            $this->_returnOk();
 //            return;
 //        }
 
@@ -274,7 +276,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 ->setBankAuthCode($this->getRequest()->getPost('BankAuthCode'))
                 ->setDeclineCode($this->getRequest()->getPost('DeclineCode'))
                 ->setEuroPaymentsStatus($euro_payment_status)
-                ->setData("server_notify_arrived",true)
+                //->setData("server_notify_arrived",true)
                 ->save();
 
         //Sage_Log::log("Notified: Transaction updated.", null, 'SagePaySuite_SERVER_RESPONSE.log');
@@ -317,7 +319,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 return;
             }
             else if($euro_payment_status !== null){
-                //Euro Payment RETRY
+                //general retry
+
+                //Mage::getSingleton('core/session')->addError("Operation timed-out. Please contact us to make sure your order has been correctly taken.");
 
                 //do nothing for now
                 $this->_returnOk();
@@ -473,7 +477,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
                         //1.9.1 ssl fix
                         $customer_id = null;
-                        if($this->getOnepage()->getQuote()->getId() == null){
+                        $quote = $this->getOnepage()->getQuote();
+                        if($quote->getId() == null){
                             $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
                             $quote = Mage::getModel('sales/quote')->loadActive($rqQuoteId);
                             $this->getOnepage()->setQuote($quote);
@@ -487,6 +492,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                                     //Sage_Log::log("Notified: Customer logged-in", null, 'SagePaySuite_SERVER_RESPONSE.log');
                                 }
                             }
+
                         }
                         //sweet tooth fix
                         if(class_exists('rewards/session', FALSE)){
@@ -552,6 +558,17 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                             $sagePayServerSession->setSuccessStatus($strDBStatus);
                         }
 
+                        $order = Mage::getModel('sales/order')->load($orderId);
+                        $isRegister      = ($quote->getData('checkout_method') == 'register');
+
+                        if($isRegister){
+                            //sweet tooth fix
+                            if(Mage::registry('rewards_createPointsTransfers_run')){
+                                Mage::unregister('rewards_createPointsTransfers_run');
+                                Mage::dispatchEvent('sales_order_save_commit_after', array('order'=>$order));
+                            }
+                        }
+
                         //save server session data on db as it gets lost sometimes
                         $server_session = array();
                         $messages = Mage::getSingleton('core/session')->getMessages();
@@ -583,15 +600,28 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         }
 
                         Mage::getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
-                        if(Mage::registry('sagepay_last_quote_id')) {
+                        if($quote->getId()) {
 
                             //Sage_Log::log("Notified: Return OK with quote.", null, 'SagePaySuite_SERVER_RESPONSE.log');
 
-                            $this->_returnOk(array('inv' => (int)Mage::registry('sagepay_create_invoice'),
-                                'cusid' => is_null($customer_id) ? Mage::registry('sagepay_customer_id') : $customer_id,
-                                'qide' => Mage::registry('sagepay_last_quote_id'),
-                                'incide' => Mage::registry('sagepay_last_real_order_id'),
-                                'oide' => Mage::registry('sagepay_last_order_id')));
+                            $get_data_to_send = array('inv' => (int)Mage::registry('sagepay_create_invoice'),
+                                'cusid' => is_null($customer_id) ? $quote->getData('customer_id') : $customer_id,
+                                'qide' => $quote->getId(),
+                                'incide' => $order->getIncrementId(),
+                                'oide' => $order->getId());
+
+                            if(!empty($msOrderIds)){
+                                $id_strings = "";
+                                foreach ($msOrderIds as $key => $value) {
+                                    if($id_strings != ''){
+                                        $id_strings .= ",";
+                                    }
+                                    $id_strings .= $key . ":" . $value;
+                                }
+                                $get_data_to_send["msorderids"] = $id_strings;
+                            }
+
+                            $this->_returnOk($get_data_to_send);
 
                         }
                         else {
@@ -613,6 +643,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         Mage::log($e->getMessage());
 
                         Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $this->getOnepage()->getQuote(), 'message' => $e->getMessage()));
+
+                        $this->_returnOkAbort();
                     }
                 }
                 else if($strStatus == 'PENDING'){ //handle EURO payments

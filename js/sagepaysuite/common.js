@@ -72,6 +72,39 @@ fillSagePayTestData = function(){
     });
 }
 
+fillSagePayTestDataNit = function(){
+
+    var shortCode = 'nit';
+    var methodCode = 'sagepaynit';
+
+    if(SuiteConfig.getConfig(shortCode,'mode') != 'test' && SuiteConfig.getConfig(shortCode,'mode') != 'simulator'){
+        return;
+    }
+
+    SuiteConfig.getConfig(shortCode,'test_data').evalJSON().each(function(cc, ci){
+
+        if(cc.code == $(methodCode + '_cc_type').getValue()){
+            $(methodCode + '_cc_owner').value = (rstring() + ' ' + rstring());
+            $(methodCode + '_expiration').setValue(Math.floor(Math.random()*12)+1);
+
+            var d = new Date();
+            $(methodCode + '_expiration_yr').setValue((parseInt(d.getFullYear())+(Math.floor(Math.random()*10)+1)));
+
+            $(methodCode + '_cc_number').value = cc.ccn;
+            $(methodCode + '_cc_cid').value = cc.cvv;
+
+            if((typeof cc.isn != 'undefined')){
+                $(methodCode + '_cc_issue').value = cc.isn;
+            }else{
+                $(methodCode + '_cc_issue').value = '';
+            }
+
+            return;
+        }
+
+    });
+}
+
 toggleNewCard = function(action){
 
 	var adminFrms = $$("#order-billing_method_form [name='payment[method]']");
@@ -119,6 +152,24 @@ toggleNewCard = function(action){
 
 		$$(frmSelector + ' ul li.tokencard-radio', frmSelector + ' a.addnew').invoke('hide');
 
+        //hide tokens
+        var token_lists = document.getElementsByClassName("tokensage");
+        for(var i=0;i<token_lists.length;i++){
+            token_lists[i].style.display="none";
+
+            //move elsewhere to be sure (OSC)
+            var auxContainer = document.getElementById("sagepaysuite_aux_token_container" + i);
+            if(!auxContainer){
+                auxContainer = document.createElement("div");
+                auxContainer.setAttribute("id","sagepaysuite_aux_token_container" + i);
+                auxContainer.setAttribute("style","display:none;");
+                document.body.appendChild(auxContainer);
+            }
+
+            auxContainer.innerHTML = token_lists[i].innerHTML;
+            token_lists[i].innerHTML = "";
+        }
+
 	}else{
 
 		var tokenInputs = $$(frmSelector + ' ul li.tokencard-radio input');
@@ -141,6 +192,16 @@ toggleNewCard = function(action){
 		});
 		$$(frmSelector + ' ul li.tokencard-radio', frmSelector + ' a.addnew').invoke('show');
 
+        //use tokens
+        var token_lists = document.getElementsByClassName("tokensage");
+        for(var i=0;i<token_lists.length;i++){
+            token_lists[i].style.display="block";
+
+            //get from aux container to be sure (OSC)
+            var auxContainer = document.getElementById("sagepaysuite_aux_token_container" + i);
+            token_lists[i].innerHTML = auxContainer.innerHTML;
+            auxContainer.innerHTML = "";
+        }
 	}
 
     //hide unneeded fields

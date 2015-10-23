@@ -368,61 +368,20 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
 
     public function massThirdmanCheckAction(){
 
-        $logPrefix = "[MANUAL] ";
-        Sage_Log::log($logPrefix . "Starting fraud checks... ", null, 'SagePaySuite_Thirdman.log');
-
         $fraudTblName = Mage::getSingleton('core/resource')->getTableName('sagepayreporting_fraud');
         $transactions = Mage::getResourceModel('sagepaysuite2/sagepaysuite_transaction_collection');
         $transactions->addFieldToSelect(array('order_id', 'vendor_tx_code', 'vps_tx_id', 'tx_type'));
 
         $transactions
             ->getSelect()
-            ->where("`main_table`.`order_id` IS NOT NULL AND (`main_table`.`order_id` NOT IN (SELECT `order_id` FROM ". $fraudTblName ."))")
+            ->where("`main_table`.`order_id` IS NOT NULL AND `main_table`.`trndate` IS NOT NULL AND `main_table`.`trndate` > (CURDATE() - INTERVAL 2 DAY) AND (`main_table`.`order_id` NOT IN (SELECT `order_id` FROM ". $fraudTblName ."))")
             ->order("main_table.created_at DESC")
-            ->limit(15);
-
-        $transactionsChecked = array();
-        $transactionsNOTChecked = array();
+            ->limit(30);
 
         foreach($transactions as $_trn) {
 
             $update = $_trn->updateFromApi();
 
-            if (!$update->getFraud()) {
-                Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": UNABLE TO GET FRAUD SCORE", null, 'SagePaySuite_Thirdman.log');
-                $transactionsNOTChecked[] = $_trn->getVendorTxCode();
-                continue;
-            }
-
-            try {
-
-                $rs             = $update->getFraud();
-                $noresult       = ((string)$rs->getThirdmanAction() == 'NORESULT');
-
-                $transactionsChecked[] = $_trn->getVendorTxCode();
-                Sage_Log::log($logPrefix . "3rd man check for " . $_trn->getVendorTxCode() . ": " . (string)$rs->getThirdmanAction(), null, 'SagePaySuite_Thirdman.log');
-
-            } catch (Exception $e) {
-                Sage_Log::logException($e);
-            }
-        }
-
-        //user messages
-        if(count($transactionsChecked) > 0){
-            $msg = "Transactions successfully checked: ";
-            for($i=0;$i<count($transactionsChecked);$i++){
-                $msg .= $i > 0 ? "  " : "";
-                $msg .= $transactionsChecked[$i];
-            }
-            Mage::getSingleton('adminhtml/session')->addSuccess($msg);
-        }
-        if(count($transactionsNOTChecked) > 0){
-            $msg = "An error occurred while checking some transactions: ";
-            for($i=0;$i<count($transactionsNOTChecked);$i++){
-                $msg .= $i > 0 ? "  " : "";
-                $msg .= $transactionsNOTChecked[$i];
-            }
-            Mage::getSingleton('adminhtml/session')->addError($msg);
         }
 
         $this->_redirect('adminhtml/sagepayreporting_fraud');
