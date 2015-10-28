@@ -656,7 +656,7 @@
             <adminhtml>
                 <args>
                     <modules>
-                        <sagepaysuite before="Mage_Adminhtml">Ebizmarts_SagePaySuite_Adminhtml</sagepaysuite>
+                        <sagepaysuite after="Mage_Adminhtml">Ebizmarts_SagePaySuite_Adminhtml</sagepaysuite>
                     </modules>
                 </args>
             </adminhtml>

@@ -409,7 +409,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
         //OSC\\
         if ((typeof transport.responseText) == 'undefined' && $(window._sagepayonepageFormId)) {
 
-            var gotNITToken = document.getElementById("nit_card_identifier") != null;
+            var gotNITToken = document.getElementById("nit_card_identifier") != null && document.getElementById("nit_card_identifier").value != "";
 
             if(!gotNITToken){
                 if (true === window._sagepayprocessingorder) {
@@ -543,6 +543,11 @@ EbizmartsSagePaySuite.Checkout.prototype = {
         if ((typeof response.response_status != 'undefined') && response.response_status != 'OK' && response.response_status != 'threed' && response.response_status != 'paypal_redirect') {
 
             this.resetOscLoading();
+
+            //reset nit
+            if(document.getElementById("nit_card_identifier")){
+                document.getElementById("nit_card_identifier").value = "";
+            }
 
             if ("REDIRECT_CART" == response.response_status_detail.toString()) {
                 setLocation(SuiteConfig.getConfig('global', 'cart_url'));
