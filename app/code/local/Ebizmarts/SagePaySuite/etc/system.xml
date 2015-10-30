@@ -1446,7 +1446,7 @@
                             <show_in_store>1</show_in_store>
                         </password>
 			<enviroment translate="label">
-                            <label>Enviroment</label>
+                            <label>Environment</label>
                             <frontend_type>select</frontend_type>
                             <source_model>sagepayreporting/config_url</source_model>
                             <config_path>sagepayreporting/account/enviroment</config_path>
@@ -1494,7 +1494,7 @@
                             <show_in_store>1</show_in_store>
                         </password>
 			<enviroment translate="label">
-                            <label>Enviroment</label>
+                            <label>Environment</label>
                             <frontend_type>select</frontend_type>
                             <source_model>sagepayreporting/config_url</source_model>
                             <config_path>sagepayreporting_moto/account/enviroment</config_path>
