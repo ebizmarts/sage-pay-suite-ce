@@ -87,6 +87,11 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
 
     }
 
+    public function getOnepage() {
+
+        return Mage::getSingleton('checkout/type_onepage');
+    }
+
     public function controllerOnePageSuccess($o) {
 
         //check if session is there
