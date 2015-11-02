@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.27</version>
+            <version>3.5.1</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
