@@ -8,7 +8,7 @@
  * @author     Ebizmarts <info@ebizmarts.com>
  */
 
-class Ebizmarts_SagePaySuite_Model_SagePayPayPal extends Mage_Payment_Model_Method_Abstract {
+class Ebizmarts_SagePaySuite_Model_SagePayPayPal extends Ebizmarts_SagePaySuite_Model_SagePayDirectPro {
 
     protected $_code  = 'sagepaypaypal';
 

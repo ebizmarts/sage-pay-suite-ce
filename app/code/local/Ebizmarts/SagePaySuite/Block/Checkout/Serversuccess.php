@@ -71,17 +71,39 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
                     ->setLastOrderId($this->getRequest()->getParam('oide'))
                     ->setLastRealOrderId($this->getRequest()->getParam('incide'));
 
+                //set invoice flag
+                $autoInvoice = (int)$this->getRequest()->getParam('inv');
+                $preventInvoice = ((int)Mage::getStoreConfig('payment/sagepaysuite/prevent_invoicing') === 1);
+                Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice && !$preventInvoice);
             }
 
-            $autoInvoice = (int)$this->getRequest()->getParam('inv');
-            if($autoInvoice) {
-                Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice);
-            }
+            $successUrl = Mage::getModel('core/url')->getUrl('checkout/onepage/success', array('_secure' => true,
+                'oide' => $this->getRequest()->getParam('oide'),
+                'qide' => $this->getRequest()->getParam('qide'),
+                'incide' => $this->getRequest()->getParam('incide'),
+                'inv' => $this->getRequest()->getParam('inv')));
 
-            $successUrl = Mage::getModel('core/url')->getUrl('checkout/onepage/success', array('_secure' => true));
 
+            //recover multishipping data
             if($this->getRequest()->getParam('multishipping')) {
+
+                //get multishipping ids data
+                $msorderids = $this->getRequest()->getParam('msorderids');
+                $msorderids = explode(",",$msorderids);
+                $msorderidsArray = array();
+                for($i = 0;$i<count($msorderids);$i++){
+                    $aux = explode(":",$msorderids[$i]);
+                    $msorderidsArray[$aux[0]] = $aux[1];
+                }
+
+                Mage::getSingleton('core/session')->setOrderIds($msorderidsArray);
+                Mage::getSingleton('checkout/type_multishipping')->setOrderIds($msorderidsArray);
+                Mage::getSingleton('checkout/type_multishipping')->getCheckoutSession()->setDisplaySuccess(true);
+
                 $successUrl = Mage::getUrl('checkout/multishipping/success', array('_secure' => true));
+
+                $state = Mage::getSingleton('checkout/type_multishipping_state');
+                $state->setCompleteStep(Mage_Checkout_Model_Type_Multishipping_State::STEP_OVERVIEW);
             }
         }
 

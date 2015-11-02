@@ -43,7 +43,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_System_Config_Fieldset_Hint extends
     }
 
     public function getHelpDeskUrl() {
-        $url = "http://tickets.ebizmarts.com/formsupport/sagepaysuite/index.php?";
+        $url = "https://tickets.ebizmarts.com/formsupport/sagepaysuite/index.php?";
 
         $url .= "magever=" . Mage::getVersion() . "&modulever=PRO_" . $this->getModuleVersion() . "&email=" . $this->getAdminEmail();
 

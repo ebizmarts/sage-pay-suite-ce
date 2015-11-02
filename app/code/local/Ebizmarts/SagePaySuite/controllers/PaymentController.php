@@ -113,15 +113,17 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
 
         }//Create Account hook
 
-
-        if (Mage::helper('customer')->isLoggedIn() && $helper->differentShippingAvailable()) {
+        //Thanks Dan Norris for his input about this code.
+        //if (Mage::helper('customer')->isLoggedIn() && $helper->differentShippingAvailable()) {
+        if (Mage::helper('customer')->isLoggedIn()) {
             if (!empty($customerAddressId)) {
                 $billingAddress = Mage::getModel('customer/address')->load($customerAddressId);
                 if (is_object($billingAddress) && $billingAddress->getCustomerId() == Mage::helper('customer')->getCustomer()->getId()) {
                     $billing_data = array_merge($billing_data, $billingAddress->getData());
                 }
             }
-            if (!empty($shippingAddressId)) {
+            //if (!empty($shippingAddressId)) {
+            if (!empty($shippingAddressId) && $helper->differentShippingAvailable()) {
                 $shippingAddress = Mage::getModel('customer/address')->load($shippingAddressId);
                 if (is_object($shippingAddress) && $shippingAddress->getCustomerId() == Mage::helper('customer')->getCustomer()->getId()) {
                     $shipping_data = array_merge($shipping_data, $shippingAddress->getData());
@@ -323,6 +325,11 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
         }
         else {
 
+            //reset token session
+            if(!empty($paymentData) && !isset($paymentData['sagepay_token_cc_id'])) {
+                $this->getSageSuiteSession()->setLastSavedTokenccid(null);
+            }
+
             /**
              * OSC
              */
@@ -382,6 +389,9 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             return;
         } else if ($paymentMethod == 'sagepayform') {
             $this->_forward('saveOrder', 'formPayment', null, $this->getRequest()->getParams());
+            return;
+        } else if ($paymentMethod == 'sagepaynit') {
+            $this->_forward('saveOrder', 'nitPayment', null, $this->getRequest()->getParams());
             return;
         } else {
 

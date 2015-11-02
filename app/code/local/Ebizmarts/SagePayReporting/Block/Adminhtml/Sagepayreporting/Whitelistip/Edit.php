@@ -21,7 +21,7 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Whitelistip_Ed
      * @return string
      */
     public function getFormActionUrl() {
-        return $this->getUrl('*/' . $this->_controller . '/save', array('_current' => true));
+        return $this->getUrl('*/sagepayreporting_whitelistip/save', array('_current' => true));
     }    
     
 }

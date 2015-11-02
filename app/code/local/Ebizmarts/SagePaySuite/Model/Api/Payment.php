@@ -202,7 +202,22 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
     }
 
     public function getTokenUrl($key, $integration) {
-        $confKey = ($integration == 'direct') ? 'sagepaydirectpro' : 'sagepayserver';
+
+        $confKey = "";
+        switch($integration){
+            case 'direct':
+                $confKey = "sagepaydirectpro";
+                break;
+            case 'server':
+                $confKey = "sagepayserver";
+                break;
+            case 'nit':
+                $confKey = "sagepaynit";
+                break;
+            default:
+                $confKey = "sagepaydirectpro";
+                break;
+        }
         $urls = Mage::helper('sagepaysuite')->getSagePayUrlsAsArray();
         return $urls['sagepaytoken'][Mage::getStoreConfig('payment/' . $confKey . '/mode', Mage::app()->getStore()->getId())][$integration . $key];
     }
@@ -355,6 +370,9 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
 
         if ($adminQuote->hasItems() === false && (int) $rqQuoteId) {
+//            Mage::getSingleton('checkout/type_onepage')->setQuote(
+//                Mage::getModel('sales/quote')->loadActive($rqQuoteId)
+//            );
             $opQuote->setQuote(Mage::getModel('sales/quote')->loadActive($rqQuoteId));
         }
 
@@ -451,6 +469,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
      */
     public function sanitizePostcode($text) {
         return preg_replace("/[^a-zA-Z0-9-\s]/", "", $text);
+        //return $text;
     }
 
     public function cleanString($text) {
@@ -488,9 +507,9 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
         $vendorTxCode = $this->_getTrnVendorTxCode();
 
-        if ($payment->getCcNumber()) {
-            $vendorTxCode .= $this->_cleanString(substr($payment->getCcOwner(), 0, 10));
-        }
+//        if ($payment->getCcNumber()) {
+//            $vendorTxCode .= $this->_cleanString(substr($payment->getCcOwner(), 0, 10));
+//        }
         $payment->setVendorTxCode($vendorTxCode);
 
         $request = new Varien_Object;
@@ -849,6 +868,11 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             $payment->addData($quoteObj->getPayment()->toArray());
         }
 
+        //nit payment
+        if(array_key_exists('nit_card_identifier',$params)){
+            $payment->setNitCardIdentifier($params['nit_card_identifier']);
+        }
+
         $payment->setTransactionType(strtoupper($this->getConfigData('payment_action')));
         $payment->setAmountOrdered($this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode()));
         $payment->setRealCapture(true); //To difference invoice from capture
@@ -931,6 +955,9 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             case 'form':
                 return 'sagepayform';
                 break;
+            case 'nit':
+                return 'sagepaynit';
+                break;
             default:
                 return '';
                 break;
@@ -938,10 +965,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
     }
 
     /**
-     * Cancel payment
-     *  - DEFERRED  -> ABORT
-     *  - PAYMENT or RELEASE -> VOID
-     *  - REGISTERED or AUTHENTICATE -> CANCEL
+     * Cancel payment (VOID)
      * @param   Varien_Object $invoicePayment
      * @return  Ebizmarts_SagePaySuite_Model_Api_Payment
      */
@@ -962,25 +986,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         if($trn->getEuroPaymentsStatus() === null || $trn->getEuroPaymentsStatus() == "OK"){
             //if it's not an euro payment I try to cancel the sagepay transaction
 
-            $t = strtoupper($trn->getTxType());
-
-            if ($t == self::REQUEST_TYPE_AUTHENTICATE) {
-                $this->_cancel($trn);
-            } else if ($t == 'PAYMENT') {
                 $this->voidPayment($trn);
-            } else if ($t == 'DEFERRED') {
 
-                //If its fully released
-                //If $order->canInvoice() is TRUE it means that was partially invoiced already
-                if ((int) $trn->getReleased() === 1) {
-
-                    if (!$order->canInvoice()) {
-                        $this->voidPayment($trn);
-                    }
-                } else {
-                    $this->abortPayment($trn);
-                }
-            }
         }else{
             $trn->setAborted(1)->save();
 
@@ -1070,6 +1077,14 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         if ($result['Status'] != 'OK') {
+
+            foreach($data as $key => $value)
+            {
+                if(empty($value)) {
+                    Mage::throwException("Unable to VOID, required data is missing for the transaction.");
+                }
+            }
+
             Sage_Log::log($result['StatusDetail']);
             Mage::throwException(Mage::helper('sagepaysuite')->__($result['StatusDetail']));
         }
@@ -1077,36 +1092,6 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         $this->saveAction($trn->getOrderId(), $data, $result);
 
         $trn->setVoided(1)->save();
-    }
-
-    private function _cancel($trn) {
-
-        /**
-         * SecurityKey from the "Admin & Access API"
-         */
-        if (!$trn->getSecurityKey() && strtoupper($trn->getIntegration()) == 'FORM') {
-            $this->_addSecurityKey($trn);
-        }
-
-        $data = array();
-        $data['VPSProtocol'] = $trn->getVpsProtocol();
-        $data['TxType'] = self::REQUEST_TYPE_CANCEL;
-        $data['ReferrerID'] = $this->getConfigData('referrer_id');
-        $data['Vendor'] = $trn->getVendorname();
-        $data['VendorTxCode'] = $trn->getVendorTxCode();
-        $data['VPSTxId'] = $trn->getVpsTxId();
-        $data['SecurityKey'] = $trn->getSecurityKey();
-
-        $result = $this->requestPost($this->getUrl('cancel', false, $this->_getIntegrationCode($trn->getIntegration()), $trn->getMode()), $data);
-
-        if ($result['Status'] != 'OK') {
-            Sage_Log::log($result['StatusDetail']);
-            Mage::throwException(Mage::helper('sagepaysuite')->__($result['StatusDetail']));
-        }
-
-        $this->saveAction($trn->getOrderId(), $data, $result);
-
-        $trn->setCanceled(1)->save();
     }
 
     protected function _getAdminQuote() {
@@ -1148,7 +1133,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
     public function getSuccessUrl() {
         if ($this->_getIsAdmin()) {
-            return Mage :: getModel('adminhtml/url')->getUrl('sgpsSecure/adminhtml_serverPayment/success', array(
+            return Mage :: getModel('adminhtml/url')->getUrl('adminhtml/spsServerPayment/success', array(
                 '_secure' => true,
                 '_nosid' => true
             )) . '?' . $this->getSidParam();
@@ -1331,23 +1316,26 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
 
         //Resend same request if fails because of basket related errors.
-        if( $this->_canRetry && isset($output['StatusDetail']) && (isset($output['Status']) && ($output['Status'] == 'INVALID')) ) {
+        if( $this->_canRetry){
+            if(isset($output['StatusDetail']) && (isset($output['Status']) && ($output['Status'] == 'INVALID')) ) {
 
-            for ($i = 0; $i < count($this->_basketErrors); $i++) {
-                if(1 === preg_match('/^' . $this->_basketErrors[$i] . '/i', $output['StatusDetail'])) {
+                for ($i = 0; $i < count($this->_basketErrors); $i++) {
+                    if (1 === preg_match('/^' . $this->_basketErrors[$i] . '/i', $output['StatusDetail'])) {
 
-                    if(isset($data['BasketXML'])) {
-                        unset($data['BasketXML']);
+                        if (isset($data['BasketXML'])) {
+                            unset($data['BasketXML']);
 
-                        self::log($output, null, 'SagePaySuite_REQUEST.log');
-                        self::log("Basket ERROR, retrying without BasketXML in POST ...", null, 'SagePaySuite_REQUEST.log');
+                            self::log($output, null, 'SagePaySuite_REQUEST.log');
+                            self::log("Basket ERROR, retrying without BasketXML in POST ...", null, 'SagePaySuite_REQUEST.log');
 
-                        return $this->requestPost($url, $data, false);
+                            return $this->requestPost($url, $data, false);
+                        }
+
                     }
-
                 }
+            }else{
+                
             }
-
         }
 
         self::log($output, null, 'SagePaySuite_REQUEST.log');
@@ -1623,20 +1611,34 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 }
 
                 $newItem = array("item"=>"",
-                                 "qty"=>0,
-                                 "item_value"=>0,
-                                 "item_tax"=>0,
-                                 "item_total"=>0,
-                                 "line_total"=>0,);
+                    "qty"=>0,
+                    "item_value"=>0,
+                    "item_tax"=>0,
+                    "item_total"=>0,
+                    "line_total"=>0,);
 
-                $tax = ($item->getBaseTaxBeforeDiscount() ? $item->getBaseTaxBeforeDiscount() : ($item->getBaseTaxAmount() ? $item->getBaseTaxAmount() : 0));
+                $itemQty = $item->getQty() * 1;
 
-                if($useBaseMoney) {
-                    $calculationPrice = $item->getBaseCalculationPrice();
+
+                if($useBaseMoney){
+
+                    $itemDiscount = $item->getBaseDiscountAmount() / $itemQty;
+
+                    $taxAmount = number_format($item->getBaseTaxAmount() / $itemQty, 3);
+
+                    $itemValue = $item->getBasePriceInclTax() - $taxAmount - $itemDiscount;
+
+                }else{
+
+                    $itemDiscount = $item->getDiscountAmount() / $itemQty;
+
+                    $taxAmount = number_format($item->getTaxAmount() / $itemQty, 3);
+
+                    $itemValue = $item->getPriceInclTax() - $taxAmount - $itemDiscount;
+
                 }
-                else {
-                    $calculationPrice = $item->getCalculationPrice();
-                }
+
+                $itemTotal = $itemValue + $taxAmount;
 
                 //Options
                 $options = $this->_getProductOptions($item);
@@ -1652,27 +1654,19 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 $newItem["item"] = str_replace(self::BASKET_SEP, self::BASKET_SEP_ESCAPE, '[' . $this->_cleanString($item->getSku()) . '] ' . $this->_cleanString($item->getName()) . $this->_cleanString($_options));
 
                 //Quantity
-                $newItem["qty"] = $item->getQty() * 1;
+                $newItem["qty"] = $itemQty;
 
                 //Item value
-                $newItem["item_value"] = $calculationPrice;
+                $newItem["item_value"] = $itemValue;
 
                 //Item tax
-                $taxAmount = number_format(($item->getTaxAmount() / ($item->getQty() * 1)), 2);
                 $newItem["item_tax"] = $taxAmount;
 
                 //Item total
-                $newItem["item_total"] = $calculationPrice + $taxAmount;
-
-                if($useBaseMoney) {
-                    $rowTotal = $item->getBaseRowTotal();
-                }
-                else {
-                    $rowTotal = $item->getRowTotal();
-                }
+                $newItem["item_total"] = $itemTotal;
 
                 //Line total
-                $newItem["line_total"] = (($rowTotal + $tax) - $item->getDiscountAmount());
+                $newItem["line_total"] = $itemTotal * $itemQty;
 
                 //add item to array
                 $basketArray[] = $newItem;
@@ -1847,6 +1841,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
             //<recipientFName>
             $recipientFName = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getFirstname()), 0, 20));
+            $recipientFName = preg_replace('/[0-9]+/', '', $recipientFName);
             if(!empty($recipientFName)){
                 $node->addChildCData('recipientFName', $recipientFName);
             }
@@ -1854,6 +1849,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
 
             //<recipientLName>
             $recipientLName = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getLastname()), 0, 20));
+            $recipientLName = preg_replace('/[0-9]+/', '', $recipientLName);
             if(!empty($recipientLName)){
                 $node->addChildCData('recipientLName', $recipientLName);
             }
@@ -1861,6 +1857,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             //<recipientMName>
             if($shippingAdd->getMiddlename()){
                 $recipientMName = $this->_convertStringToSafeXMLChar(substr(trim($shippingAdd->getMiddlename()), 0, 1));
+                $recipientMName = preg_replace('/[0-9]+/', '', $recipientMName);
                 if(!empty($recipientMName)) {
                     $node->addChildCData('recipientMName', $recipientMName);
                 }
@@ -2137,6 +2134,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                     ->save();
                 $auth = Mage::getModel('sagepaysuite2/sagepaysuite_action')
                     ->load($repeat['_requestvendor_'], 'vendor_tx_code');
+
+                $newOrder->getPayment()->setLastTransId($repeat['VPSTxId']);
             }
             else {
                 $rc->setPaymentDetails("ERROR: Could not repeat payment.");

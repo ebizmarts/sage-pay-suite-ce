@@ -54,6 +54,7 @@
 
         <reference name="content">
             <block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+            <block type="sagepaysuite/apiLibrary" name="sagepaysuite.pi.library" template="sagepaysuite/pi/ApiLibrary.phtml"/>
         </reference>
 
     </checkout_onepage_index>
@@ -100,6 +101,7 @@
 
         <reference name="content">
             <block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+            <block type="sagepaysuite/apiLibrary" name="sagepaysuite.pi.library" template="sagepaysuite/pi/ApiLibrary.phtml"/>
         </reference>
 
     </opc_index_index>
@@ -270,6 +272,7 @@
         </reference>
         <reference name="content">
             <block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+            <block type="sagepaysuite/apiLibrary" name="sagepaysuite.pi.library" template="sagepaysuite/pi/ApiLibrary.phtml"/>
         </reference>
     </onepagecheckout_index_index>
 
@@ -314,7 +317,7 @@
         </reference>
         <reference name="content">
             <block type="sagepaysuite/javascriptVars" name="sagepaysuite.js.vars" template="sagepaysuite/payment/SagePaySuiteVars.phtml" />
+            <block type="sagepaysuite/apiLibrary" name="sagepaysuite.pi.library" template="sagepaysuite/pi/ApiLibrary.phtml"/>
         </reference>
     </onestepcheckout_index_index>
-
 </layout>

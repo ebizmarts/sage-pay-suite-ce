@@ -141,7 +141,7 @@ var IframeShim = Class.create({
     initialize: function() {
         this.element = new Element('iframe',{
             style: 'position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);display:none',
-            src: 'javascript:void(0);',
+            src: 'about:blank',
             frameborder: 0 
         });
         $(document.body).insert(this.element);

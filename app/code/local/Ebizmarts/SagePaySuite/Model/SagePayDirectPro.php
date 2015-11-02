@@ -625,7 +625,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 if(!empty($billing_state)){
                     $request->setBillingState($billing_state);
                 }
-                //Mage::log($billing_state);
 
                 $request->setCustomerEMail($this->ss($billing->getEmail(), 255));
             }

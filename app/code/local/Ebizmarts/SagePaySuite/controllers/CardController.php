@@ -126,7 +126,13 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                 $rs = $this->_getServerRegisterCard();
 
                 if ($rs['Status'] == 'OK') {
-                    $text = $this->getLayout()->createBlock('sagepaysuite/customer_account_card_server_form')->setNextUrl($rs['NextURL'])->toHtml();
+                    $config = (string) Mage::getStoreConfig('payment/sagepayserver/token_iframe_position');
+                    if ($config == 'full_redirect') {
+                        $text = 'full_redirect';
+                        $url = $rs['NextURL'];
+                    }else{
+                        $text = $this->getLayout()->createBlock('sagepaysuite/customer_account_card_server_form')->setNextUrl($rs['NextURL'])->toHtml();
+                    }
                 } else {
                     $url = 'ERROR';
                     $text = $rs['StatusDetail'];
@@ -172,8 +178,14 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                                                 </html>');
     }
 
-    public function registerSuccessAction() {
-        return $this->getResponse()->setBody('<html>
+    public function registerSuccessAction()
+    {
+        $config = (string) Mage::getStoreConfig('payment/sagepayserver/token_iframe_position');
+        if ($config == 'full_redirect') {
+            $this->_redirect('*/card/');
+            return;
+        } else {
+            return $this->getResponse()->setBody('<html>
                                                     <body>
                                                         <!--<h2>' . $this->__('Redirecting') . '</h2>-->
 														<div style="background-image:url(' . Mage::helper('sagepaysuite')->getIndicator() . '); background-position: center center;background-repeat: no-repeat;height: 400px;">&nbsp;</div>
@@ -183,7 +195,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 																window.parent.location.href="' . Mage::getUrl('sgps/card/closeserverform') . '";
 															}else{
 															    var successCallback = function(){window.parent.location.reload();};
-															    var token_id = "'.$this->getRequest()->getParam('token_id').'";
+															    var token_id = "' . $this->getRequest()->getParam('token_id') . '";
 															    if(token_id && token_id != ""){
 															        window.parent.updateNickname(token_id,window.parent.$("sagepaytoken_cc_nickname").value,successCallback,null);
 															    }else{
@@ -193,10 +205,17 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 														</script>
                                                     </body>
                                                 </html>');
+        }
     }
 
-    public function registerAbortAction() {
-        return $this->getResponse()->setBody('<html>
+    public function registerAbortAction()
+    {
+        $config = (string) Mage::getStoreConfig('payment/sagepayserver/token_iframe_position');
+        if ($config == 'full_redirect') {
+            $this->_redirect('*/card/');
+            return;
+        } else {
+            return $this->getResponse()->setBody('<html>
                                                     <body>
                                                         <!--<h2>' . $this->__('Redirecting') . '</h2>-->
 														<div style="background-image:url(' . Mage::helper('sagepaysuite')->getIndicator() . '); background-position: center center;background-repeat: no-repeat;height: 400px;">&nbsp;</div>
@@ -210,6 +229,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 														</script>
                                                     </body>
                                                 </html>');
+        }
     }
 
     /**

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.0.25</version>
+            <version>3.5.1</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -60,6 +60,22 @@
                     </invoice_admin_orders>
                 </observers>
             </checkout_submit_all_after>
+            <controller_action_predispatch>
+                <observers>
+                    <profilerequestpre>
+                        <class>sagepaysuite/observer</class>
+                        <method>profilePre</method>
+                    </profilerequestpre>
+                </observers>
+            </controller_action_predispatch>
+            <controller_action_postdispatch>
+                <observers>
+                    <profilerequestpost>
+                        <class>sagepaysuite/observer</class>
+                        <method>profilePost</method>
+                    </profilerequestpost>
+                </observers>
+            </controller_action_postdispatch>
 	   </events>
     </adminhtml>
     <global>
@@ -393,6 +409,16 @@
                 <threed_layout>modal</threed_layout>
                 <avscv2>0</avscv2>
             </sagepaydirectpro>
+            <sagepaynit>
+                <active>0</active>
+                <model>sagepaysuite/sagePayNit</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize_capture</payment_action>
+                <mode>test</mode>
+                <title>Sage Pay PI</title>
+                <allowspecific>0</allowspecific>
+                <cctypes>VISA,MC,DELTA,SWITCH,MAESTRO,UKE</cctypes>
+            </sagepaynit>
             <sagepaydirectpro_moto>
                 <active>0</active>
                 <accounttype>M</accounttype>
@@ -500,14 +526,14 @@
             </updates>
         </layout>
         <events>
-            <checkout_type_onepage_save_order_after>
-                <observers>
-                    <save_order_after_sagepay>
-                        <class>sagepaysuite/observer_checkout</class>
-                        <method>serverRegisterRecoverSession</method>
-                    </save_order_after_sagepay>
-                </observers>
-            </checkout_type_onepage_save_order_after>
+            <!--<checkout_type_onepage_save_order_after>-->
+                <!--<observers>-->
+                    <!--<save_order_after_sagepay>-->
+                        <!--<class>sagepaysuite/observer_checkout</class>-->
+                        <!--<method>serverRegisterRecoverSession</method>-->
+                    <!--</save_order_after_sagepay>-->
+                <!--</observers>-->
+            <!--</checkout_type_onepage_save_order_after>-->
             <customer_login>
                 <observers>
                     <customer_login_sagepay>
@@ -630,7 +656,7 @@
             <adminhtml>
                 <args>
                     <modules>
-                        <sagepaysuite before="Mage_Adminhtml">Ebizmarts_SagePaySuite_Adminhtml</sagepaysuite>
+                        <sagepaysuite after="Mage_Adminhtml">Ebizmarts_SagePaySuite_Adminhtml</sagepaysuite>
                     </modules>
                 </args>
             </adminhtml>

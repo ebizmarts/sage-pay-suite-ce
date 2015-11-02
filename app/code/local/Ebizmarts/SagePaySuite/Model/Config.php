@@ -26,6 +26,23 @@ class Ebizmarts_SagePaySuite_Model_Config extends Mage_Payment_Model_Config
         return $types;
     }
 
+    public function getCcTypesSagePayNit()
+    {
+        $types = array();
+        foreach (Mage::getConfig()->getNode('global/payment/cc_sgps/types')->asArray() as $data) {
+            if($data['code'] == 'PAYPAL'){
+                continue;
+            }
+            $types[$data['code']] = $data['name'];
+        }
+
+        if(is_array($types) and !empty($types)) {
+            uasort($types, array($this, "cctypesSort"));
+        }
+
+        return $types;
+    }
+
     public function cctypesSort($a, $b) {
         return strcmp($a, $b);
     }

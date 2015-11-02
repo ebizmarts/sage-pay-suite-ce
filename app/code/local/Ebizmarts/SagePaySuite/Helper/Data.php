@@ -13,7 +13,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
     protected $_ccCards = array();
     protected $_sageMethods = array('sagepayserver', 'sagepayserver_moto',
         'sagepaydirectpro', 'sagepaydirectpro_moto',
-        'sagepaypaypal', 'sagepayform');
+        'sagepaypaypal', 'sagepayform', 'sagepaynit');
 
     public function currenciesToOptions() {
 
@@ -294,15 +294,18 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
 
         $serverSafeFields = Mage::getModel('sagepaysuite/sagePayServer')->getConfigSafeFields();
         $directSafeFields = Mage::getModel('sagepaysuite/sagePayDirectPro')->getConfigSafeFields();
+        $nitSafeFields = Mage::getModel('sagepaysuite/sagePayNit')->getConfigSafeFields();
 
         $conf = array();
 
         $conf ['global'] = array_intersect_key($_store->getConfig('payment/sagepaysuite'), array_flip(array('debug', 'max_token_card')));
+        $conf ['global']['not_valid_message'] = $this->__('This Sage Pay Suite module\'s license is NOT valid.');
         $conf ['global']['onepage_progress_url'] = $_url->getUrl('checkout/onepage/progress', array('_secure' => true));
         $conf ['global']['onepage_success_url'] = $_url->getUrl('checkout/onepage/success', array('_secure' => true));
         $conf ['global']['valid'] = (int) Mage::helper('sagepaysuite')->F91B2E37D34E5DC4FFC59C324BDC1157C();
         $conf ['global']['token_enabled'] = (int) Mage::getModel('sagepaysuite/sagePayToken')->isEnabled();
         $conf ['global']['sgps_saveorder_url'] = Mage::getModel('core/url')->addSessionParam()->getUrl('sgps/payment/onepageSaveOrder', array('_secure' => true));
+        $conf ['global']['sgps_nit_generate_merchant_key'] = Mage::getModel('core/url')->addSessionParam()->getUrl('sgps/nitPayment/generateMerchantKey', array('_secure' => true));
         $conf ['global']['cart_url'] = Mage::getModel('core/url')->getUrl('checkout/cart', array('_secure' => true));
         $conf ['global']['osc_loading_image'] = '<img src="' . $_d->getSkinUrl('images/opc-ajax-loader.gif') . '" />&nbsp;&nbsp;' . $this->__('Please wait, processing your order...');
         $conf ['global']['osc_save_billing_url'] = $_url->getUrl('onestepcheckout/ajax/save_billing', array('_secure' => true));
@@ -337,6 +340,12 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
 
         $conf ['directmoto'] = array_intersect_key($_store->getConfig('payment/sagepaydirectpro_moto'), array_flip($directSafeFields));
         $conf ['directmoto']['test_data'] = Mage::helper('sagepaysuite/sandbox')->getTestDataJson();
+
+
+        //nit
+        $conf ['nit'] = array_intersect_key($_store->getConfig('payment/sagepaynit'), array_flip($nitSafeFields));
+        $conf ['nit']['test_data'] = Mage::helper('sagepaysuite/sandbox')->getTestDataJson();
+        $conf ['nit']['sgps_registertrn_url'] = $_url->getUrl('sgps/nitPayment/transaction', array('_secure' => true));
 
         return Zend_Json::encode($conf);
     }
@@ -407,8 +416,9 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         $direct = Mage::getStoreConfigFlag('payment/sagepaydirectpro/active');
         $form = Mage::getStoreConfigFlag('payment/sagepayform/active');
         $paypal = Mage::getStoreConfigFlag('payment/sagepaypaypal/active');
+        $nit = Mage::getStoreConfigFlag('payment/sagepaynit/active');
 
-        return ($server || $serverMoto || $directMoto || $direct || $form || $paypal);
+        return ($server || $serverMoto || $directMoto || $direct || $form || $paypal || $nit);
     }
 
     public function logprofiler($action) {
@@ -428,7 +438,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
         $prefix  = $request->getParam('vtxcode', $request->getParam('VPSTxId', null));
         $prefix  = ($prefix ? $prefix . '_' : '');
 
-        $longest = 0;
+        $longest = 10;
         $rows = array();
         foreach ($timers as $name => $timer) {
 
@@ -446,6 +456,8 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract {
                 $longest = $thislong;
             }
         }
+
+        $longest = $longest == 0 ? 10 : $longest;
 
         //Create table
         $table = new Zend_Text_Table(array('columnWidths' => array($longest, 10, 6, 12, 12), 'decorator' => 'ascii'));

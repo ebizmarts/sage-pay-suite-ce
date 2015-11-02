@@ -170,12 +170,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
         # Invoice automatically PAYMENT transactions
         if ($this->getSession()->getInvoicePayment() || (!is_null($reg) && $tran->getTxType() == 'PAYMENT')) {
-            //Commented because casues invoices not to be generated on MAC
-            //$this->getSession()->unsetData('invoice_payment');
-            //Mage::getModel('sagepaysuite/api_payment')->invoiceOrder($order);
-            if ((int)Mage::getStoreConfig('payment/sagepaysuite/prevent_invoicing') === 0) {
-                Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(true);
-            }
+            $preventInvoice = ((int)Mage::getStoreConfig('payment/sagepaysuite/prevent_invoicing') === 1);
+            Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment(!$preventInvoice);
         }
     }
 

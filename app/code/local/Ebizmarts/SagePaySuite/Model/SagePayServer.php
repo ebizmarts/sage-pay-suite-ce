@@ -166,7 +166,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
         /**
          * Token Transaction
          */
-        $this->_tokenPresent();
         if (true === $this->_tokenPresent()) {
 
             $payment->setIntegra('server');

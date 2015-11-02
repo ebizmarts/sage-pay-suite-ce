@@ -40,7 +40,8 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
             'sagepaydirectpro',
             'sagepayserver',
             'sagepaydirectpro_moto',
-            'sagepayserver_moto');
+            'sagepayserver_moto',
+            'sagepaynit');
 
         $integrationData = Array();
 

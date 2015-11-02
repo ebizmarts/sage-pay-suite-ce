@@ -48,6 +48,7 @@
             <directregister><![CDATA[https://test.sagepay.com/gateway/service/directtoken.vsp]]></directregister>
             <serverpost><![CDATA[https://test.sagepay.com/gateway/service/vspserver-register.vsp]]></serverpost>
             <directpost><![CDATA[https://test.sagepay.com/gateway/service/vspdirect-register.vsp]]></directpost>
+            <nitpost><![CDATA[https://test.sagepay.com/gateway/service/vspdirect-register.vsp]]></nitpost>
         </test>
         <live>
 			<serverremovecard><![CDATA[https://live.sagepay.com/gateway/service/removetoken.vsp]]></serverremovecard>
@@ -56,6 +57,7 @@
             <directregister><![CDATA[https://live.sagepay.com/gateway/service/directtoken.vsp]]></directregister>
             <serverpost><![CDATA[https://live.sagepay.com/gateway/service/vspserver-register.vsp]]></serverpost>
             <directpost><![CDATA[https://live.sagepay.com/gateway/service/vspdirect-register.vsp]]></directpost>
+            <nitpost><![CDATA[https://live.sagepay.com/gateway/service/vspdirect-register.vsp]]></nitpost>
         </live>
     </sagepaytoken>
     <sagepayserver>
@@ -131,4 +133,34 @@
             <authorise><![CDATA[https://live.sagepay.com/gateway/service/authorise.vsp]]></authorise>
         </live>
     </sagepaydirectpro>
+    <sagepaynit>
+        <test>
+            <paypalcompletion><![CDATA[https://test.sagepay.com/gateway/service/complete.vsp]]></paypalcompletion>
+            <post3d><![CDATA[https://test.sagepay.com/gateway/service/direct3dcallback.vsp]]></post3d>
+            <post><![CDATA[https://test.sagepay.com/gateway/service/vspdirect-register.vsp]]></post>
+            <release><![CDATA[https://test.sagepay.com/gateway/service/release.vsp]]></release>
+            <abort><![CDATA[https://test.sagepay.com/gateway/service/abort.vsp]]></abort>
+            <refund><![CDATA[https://test.sagepay.com/gateway/service/refund.vsp]]></refund>
+            <directrefund><![CDATA[https://test.sagepay.com/gateway/service/directrefund.vsp]]></directrefund>
+            <void><![CDATA[https://test.sagepay.com/gateway/service/void.vsp]]></void>
+            <cancel><![CDATA[https://test.sagepay.com/gateway/service/cancel.vsp]]></cancel>
+            <authorise><![CDATA[https://test.sagepay.com/gateway/service/authorise.vsp]]></authorise>
+            <repeat><![CDATA[https://test.sagepay.com/gateway/service/repeat.vsp]]></repeat>
+            <api><![CDATA[https://test.sagepay.com/api/v1/]]></api>
+        </test>
+        <live>
+            <paypalcompletion><![CDATA[https://live.sagepay.com/gateway/service/complete.vsp]]></paypalcompletion>
+            <post3d><![CDATA[https://live.sagepay.com/gateway/service/direct3dcallback.vsp]]></post3d>
+            <repeat><![CDATA[https://live.sagepay.com/gateway/service/repeat.vsp]]></repeat>
+            <post><![CDATA[https://live.sagepay.com/gateway/service/vspdirect-register.vsp]]></post>
+            <release><![CDATA[https://live.sagepay.com/gateway/service/release.vsp]]></release>
+            <abort><![CDATA[https://live.sagepay.com/gateway/service/abort.vsp]]></abort>
+            <refund><![CDATA[https://live.sagepay.com/gateway/service/refund.vsp]]></refund>
+            <directrefund><![CDATA[https://live.sagepay.com/gateway/service/directrefund.vsp]]></directrefund>
+            <void><![CDATA[https://live.sagepay.com/gateway/service/void.vsp]]></void>
+            <cancel><![CDATA[https://live.sagepay.com/gateway/service/cancel.vsp]]></cancel>
+            <authorise><![CDATA[https://live.sagepay.com/gateway/service/authorise.vsp]]></authorise>
+            <api><![CDATA[https://live.sagepay.com/api/v1/]]></api>
+        </live>
+    </sagepaynit>
 </urls>

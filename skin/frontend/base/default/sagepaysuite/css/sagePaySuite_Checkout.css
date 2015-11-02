@@ -23,7 +23,10 @@ iframe#sagepaysuite-server-incheckout-iframe { border:none;height:840px;width:10
 
 div.lcontainer { background:#FFF; width:100%; height:100%; overflow:auto; }
 
-label[for="p_method_sagepaydirectpro"], label[for="p_method_sagepayserver"], label[for="p_method_sagepayform"] {
+label[for="p_method_sagepaydirectpro"],
+label[for="p_method_sagepayserver"],
+label[for="p_method_sagepayform"],
+label[for="p_method_sagepaynit"]{
     padding-left: 135px !important;
     padding-top: 7px !important;
     background-repeat: no-repeat;
@@ -75,4 +78,8 @@ div.surcharge-list p {
 div.surcharge-list table tr td {
     padding-right: 4px;
     padding-bottom: 5px;
+}
+
+#sagepay-nit-aux-placeholder {
+    display: none;
 }
