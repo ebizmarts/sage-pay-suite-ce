@@ -5,10 +5,6 @@ $installer = $this;
 $installer->startSetup();
 
 $installer->run("
-	ALTER TABLE `{$this->getTable('sagepaysuite_transaction')}` ADD INDEX `IDX_SAGEPAYSUITE_TRANSACTION_CREATED_AT` (`created_at`);
-");
-
-$installer->run("
 	ALTER TABLE `{$this->getTable('sagepaysuite_transaction')}` CHANGE `integration` `integration` ENUM('direct','server','form','nit') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 ");
 
