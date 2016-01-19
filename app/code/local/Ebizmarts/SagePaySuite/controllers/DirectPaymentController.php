@@ -230,9 +230,16 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
             $successUrl = Mage::getUrl('checkout/onepage/success', array('_secure' => true));
 
             echo '<script type="text/javascript">
-					(parent.location == window.location)? window.location.href="' . $successUrl . '" : window.parent.setLocation("' . $successUrl . '");
-				  </script>
-				  </body></html>';
+			window.onload = function(){
+				if(window.frameElement && window.frameElement.nodeName == "IFRAME"){
+					window.top.location.href = "' . $successUrl . '";
+				}
+				else{
+					window.location.href = "' . $successUrl . '";
+				}
+			}
+		</script>
+		</body></html>';
         }
     }
 
