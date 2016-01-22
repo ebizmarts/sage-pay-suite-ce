@@ -706,112 +706,112 @@
                         </allow_gift_aid>
                     </fields>
                 </sagepaydirectpro>
-                <sagepaynit translate="label" order_status="sagepaysuite">
-                    <label>Sage Pay Suite [Frontend - PI Integration] (BETA)</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>45</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <active translate="label">
-                            <label>Enabled</label>
-                            <frontend_type>select</frontend_type>
-                            <config_path>payment/sagepaynit/active</config_path>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>1</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </active>
-                        <title translate="label">
-                            <label>Title</label>
-                            <frontend_type>text</frontend_type>
-                            <config_path>payment/sagepaynit/title</config_path>
-                            <sort_order>2</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </title>
-                        <payment_action translate="label">
-                            <label>Payment Action</label>
-                            <frontend_type>select</frontend_type>
-                            <config_path>payment/sagepaynit/payment_action</config_path>
-                            <source_model>sagepaysuite/sagepaysuite_source_paymentAction</source_model>
-                            <sort_order>3</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </payment_action>
-                        <order_status translate="label">
-                            <label>New order status</label>
-                            <frontend_type>select</frontend_type>
-                            <config_path>payment/sagepaynit/order_status</config_path>
-                            <source_model>adminhtml/system_config_source_order_status</source_model>
-                            <sort_order>5</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </order_status>
-                        <mode translate="label">
-                            <label>Mode</label>
-                            <frontend_type>select</frontend_type>
-                            <config_path>payment/sagepaynit/mode</config_path>
-                            <source_model>sagepaysuite/sagepaysuite_source_paymentMode</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </mode>
-                        <key translate="label">
-                            <label>Key (Username)</label>
-                            <frontend_type>text</frontend_type>
-                            <config_path>payment/sagepaynit/key</config_path>
-                            <sort_order>11</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </key>
-                        <password translate="label">
-                            <label>Password</label>
-                            <frontend_type>obscure</frontend_type>
-                            <config_path>payment/sagepaynit/password</config_path>
-                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
-                            <comment><![CDATA[<a target="_blank" href="http://www.sagepay.co.uk">Sage Pay</a> would provide this]]></comment>
-                            <sort_order>12</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </password>
-                        <cctypesSagePayNit translate="label">
-                            <label>Accepted Card types</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <config_path>payment/sagepaynit/cctypesSagePayNit</config_path>
-                            <source_model>sagepaysuite/sagepaysuite_source_CreditCards</source_model>
-                            <sort_order>15</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </cctypesSagePayNit>
-                        <sort_order translate="label">
-                            <label>Sort order</label>
-                            <frontend_type>text</frontend_type>
-                            <config_path>payment/sagepaynit/sort_order</config_path>
-                            <sort_order>100</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><active>1</active></depends>
-                        </sort_order>
-                    </fields>
-                </sagepaynit>
+                <!--<sagepaynit translate="label" order_status="sagepaysuite">-->
+                    <!--<label>Sage Pay Suite [Frontend - PI Integration] (BETA)</label>-->
+                    <!--<frontend_type>text</frontend_type>-->
+                    <!--<sort_order>45</sort_order>-->
+                    <!--<show_in_default>1</show_in_default>-->
+                    <!--<show_in_website>1</show_in_website>-->
+                    <!--<show_in_store>1</show_in_store>-->
+                    <!--<fields>-->
+                        <!--<active translate="label">-->
+                            <!--<label>Enabled</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/active</config_path>-->
+                            <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
+                            <!--<sort_order>1</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                        <!--</active>-->
+                        <!--<title translate="label">-->
+                            <!--<label>Title</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/title</config_path>-->
+                            <!--<sort_order>2</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</title>-->
+                        <!--<payment_action translate="label">-->
+                            <!--<label>Payment Action</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/payment_action</config_path>-->
+                            <!--<source_model>sagepaysuite/sagepaysuite_source_paymentAction</source_model>-->
+                            <!--<sort_order>3</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</payment_action>-->
+                        <!--<order_status translate="label">-->
+                            <!--<label>New order status</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/order_status</config_path>-->
+                            <!--<source_model>adminhtml/system_config_source_order_status</source_model>-->
+                            <!--<sort_order>5</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</order_status>-->
+                        <!--<mode translate="label">-->
+                            <!--<label>Mode</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/mode</config_path>-->
+                            <!--<source_model>sagepaysuite/sagepaysuite_source_paymentMode</source_model>-->
+                            <!--<sort_order>10</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</mode>-->
+                        <!--<key translate="label">-->
+                            <!--<label>Key (Username)</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/key</config_path>-->
+                            <!--<sort_order>11</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</key>-->
+                        <!--<password translate="label">-->
+                            <!--<label>Password</label>-->
+                            <!--<frontend_type>obscure</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/password</config_path>-->
+                            <!--<backend_model>adminhtml/system_config_backend_encrypted</backend_model>-->
+                            <!--<comment><![CDATA[<a target="_blank" href="http://www.sagepay.co.uk">Sage Pay</a> would provide this]]></comment>-->
+                            <!--<sort_order>12</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</password>-->
+                        <!--<cctypesSagePayNit translate="label">-->
+                            <!--<label>Accepted Card types</label>-->
+                            <!--<frontend_type>multiselect</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/cctypesSagePayNit</config_path>-->
+                            <!--<source_model>sagepaysuite/sagepaysuite_source_CreditCards</source_model>-->
+                            <!--<sort_order>15</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</cctypesSagePayNit>-->
+                        <!--<sort_order translate="label">-->
+                            <!--<label>Sort order</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<config_path>payment/sagepaynit/sort_order</config_path>-->
+                            <!--<sort_order>100</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<depends><active>1</active></depends>-->
+                        <!--</sort_order>-->
+                    <!--</fields>-->
+                <!--</sagepaynit>-->
                 <sagepaypaypal translate="label">
                     <label>Sage Pay Suite [Frontend - PayPal Express Integration]</label>
                     <frontend_type>text</frontend_type>
