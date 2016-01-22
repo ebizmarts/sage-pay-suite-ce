@@ -67,7 +67,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
         $cryptPass = $this->getEncryptionPass();
 
         if (Zend_Validate::is($cryptPass, 'NotEmpty') === false) {
-            Mage::throwException('Encryption Pass is empty.');
+            Sage_Log::log('Encryption Pass is empty.', null);
+            //Mage::throwException('Encryption Pass is empty.');
         }
 
         $quoteObj = $this->_getQuote();

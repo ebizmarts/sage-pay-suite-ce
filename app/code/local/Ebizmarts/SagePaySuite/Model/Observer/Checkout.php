@@ -79,11 +79,11 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
                 for($i=0;$i<count($orderIds);$i++) {
                     Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderIds[$i]));
                 }
-
             }
         }
 
         $this->getSession()->clear();
+    }
 
     }
 
@@ -100,15 +100,17 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
             && !is_null(Mage::app()->getRequest()->getParam('incide'))
             && !is_null(Mage::app()->getRequest()->getParam('oide'))) {
 
-            $sessionCheckout
-                ->setLastSuccessQuoteId(Mage::app()->getRequest()->getParam('qide'))
-                ->setLastQuoteId(Mage::app()->getRequest()->getParam('qide'))
-                ->setLastOrderId(Mage::app()->getRequest()->getParam('oide'))
-                ->setLastRealOrderId(Mage::app()->getRequest()->getParam('incide'));
+            if(Mage::getSingleton('core/session')->getData("sagepay_server_first_arrive") == true){
+                $sessionCheckout
+                    ->setLastSuccessQuoteId(Mage::app()->getRequest()->getParam('qide'))
+                    ->setLastQuoteId(Mage::app()->getRequest()->getParam('qide'))
+                    ->setLastOrderId(Mage::app()->getRequest()->getParam('oide'))
+                    ->setLastRealOrderId(Mage::app()->getRequest()->getParam('incide'));
 
-            $autoInvoice = (int)Mage::app()->getRequest()->getParam('inv');
-            if($autoInvoice) {
-                Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice);
+                $autoInvoice = (int)Mage::app()->getRequest()->getParam('inv');
+                if($autoInvoice) {
+                    Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice);
+                }
             }
         }
 
@@ -147,7 +149,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         }
 
         if($this->getSession()->getCreateInvoicePayment(true)) {
-            //Sage_Log::log("Checkout observer, invoicing order " . $orderId , null, 'SagePaySuite_SERVER_RESPONSE.log');
             Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderId));
         }
 

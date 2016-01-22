@@ -36,6 +36,12 @@
  $stopped = ($sagepay->getVoided() || $sagepay->getAborted() || $sagepay->getCanceled()) ? true : false;
 
  $states = $this->helper('sagepaysuite')->getTxStates();
+
+if(!$sagepay->getCardExpiryDate()){
+	if($tokenCard){
+		$sagepay->setCardExpiryDate($tokenCard->getExpiryDate());
+	}
+}
 ?>
 
 <img width="270" height="43" src="<?php echo $this->getSkinUrl('sagepaysuite/images/sagepay-section-heading.png'); ?>" />

@@ -163,6 +163,11 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
         //$amount = $this->formatAmount($quoteObj->getGrandTotal(), $quoteObj->getQuoteCurrencyCode());
         $payment = $this->_getBuildPaymentObject($quoteObj);
 
+        $order_email = "";
+        if(isset($params['order']['account']['email'])){
+            $order_email = $params['order']['account']['email'];
+        }
+
         /**
          * Token Transaction
          */
@@ -202,10 +207,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
                     ->setCustomerContactInfo($requestObject->getData('ContactNumber'))
                     ->setIntegration('server')
                     ->setTrndate($this->getDate())
+                    //->setServerOrderComments($order_comments)
+                    ->setOrderEmail($order_email)
                     ->save();
 
             $rs = new Varien_Object;
             $rs->setResponseStatus($result['Status'])->setResponseStatusDetail(Mage::helper('sagepaysuite')->__($result['StatusDetail']))->setNextUrl($result['NextURL'])->setVPSTxID($result['VPSTxId']);
+            $rs->setVendorTxCode($vendorTxCode);
             return $rs;
         }
         /**
@@ -241,9 +249,11 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
                 ->setTrnCurrency($request->getData('Currency'))
                 ->setTrnAmount($request->getData('Amount'))
                 ->setNickname($token_nickname)
+                ->setOrderEmail($order_email)
                 ->setTrndate($this->getDate());
         $trn->save();
 
+        $response->setVendorTxCode($request->getData('VendorTxCode'));
         return $response;
     }
 
@@ -301,9 +311,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
 
         $confParam = (isset($adminParams['order']['send_confirmation'])) ? '&e=' . (int) $adminParams['order']['send_confirmation'] : '';
 
-        if (isset($adminParams['order']['account']['email'])) {
-            $confParam .= '&l=' . urlencode($adminParams['order']['account']['email']);
-        }
+//        if (isset($adminParams['order']['account']['email'])) {
+//            $confParam .= '&l=' . urlencode($adminParams['order']['account']['email']);
+//        }
 
         if (isset($adminParams['order']['account']['group_id'])) {
             $confParam .= '&g=' . $adminParams['order']['account']['group_id'];
@@ -430,14 +440,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
         }
 
         $data['AllowGiftAid'] = (int) $this->getConfigData('allow_gift_aid');
-        $data['ApplyAVSCV2']  = $this->getConfigData('avscv2');
 
-        //Skip PostCode and Address Validation for overseas orders
-        if((int)Mage::getStoreConfig('payment/sagepaysuite/apply_AVSCV2') === 1){
-            if($this->_SageHelper()->isOverseasOrder($billing->getCountry())){
-                $data['ApplyAVSCV2'] = 2;
-            }
-        }
+        $data['ApplyAVSCV2'] = $this->_SageHelper()->getApplyAvsCv2(
+                            $this->getConfigData('apply_AVSCV2'),
+                            $billing->getCountry(),
+                            $this->getConfigData('avscv2'));
+
+        
 
         $customerXML = $this->getCustomerXml($quoteObj);
         if (!is_null($customerXML)) {

@@ -7,7 +7,8 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySuite_Model_Api_Payment {
+class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySuite_Model_Api_Payment
+{
 
     protected $_code = 'sagepaydirectpro';
     protected $_formBlockType = 'sagepaysuite/form_sagePayDirectPro';
@@ -27,7 +28,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
     protected $_canUseCheckout = true;
     protected $_canUseForMultishipping = true;
 
-    public function registerToken($payment) {
+    public function registerToken($payment)
+    {
         if (true === $this->getTokenModel()->isEnabled()) {
             $result = $this->getTokenModel()->registerCard($this->getNewTokenCardArray($payment), true);
             if ($result['Status'] != 'OK') {
@@ -52,8 +54,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $result = $this->getTokenModel()->tokenTransaction($_info);
 
             if ($result['Status'] != self::RESPONSE_CODE_APPROVED
-                    && $result['Status'] != self::RESPONSE_CODE_3DAUTH
-                    && $result['Status'] != self::RESPONSE_CODE_REGISTERED) {
+                && $result['Status'] != self::RESPONSE_CODE_3DAUTH
+                && $result['Status'] != self::RESPONSE_CODE_REGISTERED
+            ) {
                 Mage::throwException(Mage::helper('sagepaysuite')->__($result['StatusDetail']));
             }
 
@@ -69,17 +72,17 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $this->getSageSuiteSession()->setSecure3dMethod('directCallBack3D');
 
                 Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                        ->loadByVendorTxCode($payment->getVendorTxCode())
-                        ->setVendorTxCode($payment->getVendorTxCode())
-                        ->setMd($result['MD'])
-                        ->setPareq($result['PAReq'])
-                        ->setAcsurl($result['ACSURL'])
-                        ->save();
+                    ->loadByVendorTxCode($payment->getVendorTxCode())
+                    ->setVendorTxCode($payment->getVendorTxCode())
+                    ->setMd($result['MD'])
+                    ->setPareq($result['PAReq'])
+                    ->setAcsurl($result['ACSURL'])
+                    ->save();
 
                 $this->getSageSuiteSession()
-                        ->setAcsurl($result['ACSURL'])
-                        ->setEmede($result['MD'])
-                        ->setPareq($result['PAReq']);
+                    ->setAcsurl($result['ACSURL'])
+                    ->setEmede($result['MD'])
+                    ->setPareq($result['PAReq']);
                 $this->setVndor3DTxCode($payment->getVendorTxCode());
             }
 
@@ -88,7 +91,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         /**
          * Token Transaction
          */
-        if ($this->_getIsAdmin() && (int) $this->_getAdminQuote()->getCustomerId() === 0) {
+        if ($this->_getIsAdmin() && (int)$this->_getAdminQuote()->getCustomerId() === 0) {
             //$cs = Mage::getModel('customer/customer')->setWebsiteId($this->_getAdminQuote()->getStoreId())->loadByEmail($this->_getAdminQuote()->getCustomerEmail());
             $cs = Mage::helper('sagepaysuite')->existsCustomerForEmail($this->_getAdminQuote()->getCustomerEmail(), $this->_getAdminQuote()->getStore()->getWebsite()->getId());
             if ($cs) {
@@ -101,13 +104,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
         if ($this->getSageSuiteSession()->getSecure3d()) {
             $this->directCallBack3D(
-                    $payment, $this->getSageSuiteSession()->getPares(), $this->getSageSuiteSession()->getEmede());
+                $payment, $this->getSageSuiteSession()->getPares(), $this->getSageSuiteSession()->getEmede());
             $this->getSageSuiteSession()->setSecure3d(null);
             return $this;
         }
         $this->getSageSuiteSession()->setMd(null)
-                ->setAcsurl(null)
-                ->setPareq(null);
+            ->setAcsurl(null)
+            ->setPareq(null);
 
         $error = false;
 
@@ -146,16 +149,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             case 'FAIL':
                 $error = $result->getResponseStatusDetail();
                 $payment
-                        ->setStatus('FAIL')
-                        ->setCcTransId($result->getVPSTxId())
-                        ->setLastTransId($result->getVPSTxId())
-                        ->setCcApproval('FAIL')
-                        ->setAddressResult($result->getAddressResult())
-                        ->setPostcodeResult($result->getPostCodeResult())
-                        ->setCv2Result($result->getCV2Result())
-                        ->setCcCidStatus($result->getTxAuthNo())
-                        ->setSecurityKey($result->getSecurityKey())
-                        ->setAdditionalData($result->getResponseStatusDetail());
+                    ->setStatus('FAIL')
+                    ->setCcTransId($result->getVPSTxId())
+                    ->setLastTransId($result->getVPSTxId())
+                    ->setCcApproval('FAIL')
+                    ->setAddressResult($result->getAddressResult())
+                    ->setPostcodeResult($result->getPostCodeResult())
+                    ->setCv2Result($result->getCV2Result())
+                    ->setCcCidStatus($result->getTxAuthNo())
+                    ->setSecurityKey($result->getSecurityKey())
+                    ->setAdditionalData($result->getResponseStatusDetail());
                 break;
             case 'FAIL_NOMAIL':
                 $error = $result->getResponseStatusDetail();
@@ -166,15 +169,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $payment->setSagePayResult($result);
 
                 $payment
-                        ->setStatus(self::RESPONSE_CODE_APPROVED)
-                        ->setCcTransId($result->getVPSTxId())
-                        ->setLastTransId($result->getVPSTxId())
-                        ->setCcApproval(self::RESPONSE_CODE_APPROVED)
-                        ->setAddressResult($result->getAddressResult())
-                        ->setPostcodeResult($result->getPostCodeResult())
-                        ->setCv2Result($result->getCV2Result())
-                        ->setCcCidStatus($result->getTxAuthNo())
-                        ->setSecurityKey($result->getSecurityKey());
+                    ->setStatus(self::RESPONSE_CODE_APPROVED)
+                    ->setCcTransId($result->getVPSTxId())
+                    ->setLastTransId($result->getVPSTxId())
+                    ->setCcApproval(self::RESPONSE_CODE_APPROVED)
+                    ->setAddressResult($result->getAddressResult())
+                    ->setPostcodeResult($result->getPostCodeResult())
+                    ->setCv2Result($result->getCV2Result())
+                    ->setCcCidStatus($result->getTxAuthNo())
+                    ->setSecurityKey($result->getSecurityKey());
 
                 if (strtoupper($this->getConfigData('payment_action')) == self::REQUEST_TYPE_PAYMENT) {
                     $this->getSageSuiteSession()->setInvoicePayment(true);
@@ -190,14 +193,14 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $this->getSageSuiteSession()->setSecure3dMethod('directCallBack3D');
 
                 $this->getSageSuiteSession()
-                        ->setAcsurl($result->getData('a_cs_ur_l'))
-                        ->setEmede($result->getData('m_d'))
-                        ->setPareq($result->getData('p_areq'));
+                    ->setAcsurl($result->getData('a_cs_ur_l'))
+                    ->setEmede($result->getData('m_d'))
+                    ->setPareq($result->getData('p_areq'));
 
                 $dbTrn->setMd($result->getData('m_d'))
-                        ->setPareq($result->getData('p_areq'))
-                        ->setAcsurl($result->getData('a_cs_ur_l'))
-                        ->save();
+                    ->setPareq($result->getData('p_areq'))
+                    ->setAcsurl($result->getData('a_cs_ur_l'))
+                    ->save();
 
                 $this->setVndor3DTxCode($payment->getVendorTxCode());
 
@@ -208,16 +211,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     if ($result->getResponseStatus() == self::RESPONSE_CODE_NOTAUTHED) {
 
                         $this->getSageSuiteSession()
-                                ->setAcsurl(null)
-                                ->setEmede(null)
-                                ->setPareq(null);
+                            ->setAcsurl(null)
+                            ->setEmede(null)
+                            ->setPareq(null);
 
                         $error = $this->_SageHelper()->__('Your credit card can not be authenticated: ');
                     } else if ($result->getResponseStatus() == self::RESPONSE_CODE_REJECTED) {
                         $this->getSageSuiteSession()
-                                ->setAcsurl(null)
-                                ->setEmede(null)
-                                ->setPareq(null);
+                            ->setAcsurl(null)
+                            ->setEmede(null)
+                            ->setPareq(null);
                         $error = $this->_SageHelper()->__('Your credit card was rejected: ');
                     }
                     $error .= $result->getResponseStatusDetail();
@@ -239,11 +242,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         return $this;
     }
 
-    protected function _getPayPalCallbackUrl() {
+    protected function _getPayPalCallbackUrl()
+    {
         return Mage::getModel('core/url')->addSessionParam()->getUrl('sgps/paypalexpress/callback', array('_secure' => true));
     }
 
-    public function getPayPalMode() {
+    public function getPayPalMode()
+    {
         return Mage::getStoreConfig('payment/sagepaypaypal/mode', Mage::app()->getStore()->getId());
     }
 
@@ -264,7 +269,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             }
 
             $onePage = Mage::getSingleton('checkout/type_onepage');
-            $quote   = $onePage->getQuote();
+            $quote = $onePage->getQuote();
             $quote->collectTotals();
 
             Mage::helper('sagepaysuite')->ignoreAddressValidation($quote);
@@ -272,36 +277,36 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $onePage->saveOrder();
 
             $_transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                    ->loadByVendorTxCode($this->getSageSuiteSession()->getLastVendorTxCode())
-                    ->setVpsProtocol($result->getData('VPSProtocol'))
-                    ->setSecurityKey($result->getData('SecurityKey'))
-                    ->setStatus($result->getData('Status'))
-                    ->setStatusDetail($result->getData('StatusDetail'))
-                    ->setVpsTxId($result->getData('VPSTxId'))
-                    ->setTxAuthNo($result->getData('TxAuthNo'))
-                    ->setAvscv2($result->getData('AVSCV2'))
-                    ->setPostcodeResult($result->getData('PostCodeResult'))
-                    ->setAddressResult($result->getData('AddressResult'))
-                    ->setCv2result($result->getData('CV2Result'))
-                    ->setThreedSecureStatus($result->getData('3DSecureStatus'))
-                    ->setCavv($result->getData('CAVV'))
-                    ->setRedFraudResponse($result->getData('FraudResponse'))
-                    ->setBankAuthCode($result->getData('BankAuthCode'))
-                    ->setDeclineCode($result->getData('DeclineCode'))
-                    ->save();
+                ->loadByVendorTxCode($this->getSageSuiteSession()->getLastVendorTxCode())
+                ->setVpsProtocol($result->getData('VPSProtocol'))
+                ->setSecurityKey($result->getData('SecurityKey'))
+                ->setStatus($result->getData('Status'))
+                ->setStatusDetail($result->getData('StatusDetail'))
+                ->setVpsTxId($result->getData('VPSTxId'))
+                ->setTxAuthNo($result->getData('TxAuthNo'))
+                ->setAvscv2($result->getData('AVSCV2'))
+                ->setPostcodeResult($result->getData('PostCodeResult'))
+                ->setAddressResult($result->getData('AddressResult'))
+                ->setCv2result($result->getData('CV2Result'))
+                ->setThreedSecureStatus($result->getData('3DSecureStatus'))
+                ->setCavv($result->getData('CAVV'))
+                ->setRedFraudResponse($result->getData('FraudResponse'))
+                ->setBankAuthCode($result->getData('BankAuthCode'))
+                ->setDeclineCode($result->getData('DeclineCode'))
+                ->save();
 
             //Saving TOKEN after 3D response.
             if ($result->getData('Token')) {
                 $tokenData = array(
-                    'Token'        => $result->getData('Token'),
-                    'Status'       => $result->getData('Status'),
-                    'Vendor'       => $_transaction->getVendorname(),
-                    'CardType'     => $_transaction->getCardType(),
-                    'ExpiryDate'   => $result->getData('ExpiryDate'),
+                    'Token' => $result->getData('Token'),
+                    'Status' => $result->getData('Status'),
+                    'Vendor' => $_transaction->getVendorname(),
+                    'CardType' => $_transaction->getCardType(),
+                    'ExpiryDate' => $result->getData('ExpiryDate'),
                     'StatusDetail' => $result->getData('StatusDetail'),
-                    'Protocol'     => 'direct',
-                    'CardNumber'   => $_transaction->getLastFourDigits(),
-                    'Nickname'     => $_transaction->getNickname()
+                    'Protocol' => 'direct',
+                    'CardNumber' => $_transaction->getLastFourDigits(),
+                    'Nickname' => $_transaction->getNickname()
                 );
                 Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
             }
@@ -309,30 +314,29 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $payment->setSagePayResult($result);
 
             $payment->setStatus(self::STATUS_APPROVED)
-                    ->setCcTransId($result->getVPSTxId())
-                    ->setCcApproval(self::RESPONSE_CODE_APPROVED)
-                    ->setLastTransId($result->getVPSTxId())
-                    ->setAddressResult($result->getAddressResult())
-                    ->setPostcodeResult($result->getPostCodeResult())
-                    ->setCv2Result($result->getCV2Result())
-                    ->setSecurityKey($result->getSecurityKey())
-                    ->setCcCidStatus($result->getTxAuthNo())
-                    ->setAdditionalData($result->getResponseStatusDetail());
+                ->setCcTransId($result->getVPSTxId())
+                ->setCcApproval(self::RESPONSE_CODE_APPROVED)
+                ->setLastTransId($result->getVPSTxId())
+                ->setAddressResult($result->getAddressResult())
+                ->setPostcodeResult($result->getPostCodeResult())
+                ->setCv2Result($result->getCV2Result())
+                ->setSecurityKey($result->getSecurityKey())
+                ->setCcCidStatus($result->getTxAuthNo())
+                ->setAdditionalData($result->getResponseStatusDetail());
             $payment->save();
-        }
-        else {
+        } else {
 
             //Update status if 3d failed
             Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                    ->loadByVendorTxCode($this->getSageSuiteSession()->getLastVendorTxCode())
-                    ->setStatus($result->getResponseStatus())
-                    ->setStatusDetail($result->getResponseStatusDetail())
-                    ->setVpsTxId($result->getVpsTxId())
-                    ->setSecurityKey($result->getSecurityKey())
-                    ->setPares(null)//Resetting data so we dont get "5036 : transaction not found" error for repeated calls to sagepay on 3d callback.
-                    ->setMd(null)//Resetting data so we dont get "5036 : transaction not found" error for repeated calls to sagepay on 3d callback.
-                    ->setPareq(null)
-                    ->save();
+                ->loadByVendorTxCode($this->getSageSuiteSession()->getLastVendorTxCode())
+                ->setStatus($result->getResponseStatus())
+                ->setStatusDetail($result->getResponseStatusDetail())
+                ->setVpsTxId($result->getVpsTxId())
+                ->setSecurityKey($result->getSecurityKey())
+                ->setPares(null)//Resetting data so we dont get "5036 : transaction not found" error for repeated calls to sagepay on 3d callback.
+                ->setMd(null)//Resetting data so we dont get "5036 : transaction not found" error for repeated calls to sagepay on 3d callback.
+                ->setPareq(null)
+                ->save();
 
             if ($result->getResponseStatusDetail()) {
                 if ($result->getResponseStatus() == self::RESPONSE_CODE_NOTAUTHED) {
@@ -352,10 +356,11 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         return $this;
     }
 
-    protected function _buildRequest3D($PARes, $MD) {
+    protected function _buildRequest3D($PARes, $MD)
+    {
         return $this->_getRequest()
-                        ->setMD($MD)
-                        ->setPARes($PARes);
+            ->setMD($MD)
+            ->setPARes($PARes);
     }
 
     /**
@@ -365,7 +370,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
      * @param bool $onlyToken
      * @param float $macOrder MAC single order
      */
-    public function registerTransaction($params = null, $onlyToken = false, $macOrder = null) {
+    public function registerTransaction($params = null, $onlyToken = false, $macOrder = null)
+    {
 
         $quoteObj = $this->_getQuote();
         $quoteObj2 = $this->getQuoteDb($quoteObj);
@@ -385,8 +391,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
         if (!is_null($params)) {
             $payment = $this->_getBuildPaymentObject($quoteObj2, $params);
-        }
-        else {
+        } else {
             $payment = $this->_getBuildPaymentObject($quoteObj2);
         }
 
@@ -394,7 +399,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             return $this->registerToken($payment);
         }
 
-        $_rs  = $this->directRegisterTransaction($payment, $amount);
+        $_rs = $this->directRegisterTransaction($payment, $amount);
         $_req = $payment->getSagePayResult()->getRequest();
         $_res = $payment->getSagePayResult();
 
@@ -412,28 +417,28 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         }
 
         Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                ->loadByVendorTxCode($_req->getData('VendorTxCode'))
-                ->setVendorTxCode($_req->getData('VendorTxCode'))
-                ->setToken($_req->getData('Token'))
-                ->setTrnCurrency($_req->getData('Currency'))
-                ->setTrnAmount($_req->getData('Amount'))
-                ->setTxType($_req->getData('Txtype'))
-                ->setMode($this->getConfigData('mode'))
-                ->setVendorname($_req->getData('Vendor'))
-                ->setVpsProtocol($_res->getData('VPSProtocol'))
-                ->setSecurityKey($_res->getData('SecurityKey'))
-                ->setVpsTxId($_res->getData('VPSTxId'))
-                ->setTxAuthNo($_res->getData('TxAuthNo'))
-                ->setAvscv2($_res->getData('AVSCV2'))
-                ->setPostcodeResult($_res->getData('PostCodeResult'))
-                ->setAddressResult($_res->getData('AddressResult'))
-                ->setCv2result($_res->getData('CV2Result'))
-                ->setThreedSecureStatus($_res->getData('3DSecureStatus'))
-                ->setCavv($_res->getData('CAVV'))
-                ->setRedFraudResponse($_res->getData('FraudResponse'))
-                ->setBankAuthCode($_res->getData('BankAuthCode'))
-                ->setDeclineCode($_res->getData('DeclineCode'))
-                ->save();
+            ->loadByVendorTxCode($_req->getData('VendorTxCode'))
+            ->setVendorTxCode($_req->getData('VendorTxCode'))
+            ->setToken($_req->getData('Token'))
+            ->setTrnCurrency($_req->getData('Currency'))
+            ->setTrnAmount($_req->getData('Amount'))
+            ->setTxType($_req->getData('Txtype'))
+            ->setMode($this->getConfigData('mode'))
+            ->setVendorname($_req->getData('Vendor'))
+            ->setVpsProtocol($_res->getData('VPSProtocol'))
+            ->setSecurityKey($_res->getData('SecurityKey'))
+            ->setVpsTxId($_res->getData('VPSTxId'))
+            ->setTxAuthNo($_res->getData('TxAuthNo'))
+            ->setAvscv2($_res->getData('AVSCV2'))
+            ->setPostcodeResult($_res->getData('PostCodeResult'))
+            ->setAddressResult($_res->getData('AddressResult'))
+            ->setCv2result($_res->getData('CV2Result'))
+            ->setThreedSecureStatus($_res->getData('3DSecureStatus'))
+            ->setCavv($_res->getData('CAVV'))
+            ->setRedFraudResponse($_res->getData('FraudResponse'))
+            ->setBankAuthCode($_res->getData('BankAuthCode'))
+            ->setDeclineCode($_res->getData('DeclineCode'))
+            ->save();
 
         return $_res;
     }
@@ -444,10 +449,11 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
      * @param   Mage_Payment_Model_Info $info
      * @return  Mage_Payment_Model_Abstract
      */
-    public function validate() {
+    public function validate()
+    {
         $info = $this->getInfoInstance();
 
-        $tokenCardId = (int) $info->getSagepayTokenCcId();
+        $tokenCardId = (int)$info->getSagepayTokenCcId();
 
         if ($tokenCardId) {
             $valid = $this->getTokenModel()->isTokenValid($tokenCardId);
@@ -468,9 +474,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
         $info = $this->getInfoInstance();
         $errorMsg = false;
-        if($this->_code == "sagepaydirectpro"){
+        if ($this->_code == "sagepaydirectpro") {
             $availableTypes = explode(',', Mage::getStoreConfig('payment/sagepaydirectpro/cctypesSagePayDirectPro'));
-        }else if($this->_code == "sagepaydirectpro_moto"){
+        } else if ($this->_code == "sagepaydirectpro_moto") {
             $availableTypes = explode(',', Mage::getStoreConfig('payment/sagepaydirectpro_moto/cctypesSagePayDirectPro'));
         }
 
@@ -493,20 +499,25 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
             if (in_array($info->getCcType(), $availableTypes)) {
                 if ($this->validateCcNum($ccNumber)
-                        // Other credit card type number validation
-                        || ($this->OtherCcType($info->getCcType()) && $this->validateCcNumOther($ccNumber))) {
+                    // Other credit card type number validation
+                    || ($this->OtherCcType($info->getCcType()) && $this->validateCcNumOther($ccNumber))
+                ) {
 
                     $ccType = 'OT';
                     $ccTypeRegExpList = array(
                         'VISA' => '/^4[0-9]{12}([0-9]{3})?$/', // Visa
                         'MC' => '/^5[1-5][0-9]{14}$/', // Master Card
                         'AMEX' => '/^3[47][0-9]{13}$/'//,        // American Express
-                            //'DI' => '/^6011[0-9]{12}$/'          // Discovery
+                        //'DI' => '/^6011[0-9]{12}$/'          // Discovery
                     );
 
                     foreach ($ccTypeRegExpList as $ccTypeMatch => $ccTypeRegExp) {
                         if (preg_match($ccTypeRegExp, $ccNumber)) {
-                            $ccType = $ccTypeMatch;
+                            if ($info->getCcType() == "MCDEBIT" && $ccTypeMatch == "MC") {
+                                $ccType = "MCDEBIT";
+                            } else {
+                                $ccType = $ccTypeMatch;
+                            }
                             break;
                         }
                     }
@@ -537,11 +548,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
           return parent::validate(); */
     }
 
-    public function OtherCcType($type) {
+    public function OtherCcType($type)
+    {
         return $type == 'OT' || $type == 'SOLO' || $type == 'DELTA' || $type == 'UKE' || $type == 'MAESTRO' || $type == 'SWITCH' || $type == 'LASER' || $type == 'JCB' || $type == 'DC';
     }
 
-    protected function _buildRequest(Varien_Object $payment) {
+    protected function _buildRequest(Varien_Object $payment)
+    {
 
         $order = $payment->getOrder();
 
@@ -552,30 +565,30 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         $_mode = ($payment->getRequestMode() ? $payment->getRequestMode() : $this->getConfigData('mode'));
 
         $request = Mage::getModel('sagepaysuite/sagepaysuite_request')
-                ->setVPSProtocol($this->getVpsProtocolVersion($_mode))
-                ->setMode($_mode)
-                ->setReferrerID($this->getConfigData('referrer_id'))
-                ->setTxType($payment->getAnetTransType())
-                ->setInternalTxtype($payment->getAnetTransType()) # Just for storing in transactions table
-                ->setVendor(($payment->getRequestVendor() ? $payment->getRequestVendor() : $this->getConfigData('vendor')))
-                ->setVendorTxCode($vendorTxCode)
-                ->setDescription($this->ss(($payment->getCcOwner() ? $payment->getCcOwner() : '.'), 100))
-                ->setClientIPAddress($this->getClientIp());
+            ->setVPSProtocol($this->getVpsProtocolVersion($_mode))
+            ->setMode($_mode)
+            ->setReferrerID($this->getConfigData('referrer_id'))
+            ->setTxType($payment->getAnetTransType())
+            ->setInternalTxtype($payment->getAnetTransType())# Just for storing in transactions table
+            ->setVendor(($payment->getRequestVendor() ? $payment->getRequestVendor() : $this->getConfigData('vendor')))
+            ->setVendorTxCode($vendorTxCode)
+            ->setDescription($this->ss(($payment->getCcOwner() ? $payment->getCcOwner() : '.'), 100))
+            ->setClientIPAddress($this->getClientIp());
 
 
         //basket
         $force_xml = false;
         if ($order->getPayment()->getMethodInstance()->getCode() == 'sagepaypaypal' &&
-            Mage::getStoreConfig('payment/sagepaypaypal/force_basketxml_paypal') == TRUE) {
+            Mage::getStoreConfig('payment/sagepaypaypal/force_basketxml_paypal') == TRUE
+        ) {
             //force XML for paypal
             $force_xml = true;
         }
-        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote(),$force_xml);
-        if(!empty($basket)) {
-            if($basket[0] == "<") {
+        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote(), $force_xml);
+        if (!empty($basket)) {
+            if ($basket[0] == "<") {
                 $request->setBasketXML($basket);
-            }
-            else {
+            } else {
                 $request->setBasket($basket);
             }
         }
@@ -591,8 +604,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         if ($payment->getAmountOrdered()) {
 
             $this->_setRequestCurrencyAmount($request, $this->_getQuote());
-        }
-        else {
+        } else {
             Sage_Log::log('No amount on payment');
             Mage::throwException('No amount on payment');
         }
@@ -603,7 +615,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $billing = $order->getBillingAddress();
             if (!empty($billing)) {
                 $request->setBillingAddress($this->ss($billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
-                        $billing->getRegion() . ' ' . $billing->getCountry(), 100)
+                    $billing->getRegion() . ' ' . $billing->getCountry(), 100)
                 )
                     ->setBillingSurname($this->ss($billing->getLastname(), 20))
                     ->setBillingFirstnames($this->ss($billing->getFirstname(), 20))
@@ -611,7 +623,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     ->setBillingAddress1($this->ss($billing->getStreet(1), 100))
                     ->setBillingAddress2($this->ss($billing->getStreet(2), 100))
                     ->setBillingCity($this->ss($billing->getCity(), 40))
-                    ->setBillingCountry($billing->getCountry())
+                    ->setBillingCountry(trim($billing->getCountry()))
                     ->setCustomerName($this->ss($billing->getFirstname() . ' ' . $billing->getLastname(), 100))
                     ->setContactNumber(substr($this->_cphone($billing->getTelephone()), 0, 20))
                     ->setContactFax($billing->getFax());
@@ -619,10 +631,10 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 //billing state
                 $billing_state = $billing->getRegionCode();
                 Mage::log($billing_state);
-                if(!is_null($billing_state) && strlen($billing_state) > 2){
-                    $billing_state = substr($billing_state,0,2);
+                if (!is_null($billing_state) && strlen($billing_state) > 2) {
+                    $billing_state = substr($billing_state, 0, 2);
                 }
-                if(!empty($billing_state)){
+                if (!empty($billing_state)) {
                     $request->setBillingState($billing_state);
                 }
 
@@ -630,7 +642,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             }
 
             //set shipping address
-            if(!$order->getIsVirtual()){
+            if (!$order->getIsVirtual()) {
 
                 $shipping = $order->getShippingAddress();
 
@@ -644,19 +656,19 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                         ->setDeliveryAddress1($this->ss($shipping->getStreet(1), 100))
                         ->setDeliveryAddress2($this->ss($shipping->getStreet(2), 100))
                         ->setDeliveryCity($this->ss($shipping->getCity(), 40))
-                        ->setDeliveryCountry($shipping->getCountry());
+                        //->setDeliveryCountry($shipping->getCountry());
+                        ->setDeliveryCountry(trim($shipping->getCountry()));
 
                     //shipping state
                     $shipping_state = $shipping->getRegionCode();
-                    if(!is_null($shipping_state) && strlen($shipping_state) > 2){
-                        $shipping_state = substr($shipping_state,0,2);
+                    if (!is_null($shipping_state) && strlen($shipping_state) > 2) {
+                        $shipping_state = substr($shipping_state, 0, 2);
                     }
-                    if(!empty($shipping_state)){
+                    if (!empty($shipping_state)) {
                         $request->setDeliveryState($shipping_state);
                     }
                 }
-            }
-            else {
+            } else {
                 #If the cart only has virtual products, I need to put an shipping address to Sage Pay.
                 #Then the billing address will be the shipping address to
                 $request->setDeliveryAddress($billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
@@ -668,14 +680,14 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     ->setDeliveryAddress1($this->ss($billing->getStreet(1), 100))
                     ->setDeliveryAddress2($this->ss($billing->getStreet(2), 100))
                     ->setDeliveryCity($billing->getCity())
-                    ->setDeliveryCountry($billing->getCountry());
+                    ->setDeliveryCountry(trim($billing->getCountry()));
 
                 //shipping state
                 $shipping_state = $billing->getRegionCode();
-                if(!is_null($shipping_state) && strlen($shipping_state) > 2){
-                    $shipping_state = substr($shipping_state,0,2);
+                if (!is_null($shipping_state) && strlen($shipping_state) > 2) {
+                    $shipping_state = substr($shipping_state, 0, 2);
                 }
-                if(!empty($shipping_state)){
+                if (!empty($shipping_state)) {
                     $request->setDeliveryState($shipping_state);
                 }
             }
@@ -701,13 +713,12 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $request->setApply3DSecure('2');
         } else if ($this->_isMultishippingCheckout()) {
             $request->setApply3DSecure('2');
-        }
-        else {
+        } else {
             $request->setApply3DSecure($this->getConfigData('secure3d'));
         }
 
         if ($request->getAccountType() != 'M' && $this->_forceCardChecking($payment->getCcType()) === true) {
-            $request->setApply3DSecure('3');
+            $request->setApply3DSecure('1');
         }
 
         $request->setData('ApplyAVSCV2', $this->getConfigData('avscv2'));
@@ -725,7 +736,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
         //Set to CreateToken if needed
         if ($this->_createToken() OR $payment->getRemembertoken()) {
-            if(!$request->setCreateToken(1,$payment->getCcNumber(),$request->getExpiryDate(),$payment->getCcType())){
+            if (!$request->setCreateToken(1, $payment->getCcNumber(), $request->getExpiryDate(), $payment->getCcType())) {
                 $message = Mage::helper('sagepaysuite')->__('Credit card could not be saved for future use. You already have this card attached to your account or you have reached your account\'s maximum card storage capacity.');
                 Mage::getSingleton('core/session')->addWarning($message);
             }
@@ -739,8 +750,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         }
 
         //Skip PostCode and Address Validation for overseas orders
-        if((int)Mage::getStoreConfig('payment/sagepaysuite/apply_AVSCV2') === 1){
-            if($this->_SageHelper()->isOverseasOrder($billing->getCountry())){
+        if ((int)Mage::getStoreConfig('payment/sagepaysuite/apply_AVSCV2') === 1) {
+            if ($this->_SageHelper()->isOverseasOrder($billing->getCountry())) {
                 $request->setData('ApplyAVSCV2', 2);
             }
         }
@@ -751,7 +762,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
     /**
      * Force 3D secure checking based on card rule
      */
-    protected function _forceCardChecking($ccType = null) {
+    protected function _forceCardChecking($ccType = null)
+    {
         $config = $this->getConfigData('force_threed_cards');
 
         if (is_null($ccType) || strlen($config) === 0) {
@@ -766,7 +778,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         return false;
     }
 
-    protected function _postRequest(Varien_Object $request, $callback3D = false) {
+    protected function _postRequest(Varien_Object $request, $callback3D = false)
+    {
 
         $result = Mage::getModel('sagepaysuite/sagepaysuite_result');
 
@@ -780,11 +793,11 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $response = $this->requestPost($uri, $request->getData());
         } catch (Exception $e) {
             $result->setResponseCode(-1)
-                    ->setResponseReasonCode($e->getCode())
-                    ->setResponseReasonText($e->getMessage());
+                ->setResponseReasonCode($e->getCode())
+                ->setResponseReasonText($e->getMessage());
 
             Mage::throwException(
-                    $this->_SageHelper()->__('Gateway request error: %s', $e->getMessage())
+                $this->_SageHelper()->__('Gateway request error: %s', $e->getMessage())
             );
         }
 
@@ -798,8 +811,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $msg = $this->_SageHelper()->__('Sage Pay is not available at this time. Please try again later.');
                 Sage_Log::log($msg, 1);
                 $result
-                        ->setResponseStatus('ERROR')
-                        ->setResponseStatusDetail($msg);
+                    ->setResponseStatus('ERROR')
+                    ->setResponseStatusDetail($msg);
                 return $result;
             }
 
@@ -817,15 +830,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     //$rc = $this->sendNotificationEmail('', '', $params);
 
                     $result->setResponseStatus($r['Status'])
-                            ->setResponseStatusDetail(Mage::helper('sagepaysuite')->__($r['StatusDetail']))
-                            ->setVPSTxID(1)
-                            ->setSecurityKey(1)
-                            ->setTxAuthNo(1)
-                            ->setAVSCV2(1)
-                            ->setAddressResult(1)
-                            ->setPostCodeResult(1)
-                            ->setCV2Result(1)
-                            ->setTrnSecuritykey(1);
+                        ->setResponseStatusDetail(Mage::helper('sagepaysuite')->__($r['StatusDetail']))
+                        ->setVPSTxID(1)
+                        ->setSecurityKey(1)
+                        ->setTxAuthNo(1)
+                        ->setAVSCV2(1)
+                        ->setAddressResult(1)
+                        ->setPostCodeResult(1)
+                        ->setCV2Result(1)
+                        ->setTrnSecuritykey(1);
                     return $result;
                     break;
                 case 'FAIL_NOMAIL':
@@ -845,19 +858,19 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     break;
                 case parent::RESPONSE_CODE_3DAUTH:
                     $result->setResponseStatus($r['Status'])
-                            ->setResponseStatusDetail((isset($r['StatusDetail']) ? $r['StatusDetail'] : '')) //Fix for simulator
-                            ->set3DSecureStatus($r['3DSecureStatus'])    // to store
-                            ->setMD($r['MD']) // to store
-                            ->setACSURL($r['ACSURL'])
-                            ->setPAReq($r['PAReq']);
+                        ->setResponseStatusDetail((isset($r['StatusDetail']) ? $r['StatusDetail'] : ''))//Fix for simulator
+                        ->set3DSecureStatus($r['3DSecureStatus'])// to store
+                        ->setMD($r['MD'])// to store
+                        ->setACSURL($r['ACSURL'])
+                        ->setPAReq($r['PAReq']);
                     break;
                 default:
 
                     $result->setResponseStatus($r['Status'])
-                            ->setResponseStatusDetail($r['StatusDetail'])  // to store
-                            ->setVpsTxId($r['VPSTxId'])    // to store
-                            ->setSecurityKey($r['SecurityKey']) // to store
-                            ->setTrnSecuritykey($r['SecurityKey']);
+                        ->setResponseStatusDetail($r['StatusDetail'])// to store
+                        ->setVpsTxId($r['VPSTxId'])// to store
+                        ->setSecurityKey($r['SecurityKey'])// to store
+                        ->setTrnSecuritykey($r['SecurityKey']);
                     if (isset($r['3DSecureStatus']))
                         $result->set3DSecureStatus($r['3DSecureStatus']);
                     if (isset($r['CAVV']))
@@ -879,15 +892,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     //Saving TOKEN.
                     if (!$callback3D && $result->getData('Token')) {
                         $tokenData = array(
-                            'Token'        => $result->getData('Token'),
-                            'Status'       => $result->getData('Status'),
-                            'Vendor'       => $request->getData('Vendor'),
-                            'CardType'     => $request->getData('CardType'),
-                            'ExpiryDate'   => $request->getData('ExpiryDate'),
+                            'Token' => $result->getData('Token'),
+                            'Status' => $result->getData('Status'),
+                            'Vendor' => $request->getData('Vendor'),
+                            'CardType' => $request->getData('CardType'),
+                            'ExpiryDate' => $request->getData('ExpiryDate'),
                             'StatusDetail' => $result->getData('StatusDetail'),
-                            'Protocol'     => 'direct',
-                            'CardNumber'   => $request->getData('CardNumber'),
-                            'Nickname'     => $request->getData('Nickname')
+                            'Protocol' => 'direct',
+                            'CardNumber' => $request->getData('CardNumber'),
+                            'Nickname' => $request->getData('Nickname')
                         );
 
                         Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
@@ -900,23 +913,24 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             Sage_Log::logException($e);
 
             $result
-                    ->setResponseStatus('ERROR')
-                    ->setResponseStatusDetail(Mage::helper('sagepaysuite')->__($e->getMessage()));
+                ->setResponseStatus('ERROR')
+                ->setResponseStatusDetail(Mage::helper('sagepaysuite')->__($e->getMessage()));
             return $result;
         }
 
         return $result;
     }
 
-    public function getNewTokenCardArray(Varien_Object $payment) {
+    public function getNewTokenCardArray(Varien_Object $payment)
+    {
         $data = array();
         $data ['CardHolder'] = $payment->getCcOwner();
         $data ['CardNumber'] = $payment->getCcNumber();
-        $data ['CardType']   = $payment->getCcType();
-        $data ['Currency']   = $payment->getOrder()->getOrderCurrencyCode();
-        $data ['CV2']        = $payment->getCcCid();
-        $data ['Nickname']   = $payment->getCcNickname();
-        $data ['Protocol']   = 'direct'; #For persistant storing
+        $data ['CardType'] = $payment->getCcType();
+        $data ['Currency'] = $payment->getOrder()->getOrderCurrencyCode();
+        $data ['CV2'] = $payment->getCcCid();
+        $data ['Nickname'] = $payment->getCcNickname();
+        $data ['Protocol'] = 'direct'; #For persistant storing
         $data ['ExpiryDate'] = str_pad($payment->getCcExpMonth(), 2, '0', STR_PAD_LEFT) . substr($payment->getCcExpYear(), 2);
         if ($payment->getCcSsStartMonth() && $payment->getCcSsStartYear()) {
             $data['StartDate'] = str_pad($payment->getCcSsStartMonth(), 2, '0', STR_PAD_LEFT) . substr($payment->getCcSsStartYear(), 2);
@@ -931,7 +945,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
      * @param   Varien_Object $orderPayment
      * @return  Mage_Payment_Model_Abstract
      */
-    public function capture(Varien_Object $payment, $amount) {
+    public function capture(Varien_Object $payment, $amount)
+    {
         #Process invoice
         if (!$payment->getRealCapture()) {
             return $this->captureInvoice($payment, $amount);
@@ -955,7 +970,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         /**
          * Token Transaction
          */
-        if ($this->_getIsAdmin() && (int) $this->_getAdminQuote()->getCustomerId() === 0) {
+        if ($this->_getIsAdmin() && (int)$this->_getAdminQuote()->getCustomerId() === 0) {
             //$cs = Mage::getModel('customer/customer')->setWebsiteId($this->_getAdminQuote()->getStoreId())->loadByEmail($this->_getAdminQuote()->getCustomerEmail());
             $cs = Mage::helper('sagepaysuite')->existsCustomerForEmail($this->_getAdminQuote()->getCustomerEmail(), $this->_getAdminQuote()->getStore()->getWebsite()->getId());
             if ($cs) {
@@ -972,8 +987,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
           return $this;
           } */
         $this->getSageSuiteSession()->setMd(null)
-                ->setAcsurl(null)
-                ->setPareq(null);
+            ->setAcsurl(null)
+            ->setPareq(null);
 
         $error = false;
 
@@ -986,16 +1001,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         switch ($result->getResponseStatus()) {
             case 'FAIL':
                 $payment
-                        ->setStatus('FAIL')
-                        ->setCcTransId($result->getVPSTxId())
-                        ->setLastTransId($result->getVPSTxId())
-                        ->setCcApproval('FAIL')
-                        ->setAddressResult($result->getAddressResult())
-                        ->setPostcodeResult($result->getPostCodeResult())
-                        ->setCv2Result($result->getCV2Result())
-                        ->setCcCidStatus($result->getTxAuthNo())
-                        ->setSecurityKey($result->getSecurityKey())
-                        ->setAdditionalData($result->getResponseStatusDetail());
+                    ->setStatus('FAIL')
+                    ->setCcTransId($result->getVPSTxId())
+                    ->setLastTransId($result->getVPSTxId())
+                    ->setCcApproval('FAIL')
+                    ->setAddressResult($result->getAddressResult())
+                    ->setPostcodeResult($result->getPostCodeResult())
+                    ->setCv2Result($result->getCV2Result())
+                    ->setCcCidStatus($result->getTxAuthNo())
+                    ->setSecurityKey($result->getSecurityKey())
+                    ->setAdditionalData($result->getResponseStatusDetail());
                 break;
             case 'FAIL_NOMAIL':
                 $error = $result->getResponseStatusDetail();
@@ -1005,15 +1020,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $payment->setSagePayResult($result);
 
                 $payment
-                        ->setStatus(parent::RESPONSE_CODE_APPROVED)
-                        ->setCcTransId($result->getVPSTxId())
-                        ->setLastTransId($result->getVPSTxId())
-                        ->setCcApproval(parent::RESPONSE_CODE_APPROVED)
-                        ->setAddressResult($result->getAddressResult())
-                        ->setPostcodeResult($result->getPostCodeResult())
-                        ->setCv2Result($result->getCV2Result())
-                        ->setCcCidStatus($result->getTxAuthNo())
-                        ->setSecurityKey($result->getSecurityKey());
+                    ->setStatus(parent::RESPONSE_CODE_APPROVED)
+                    ->setCcTransId($result->getVPSTxId())
+                    ->setLastTransId($result->getVPSTxId())
+                    ->setCcApproval(parent::RESPONSE_CODE_APPROVED)
+                    ->setAddressResult($result->getAddressResult())
+                    ->setPostcodeResult($result->getPostCodeResult())
+                    ->setCv2Result($result->getCV2Result())
+                    ->setCcCidStatus($result->getTxAuthNo())
+                    ->setSecurityKey($result->getSecurityKey());
 
                 $this->getSageSuiteSession()->setInvoicePayment(true);
 
@@ -1027,9 +1042,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $this->getSageSuiteSession()->setSecure3dMethod('directCallBack3D');
 
                 $this->getSageSuiteSession()
-                        ->setAcsurl($result->getData('a_cs_ur_l'))
-                        ->setEmede($result->getData('m_d'))
-                        ->setPareq($result->getData('p_areq'));
+                    ->setAcsurl($result->getData('a_cs_ur_l'))
+                    ->setEmede($result->getData('m_d'))
+                    ->setPareq($result->getData('p_areq'));
                 $this->setVndor3DTxCode($payment->getVendorTxCode());
 
                 break;
@@ -1054,7 +1069,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         return $this;
     }
 
-    public function saveOrderAfter3dSecure($pares, $md) {
+    public function saveOrderAfter3dSecure($pares, $md)
+    {
 
         $this->getSageSuiteSession()->setSecure3d(true);
         $this->getSageSuiteSession()->setPares($pares);
@@ -1064,18 +1080,19 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         $order = $this->directCallBack3D($quote->getPayment(), $pares, $md);
 
         $this->getSageSuiteSession()
-                ->setAcsurl(null)
-                ->setPareq(null)
-                ->setSageOrderId(null)
-                ->setSecure3d(null)
-                ->setEmede(null)
-                ->setPares(null)
-                ->setMd(null);
+            ->setAcsurl(null)
+            ->setPareq(null)
+            ->setSageOrderId(null)
+            ->setSecure3d(null)
+            ->setEmede(null)
+            ->setPares(null)
+            ->setMd(null);
 
         return $order;
     }
 
-    public function sendNotificationEmail($toEmail = '', $toName = '', $params = array()) {
+    public function sendNotificationEmail($toEmail = '', $toName = '', $params = array())
+    {
         $translate = Mage::getSingleton('core/translate');
 
         $translate->setTranslateInline(false);
@@ -1092,8 +1109,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
 
         $mail = Mage::getModel('core/email_template')
-                ->setDesignConfig(array('area' => 'frontend', 'store' => $storeId))
-                ->sendTransactional(
+            ->setDesignConfig(array('area' => 'frontend', 'store' => $storeId))
+            ->sendTransactional(
                 Mage::getStoreConfig('payment/sagepaydirectpro/email_timeout_template'), array('name' => Mage::getStoreConfig('trans_email/ident_general/name', $storeId), 'email' => Mage::getStoreConfig('trans_email/ident_general/email', $storeId)),
 //                Mage::getStoreConfig('payment/sagepaydirectpro/email_timeout_identity'),
                 $toEmail, $toName, $params);
@@ -1117,14 +1134,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
       }
       } */
 
-    public function getPayPalTitle() {
+    public function getPayPalTitle()
+    {
         return Mage::getStoreConfig('payment/sagepaypaypal/title', Mage::app()->getStore()->getId());
     }
 
     /**
      * @return array
      */
-    public function getConfigSafeFields() {
+    public function getConfigSafeFields()
+    {
         return array('active', 'mode', 'title', 'useccv', 'threed_iframe_height', 'threed_iframe_width', 'threed_layout');
     }
 

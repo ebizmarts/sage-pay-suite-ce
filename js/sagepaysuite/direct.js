@@ -154,6 +154,16 @@ Validation.addAllThese([
         }
 
         return true;
+    }],
+    ['validate-ccnumber-notowner', 'Invalid name on card.', function (v, elm) {
+        try {
+            if (isNaN(v)) {
+                return true;
+            }
+            return false;
+        } catch (_error) {
+            return true;
+        }
     }]
 ]);
 

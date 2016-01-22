@@ -87,7 +87,10 @@ class Ebizmarts_SagePaySuite_Model_Fraud
         curl_setopt($curlSession, CURLOPT_TIMEOUT, 90);
         //The next two lines must be present for the kit to work with newer version of cURL
         //You should remove them if you have any problems in earlier versions of cURL
-        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER, false);
+
+        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER,
+            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+
         curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
 
         if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){

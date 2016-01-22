@@ -14,7 +14,7 @@
     <li>
         <label for="<?php echo $_code ?>_cc_owner"><?php echo $this->__('Name on Card') ?> <span class="required">*</span></label>
         <div class="input-box">
-            <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry" id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]" value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" />
+            <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text validate-ccnumber-notowner required-entry" id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]" value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" />
         </div>
     </li>
     <li>

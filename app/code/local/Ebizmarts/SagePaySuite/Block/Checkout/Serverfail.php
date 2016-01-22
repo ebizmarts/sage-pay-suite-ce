@@ -40,40 +40,49 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serverfail extends Mage_Core_Block_T
                 $alert = 'alert("' . $message . '");';
             }
 
+            //redirect to cart
+            Mage::getSingleton('checkout/session')->addError(Mage::helper('sagepaysuite/error')->parseTransactionFailedError($message));
+
+            $checkoutUrl     = $this->getUrl('checkout/cart', array('_secure'=>true));
+            $fullRedirectionJsScript = "window.top.location.href = \"{$checkoutUrl}\";";
             $html = '<html><body>';
-            $html.= '<script type="text/javascript">' . $alert .
-                'var inChElem = window.parent.$(\'sagepaysuite-server-incheckout-iframe\');
-
-                        if(inChElem){ //Iframe below Place Order button
-
-                            var inChElemOsc = window.parent.$(\'onestepcheckout-place-order\');
-                            if(inChElemOsc){ //Iframe below Place Order button OSC
-                                inChElemOsc.show();
-                            }else{
-                                window.parent.$(\'checkout-review-submit\').show();
-                            }
-
-                            inChElem.remove();
-                        }else{
-                            try{
-                                window.parent.Control.Window.windows.each(
-                                    function(w){
-                                        if(w.container.visible()){
-                                            w.close();
-                                        }
-                                    }
-                                );
-                            }catch(er){}
-
-                                                    //@ToDo: Full redirection
-                        }
-
-                        if((typeof window.parent.restoreOscLoad) != "undefined") {
-                            window.parent.restoreOscLoad();
-                        }
-
-                    </script>';
+            $html.= '<script type="text/javascript">' . $fullRedirectionJsScript . '</script>';
             $html.= '</body></html>';
+
+//            $html = '<html><body>';
+//            $html.= '<script type="text/javascript">' . $alert .
+//                'var inChElem = window.parent.$(\'sagepaysuite-server-incheckout-iframe\');
+//
+//                        if(inChElem){ //Iframe below Place Order button
+//
+//                            var inChElemOsc = window.parent.$(\'onestepcheckout-place-order\');
+//                            if(inChElemOsc){ //Iframe below Place Order button OSC
+//                                inChElemOsc.show();
+//                            }else{
+//                                window.parent.$(\'checkout-review-submit\').show();
+//                            }
+//
+//                            inChElem.remove();
+//                        }else{
+//                            try{
+//                                window.parent.Control.Window.windows.each(
+//                                    function(w){
+//                                        if(w.container.visible()){
+//                                            w.close();
+//                                        }
+//                                    }
+//                                );
+//                            }catch(er){}
+//
+//                                                    //@ToDo: Full redirection
+//                        }
+//
+//                        if((typeof window.parent.restoreOscLoad) != "undefined") {
+//                            window.parent.restoreOscLoad();
+//                        }
+//
+//                    </script>';
+//            $html.= '</body></html>';
         }
 
         return $html;

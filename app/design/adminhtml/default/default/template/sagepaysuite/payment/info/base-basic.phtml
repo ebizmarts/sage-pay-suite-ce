@@ -23,6 +23,13 @@
  	$sagepay = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                 ->loadByParent($this->getInfo()->getOrder()->getId());
  }
+
+ 	if(!$sagepay->getCardExpiryDate()){
+		if($tokenCard){
+			$sagepay->setCardExpiryDate($tokenCard->getExpiryDate());
+		}
+	}
+
 ?>
 <img width="270" height="43" src="<?php echo $this->getSkinUrl('sagepaysuite/images/sagepay-section-heading.png'); ?>" />
 <p>

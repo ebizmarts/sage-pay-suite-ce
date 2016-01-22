@@ -65,7 +65,8 @@ iframe#sagepaysuite-log-view { background: #BFBFBF; width: 100%; height:800px; b
 table.trndetail-basket thead { font-weight:bold; }
 table.trndetail-basket { width:100%; border: 1px solid #ccc; }
 
-select#sagepaysuite_sagepaysuite_order_error_save + p.note { color:#FF0000; }
+/*select#sagepaysuite_sagepaysuite_order_error_save + p.note { color:#FF0000; }*/
+select#sagepaysuite_sagepaysuite_curl_verifypeer + p.note { color:#FF0000; }
 
 code.on { color: #009F33; }
 code.off { color: #FFA200; }
