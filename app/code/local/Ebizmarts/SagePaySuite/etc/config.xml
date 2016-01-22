@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ebizmarts_SagePaySuite>
-            <version>3.5.1</version>
+            <version>3.6.1</version>
         </Ebizmarts_SagePaySuite>
     </modules>
     <adminhtml>
@@ -346,6 +346,12 @@
     			<enviroment>2</enviroment>
     		</account>
     	</sagepayreporting>
+        <sagepayreporting_moto>
+            <account>
+                <vendor>testebizmarts</vendor>
+                <enviroment>2</enviroment>
+            </account>
+        </sagepayreporting_moto>
         <sagepaysuite>
             <notifications>
                 <updates_url><![CDATA[http://store.ebizmarts.com/media/feeds/]]></updates_url>
@@ -365,8 +371,6 @@
                 <cms_index_logo>1</cms_index_logo>
                 <sagepay_notifications>1</sagepay_notifications>
                 <orphans_notification>1</orphans_notification>
-                <order_error_save>0</order_error_save>
-                <order_error_save_message><![CDATA[Order saving process halted.]]></order_error_save_message>
                 <timeout_message><![CDATA[A connection error prevented your order from being saved, please retry or email {admin_email} for assistance. Thanks, {store_name}]]></timeout_message>
                 <send_basket>1</send_basket>
                 <basket_format>sage</basket_format>
@@ -450,6 +454,8 @@
             <sagepayserver>
                 <avscv2>0</avscv2>
                 <active>0</active>
+                <pre_save>0</pre_save>
+                <cancel_pending_payment>20</cancel_pending_payment>
                 <debug>0</debug>
                 <model>sagepaysuite/sagePayServer</model>
                 <order_status>pending</order_status>
@@ -679,6 +685,10 @@
                 <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
                 <run><model>sagepaysuite/cron::syncFromApi</model></run>
             </sagepaysuite_sync_trndata_fromapi>
+            <sagepaysuite_cancel_pending_payment_orders>
+                <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
+                <run><model>sagepaysuite/cron::cancelPendingPaymentOrders</model></run>
+            </sagepaysuite_cancel_pending_payment_orders>
         </jobs>
     </crontab>
 </config>

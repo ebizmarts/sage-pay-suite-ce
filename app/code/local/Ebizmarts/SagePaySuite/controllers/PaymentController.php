@@ -294,7 +294,8 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
           $paymentMethod = $post['payment']['method'];
           } */
 
-        if (!$this->getOnepage()->getQuote()->isVirtual() && !$this->getOnepage()->getQuote()->getShippingAddress()->getShippingDescription()) {
+        if (!$this->getOnepage()->getQuote()->isVirtual() &&
+            !$this->getOnepage()->getQuote()->getShippingAddress()->getShippingMethod()) {
             $result['success'] = false;
             $result['response_status'] = 'ERROR';
             $result['response_status_detail'] = $this->__('Please choose a shipping method');

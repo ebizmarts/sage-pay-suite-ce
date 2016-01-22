@@ -157,7 +157,17 @@
                 }
 
                 return true;
-            }]
+            }],
+        ['validate-ccnumber-notowner', 'Invalid name on card.', function (v, elm) {
+            try {
+                if (isNaN(v)) {
+                    return true;
+                }
+                return false;
+            } catch (_error) {
+                return true;
+            }
+        }]
     ]);
 </script>
 <div id="payment_form_<?php echo $_code ?>" style="display:none;">
@@ -174,7 +184,7 @@
     <li<?php echo $sageStyle; ?>>
         <label for="<?php echo $_code ?>_cc_owner"><span class="required">*</span><?php echo $this->__('Name on Card') ?></label>
         <div class="input-box">
-            <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry" id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]" value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" />
+            <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry validate-ccnumber-notowner" id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]" value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" />
         </div>
     </li>
     <li<?php echo $sageStyle; ?>>

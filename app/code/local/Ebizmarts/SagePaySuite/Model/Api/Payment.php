@@ -56,6 +56,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                                  'layout_rewrites',
                                  'ignore_address_validation',
                                  'send_payment_failed_emails',
+                                 'apply_AVSCV2'
     );
 
     /**
@@ -971,6 +972,11 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
      */
     public function cancelOrder(Varien_Object $payment) {
         $order = $payment->getOrder();
+
+        if($order->getStatus() == "sagepaysuite_pending_payment"){
+            return;
+        }
+
         $trn = $this->getTransactionDetails($order->getId());
 
         if (!$trn->getId()) {
@@ -1271,9 +1277,8 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
             curl_setopt($curlSession, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));
         }
 
-        $verifyPeerConfig = (int)$this->getConfigData('curl_verifypeer');
-        $verifyPeer       = 1 === $verifyPeerConfig ? true : false;
-        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER, $verifyPeer);
+        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER,
+            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
 
         curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
 

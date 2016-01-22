@@ -48,6 +48,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySui
     }
 
     public function multiShipping($observer) {
+
         $order = $observer->getEvent()->getOrder();
         $pmethod = (string) $order->getPayment()->getMethod();
 

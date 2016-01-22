@@ -333,7 +333,10 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         curl_setopt($curlSession, CURLOPT_POSTFIELDS, 'XML=' . $xml);
         curl_setopt($curlSession, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curlSession, CURLOPT_TIMEOUT, 120);
-        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER, false);
+
+        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER,
+            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+
         curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
 
         $rawresponse = curl_exec($curlSession);

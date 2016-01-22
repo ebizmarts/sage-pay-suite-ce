@@ -91,7 +91,10 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
             curl_setopt($curl, CURLOPT_SSLVERSION, $sslversion);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl, CURLOPT_TIMEOUT, 4);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,
+                Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
             if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
                 curl_setopt($curl, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));

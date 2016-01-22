@@ -114,6 +114,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
      * @return bool
      */
     public function isTokenValid($cardId) {
+
         $card = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')
                 ->load($cardId);
 
@@ -198,10 +199,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
         }
 
         if ($this->forceCardChecking($_t->getCardType()) === true) {
-            $postData['Apply3DSecure'] = 3;
+            $postData['Apply3DSecure'] = 1;
         }
 
-        $postData['ApplyAVSCV2'] = (int) $this->getConfigData('avscv2');
+        $postData['ApplyAVSCV2'] = $this->_SageHelper()->getApplyAvsCv2(
+                            $this->getConfigData('apply_AVSCV2'),
+                            $postData['BillingCountry'],
+                            $this->getConfigData('avscv2'));
 
         $urlPost = $this->getTokenUrl('post', (isset($postData['Integration']) ? $postData['Integration'] : 'direct'));
 

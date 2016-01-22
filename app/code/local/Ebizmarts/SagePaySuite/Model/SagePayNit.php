@@ -13,15 +13,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
     protected $_canAuthorize = true;
     protected $_canCapture = true;
     protected $_canCapturePartial = true;
-    /**
-     * Can refund online?
-     */
     protected $_canRefund = false;
     protected $_canRefundInvoicePartial = false;
-
-    /**
-     * Can void transactions online?
-     */
     protected $_canVoid = false;
     protected $_canUseInternal = false;
     protected $_canUseCheckout = true;
@@ -224,7 +217,10 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         curl_setopt($curl, CURLOPT_SSLVERSION, $sslversion);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_TIMEOUT, 8);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,
+            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
         if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
             curl_setopt($curl, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));

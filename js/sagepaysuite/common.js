@@ -172,6 +172,17 @@ toggleNewCard = function(action){
 
 	}else{
 
+		//use tokens
+		var token_lists = document.getElementsByClassName("tokensage");
+		for(var i=0;i<token_lists.length;i++){
+			token_lists[i].style.display="block";
+
+			//get from aux container to be sure (OSC)
+			var auxContainer = document.getElementById("sagepaysuite_aux_token_container" + i);
+			token_lists[i].innerHTML = auxContainer.innerHTML;
+			auxContainer.innerHTML = "";
+		}
+
 		var tokenInputs = $$(frmSelector + ' ul li.tokencard-radio input');
 		if(parseInt(tokenInputs.length) === 0){
 			return;
@@ -192,16 +203,7 @@ toggleNewCard = function(action){
 		});
 		$$(frmSelector + ' ul li.tokencard-radio', frmSelector + ' a.addnew').invoke('show');
 
-        //use tokens
-        var token_lists = document.getElementsByClassName("tokensage");
-        for(var i=0;i<token_lists.length;i++){
-            token_lists[i].style.display="block";
 
-            //get from aux container to be sure (OSC)
-            var auxContainer = document.getElementById("sagepaysuite_aux_token_container" + i);
-            token_lists[i].innerHTML = auxContainer.innerHTML;
-            auxContainer.innerHTML = "";
-        }
 	}
 
     //hide unneeded fields
