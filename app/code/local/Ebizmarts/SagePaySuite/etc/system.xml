@@ -1199,6 +1199,58 @@
                         </allow_gift_aid>
                     </fields>
                 </sagepaydirectpro_moto>
+                <sagepaysuitetoken translate="label comment" module="sagepaysuite">
+                    <label>Sage Pay Suite [Token - Saved Credit Cards Settings]</label>
+                    <sort_order>110</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <config_path>payment/sagepaysuite_source_tokenActive</config_path>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <token_integration translate="label">
+                            <label>Customer Area Integration</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>sagepaysuite/sagepaysuite_source_tokenintegration</source_model>
+                            <config_path>payment/sagepaysuite/token_integration</config_path>
+                            <comment><![CDATA[Only applicable for My Account card registration. If not enabled won't be used anywhere.]]></comment>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><active>1</active></depends>
+                        </token_integration>
+                        <token_iframe_position>
+                            <label>Token pages layout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>sagepaysuite/sagepaysuite_source_tokenIframePosition</source_model>
+                            <config_path>payment/sagepayserver/token_iframe_position</config_path>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><active>1</active></depends>
+                        </token_iframe_position>
+                        <max_token_card translate="label">
+                            <label>Max Token Cards Per customer</label>
+                            <frontend_type>text</frontend_type>
+                            <config_path>payment/sagepaysuite/max_token_card</config_path>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><active>1</active></depends>
+                        </max_token_card>
+                    </fields>
+                </sagepaysuitetoken>
                 <sagepayreporting>
                     <label><![CDATA[Sage Pay Suite [Reporting & Third Man API Integration]]]></label>
                     <frontend_type>text</frontend_type>
