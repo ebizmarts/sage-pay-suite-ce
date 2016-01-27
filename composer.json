@@ -1,0 +1,16 @@
+{
+    "name": "ebizmarts/sagepaysuitece",
+    "type": "magento-module",
+    "license": "OSL-3.0",
+    "homepage": "http://www.magentocommerce.com/magento-connect/ebizmarts-sage-pay-suite-ce-europe-free-sagepay-official-extension.html",
+    "description": "SagePay OFFICIAL extension by ebizmarts. Integrates Protocol v3 Direct, Server inFrame, Form & Token",
+    "authors": [
+        {
+            "name": "Ebizmarts",
+            "email": "info@ebizmarts.com"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
