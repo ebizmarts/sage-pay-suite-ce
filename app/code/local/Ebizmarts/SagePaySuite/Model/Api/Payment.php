@@ -965,6 +965,24 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         }
     }
 
+    public function captureInvoice($payment, $amount) {
+        $order = $payment->getOrder();
+        $trn = $this->getTransactionDetails($order->getId());
+
+        if (!$trn->getId()) {
+            $msg = $this->_getCoreHelper()->__('Transaction does not exist, order id -> %s', $order->getId());
+            self::log($msg);
+            throw new Mage_Core_Exception($msg);
+        }
+
+        $payment->setTransactionId($trn->getId());
+
+        // Fix amount for orders placed in different currency.
+        if($order->getOrderCurrencyCode() != $order->getGlobalCurrencyCode()) {
+            $amount = $this->formatAmount(($amount * $order->getStoreToOrderRate()), $order->getOrderCurrencyCode());
+        }
+    }
+
     /**
      * Cancel payment (VOID)
      * @param   Varien_Object $invoicePayment

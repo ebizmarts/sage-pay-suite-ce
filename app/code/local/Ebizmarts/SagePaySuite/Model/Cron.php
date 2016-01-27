@@ -38,8 +38,33 @@ class Ebizmarts_SagePaySuite_Model_Cron {
         }
         
         return $this;
-        
     }
 
+    public function cancelPendingPaymentOrders($cron){
+
+        if((int)Mage::getStoreConfig('payment/sagepayserver/pre_save') === 1 &&
+            (int)Mage::getStoreConfig('payment/sagepayserver/cancel_pending_payment') > 0){
+
+            $minutes = (int)Mage::getStoreConfig('payment/sagepayserver/cancel_pending_payment');
+
+            $orders = Mage::getModel('sales/order')->getCollection()
+                ->addAttributeToFilter('created_at', array("to" => gmdate("Y-m-d H:i:s", strtotime("-".$minutes." minutes"))))
+                ->addAttributeToFilter('status', array('eq' => "sagepaysuite_pending_payment"));
+
+            if($orders->getSize()) {
+                foreach($orders as $order) {
+                    if ($order->canCancel()) {
+                        try {
+                            $order->cancel();
+                            $order->setStatus("sagepaysuite_pending_cancel");
+                            $order->save();
+                        } catch (Exception $e) {
+                            Mage::logException($e);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
