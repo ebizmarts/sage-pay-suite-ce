@@ -522,12 +522,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
                 Mage:: helper('sagepaysuite')->__('Error in creating an invoice', true));
         } else {
 
-            $osar = $this->getSPSModel()->getConfigData('order_status_after_release');
-            $status = Mage_Sales_Model_Order :: STATE_PROCESSING;
-
-            if (!empty($osar)) {
-                $status = $osar;
-            }
+            $status = (string)Mage::getModel('sagepaysuite/sagePayServerMoto')->getConfigData('order_status');
             $invoice = $order->prepareInvoice();
             $invoice->register()->capture();
             Mage:: getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder())->save();
