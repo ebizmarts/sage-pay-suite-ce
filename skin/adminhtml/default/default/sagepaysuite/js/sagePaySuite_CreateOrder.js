@@ -80,7 +80,7 @@ orderSave: function() {
             onSuccess:function(transport){
 
                 var response = this.evalTransport(transport);
-                if((typeof response.next_url) == 'undefined'){
+                if((typeof response.next_url) == 'undefined' || response.response_status == "ERROR"){
                     alert(response.response_status_detail);
                     return;
                 }
