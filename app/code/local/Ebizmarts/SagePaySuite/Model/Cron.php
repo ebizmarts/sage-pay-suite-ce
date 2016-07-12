@@ -58,6 +58,7 @@ class Ebizmarts_SagePaySuite_Model_Cron {
                             $order->cancel();
                             $order->setStatus("sagepaysuite_pending_cancel");
                             $order->save();
+                            Mage::dispatchEvent('sagepaysuite_order_cancel', array('order' => $order));
                         } catch (Exception $e) {
                             Mage::logException($e);
                         }
