@@ -279,6 +279,8 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             return;
         }
 
+        Mage::dispatchEvent('sagepaysuite_place_order', array('post' => $this->getRequest()->getPost()));
+
         $paymentData = $this->getRequest()->getPost('payment', array());
         if ($paymentData) {
 
