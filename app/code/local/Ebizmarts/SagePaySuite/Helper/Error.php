@@ -9,7 +9,7 @@ class Ebizmarts_SagePaySuite_Helper_Error extends Mage_Core_Helper_Abstract
 
         //canceled by customer
         if(strpos($message,'2013') !== FALSE){
-            $newMessage = 'Transaction canceled by customer.';
+            $newMessage = 'Transaction cancelled by customer.';
         }else{
             if(is_null($newMessage) || empty($newMessage)){
                 $newMessage = 'An error occurred which prevented the order from saving. Please contact administration.';
