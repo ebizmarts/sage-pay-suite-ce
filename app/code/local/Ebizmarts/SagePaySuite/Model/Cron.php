@@ -28,7 +28,7 @@ class Ebizmarts_SagePaySuite_Model_Cron {
             $transactions->addFieldToFilter('created_at', array("from" => gmdate("Y-m-d H:i:s", strtotime("-1 day")), "to" => $ts));
             
             if($transactions->getSize()) {
-                
+
                 foreach($transactions as $trn) {
                     $trn->updateFromApi();
                 }
