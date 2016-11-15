@@ -137,7 +137,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             ->setCardExpiryDate($request->getData('ExpiryDate'))
             ->setLastFourDigits(substr($request->getData('CardNumber'), -4))
             ->setToken($request->getData('Token'))
-            ->setNickname($request->getData('Nickname'))
+            ->setNickname(filter_var($request->getData('Nickname'), FILTER_SANITIZE_STRING))
             ->setTrnCurrency($request->getData('Currency'))
             ->setMode($this->getConfigData('mode'))
             ->setTrndate($this->getDate())
@@ -306,7 +306,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     'StatusDetail' => $result->getData('StatusDetail'),
                     'Protocol' => 'direct',
                     'CardNumber' => $_transaction->getLastFourDigits(),
-                    'Nickname' => $_transaction->getNickname()
+                    'Nickname' => filter_var($_transaction->getNickname(), FILTER_SANITIZE_STRING)
                 );
                 Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
             }
@@ -929,7 +929,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         $data ['CardType'] = $payment->getCcType();
         $data ['Currency'] = $payment->getOrder()->getOrderCurrencyCode();
         $data ['CV2'] = $payment->getCcCid();
-        $data ['Nickname'] = $payment->getCcNickname();
+        $data ['Nickname'] = filter_var($payment->getCcNickname(), FILTER_SANITIZE_STRING);
         $data ['Protocol'] = 'direct'; #For persistant storing
         $data ['ExpiryDate'] = str_pad($payment->getCcExpMonth(), 2, '0', STR_PAD_LEFT) . substr($payment->getCcExpYear(), 2);
         if ($payment->getCcSsStartMonth() && $payment->getCcSsStartYear()) {

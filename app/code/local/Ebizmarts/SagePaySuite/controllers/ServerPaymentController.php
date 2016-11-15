@@ -313,7 +313,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 'CardType' => $result->getPost('CardType'),
                 'ExpiryDate' => $result->getPost('ExpiryDate'),
                 'StatusDetail' => $result->getPost('StatusDetail'),
-                'Nickname' => $_transaction->getNickname(),
+                'Nickname' => filter_var($_transaction->getNickname(), FILTER_SANITIZE_STRING),
                 'Protocol' => 'server',
                 'CardNumber' => '00000000' . $result->getPost('Last4Digits')
             );

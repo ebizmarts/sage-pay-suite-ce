@@ -229,7 +229,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayServer extends Ebizmarts_SagePaySuite_
             $this->getSageSuiteSession()->setInvoicePayment(true);
         }
 
-        $token_nickname = (array_key_exists("cc_nickname",$this->_postPayment) ? $this->_postPayment['cc_nickname'] : null);
+        $token_nickname = (array_key_exists("cc_nickname",$this->_postPayment) ? filter_var($this->_postPayment['cc_nickname'], FILTER_SANITIZE_STRING) : null);
 
         $trn = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                 ->loadByVendorTxCode($request->getData('VendorTxCode'))

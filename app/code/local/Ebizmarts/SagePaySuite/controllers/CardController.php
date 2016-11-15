@@ -77,7 +77,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                     'StatusDetail' => $rs['StatusDetail'],
                     'Protocol'     => 'direct',
                     'CardNumber'   => $post['CardNumber'],
-                    'Nickname'     => $post['Nickname']
+                    'Nickname' => filter_var($post['Nickname'], FILTER_SANITIZE_STRING)
                 );
                 $save = Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
 
@@ -90,7 +90,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                         'defaultchecked' => ($save->getIsDefault() == 1 ? ' checked="checked"' : ''),
                         'ccnumber'       => $save->getCcNumber(),
                         'exp'            => $save->getExpireDate(),
-                        'ccnickname'     => $save->getNickname(),
+                        'ccnickname' => filter_var($save->getNickname(), FILTER_SANITIZE_STRING),
                         'delurl'         => Mage::getUrl('sgps/card/delete', array('card' => $save->getId()))
                     );
                 }else{
@@ -329,7 +329,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         }
 
         $cardId = (int) $this->getRequest()->getParam('card');
-        $cardNickname = $this->getRequest()->getParam('nickname');
+        $cardNickname = filter_var($this->getRequest()->getParam('nickname'), FILTER_SANITIZE_STRING);
 
         $objCard = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->load($cardId);
 

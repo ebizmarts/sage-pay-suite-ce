@@ -57,8 +57,8 @@
 	<?php endif; ?>
 
        <?php if($this->getInfo()->getRemembertoken()): ?>
-                <input id="token-remembertoken" type="hidden" name="payment[remembertoken]" value="<?php echo $this->getInfo()->getRemembertoken(); ?>" />
-                <input type="hidden" name="payment[cc_nickname]" value="<?php echo $this->htmlEscape($this->getInfo()->getCcNickname()); ?>" />
+            <input id="token-remembertoken" type="hidden" name="payment[remembertoken]" value="<?php echo $this->getInfo()->getRemembertoken(); ?>" />
+            <input type="hidden" name="payment[cc_nickname]" value="<?php echo $this->htmlEscape($this->htmlEscape($this->getInfo()->getCcNickname())); ?>" />
        <?php endif; ?>
 
 <?php endif; ?>

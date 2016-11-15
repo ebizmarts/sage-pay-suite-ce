@@ -82,7 +82,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayToken extends Ebizmarts_SagePaySuite_M
 
         $nickname = "";
         if(array_key_exists('Nickname', $info)){
-            $nickname = $info['Nickname'];
+            $nickname = filter_var($info['Nickname'], FILTER_SANITIZE_STRING);
         }
 
         $save = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')

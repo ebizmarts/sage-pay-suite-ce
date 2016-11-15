@@ -358,7 +358,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
                 ->setTokenCvv($data->getTokenCvv())
                 ->setCcStartMonth($data->getCcStartMonth())
                 ->setCcStartYear($data->getCcStartYear())
-                ->setCcNickname($data->getCcNickname())
+                ->setCcNickname(filter_var($data->getCcNickname(), FILTER_SANITIZE_STRING))
                 ->setCcGiftaid($dgift);
         return $this;
     }
