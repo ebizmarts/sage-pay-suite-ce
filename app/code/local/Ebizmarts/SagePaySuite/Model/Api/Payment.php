@@ -1796,6 +1796,17 @@ class Ebizmarts_SagePaySuite_Model_Api_Payment extends Mage_Payment_Model_Method
         $shippingAdd = $quote->getShippingAddress();
         $billingAdd  = $quote->getBillingAddress();
 
+        //when the $quote contains only virtual products because a virtual order has empty shipping address data.
+        if($quote->isVirtual())
+        {
+            $shippingAdd = $quote->getBillingAddress();
+        }
+        else
+        {
+            $shippingAdd = $quote->getShippingAddress();
+        }
+        $billingAdd = $quote->getBillingAddress();
+
         $itemsCollection   = $quote->getItemsCollection();
 
         foreach ($itemsCollection as $item) {
