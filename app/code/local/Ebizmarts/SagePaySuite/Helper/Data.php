@@ -343,11 +343,15 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         if (is_array($_store->getConfig('payment/sagepayserver'))) {
             $conf ['server'] = array_intersect_key($_store->getConfig('payment/sagepayserver'), array_flip($serverSafeFields));
             $conf ['server']['sgps_registertrn_url'] = $_url->getUrl('sgps/serverPayment/registertrn', array('_secure' => true));
-            $conf ['server']['sgps_admin_registertrn_url'] = $_urlAdmin->getUrl('adminhtml/spsServerPayment/registertrn', array('_secure' => true));
             $conf ['server']['osc_savebilling_url'] = $_url->getUrl('onestepcheckout/ajax/save_billing', array('_secure' => true));
             $conf ['server']['osc_setmethods_url'] = $_url->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure' => true));
             $conf ['server']['new_token_url'] = $_url->getUrl('sgps/card/serverform', array('_secure' => true));
             $conf ['server']['secured_by_image'] = $_d->getSkinUrl('sagepaysuite/images/secured-by-sage-pay.png');
+
+            if ($this->creatingAdminOrder()) {
+                $conf ['server']['sgps_admin_registertrn_url'] = $_urlAdmin->getUrl('adminhtml/spsServerPayment/registertrn', array('_secure' => true));
+            }
+
         }
 
         $conf ['form']['url'] = $_url->getUrl('sgps/formPayment/go', array('_secure' => true));
