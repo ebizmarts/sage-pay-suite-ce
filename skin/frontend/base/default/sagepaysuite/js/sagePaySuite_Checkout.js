@@ -261,30 +261,10 @@ EbizmartsSagePaySuite.Checkout.prototype = {
     growlError: function (msg) {
         alert(msg);
         return;
-        try {
-            var ng = new k.Growler({
-                location: "tc"
-            });
-            ng.error(msg, {
-                life: 10
-            });
-        } catch (grwlerror) {
-            alert(msg);
-        }
     },
     growlWarn: function (msg) {
         alert(msg);
         return;
-        try {
-            var ng = new k.Growler({
-                location: "tc"
-            });
-            ng.warn(msg, {
-                life: 10
-            });
-        } catch (grwlerror) {
-            alert(msg);
-        }
     },
     isDirectTokenTransaction: function () {
         var tokenRadios = $$('div#payment_form_sagepaydirectpro ul.tokensage li.tokencard-radio input');
