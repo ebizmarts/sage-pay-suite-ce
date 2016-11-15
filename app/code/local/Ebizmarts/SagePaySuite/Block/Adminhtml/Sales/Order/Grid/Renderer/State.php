@@ -1,6 +1,6 @@
 <?php
 
-class Ebizmarts_SagePaysuite_Block_Adminhtml_Sales_Order_Grid_Renderer_State extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Grid_Renderer_State extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
 {
 
     /**
