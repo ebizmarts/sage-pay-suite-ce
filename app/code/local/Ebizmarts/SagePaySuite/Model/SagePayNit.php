@@ -70,6 +70,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
 
         Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
             ->loadByVendorTxCode($_req->getData('VendorTxCode'))
+            ->setReferrerID($this->getConfigData('referrer_id'))
             ->setVendorTxCode($_req->getData('VendorTxCode'))
             ->setToken($_req->getData('Token'))
             ->setTrnCurrency($_req->getData('Currency'))
