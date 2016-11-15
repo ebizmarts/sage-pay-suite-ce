@@ -18,7 +18,11 @@ class Ebizmarts_SagePaySuite_Helper_Sandbox extends Mage_Core_Helper_Abstract
 
 	public function getSandBox()
 	{
-		return new Varien_Simplexml_Element(file_get_contents(Mage::getModuleDir('etc', 'Ebizmarts_SagePaySuite').DS.'sandbox.xml'));
+		$sandbox = file_get_contents(Mage::getModuleDir('etc', 'Ebizmarts_SagePaySuite') . DS . 'sandbox.xml');
+		if ($sandbox === FALSE) {
+			return null;
+		}
+		return new Varien_Simplexml_Element(file_get_contents($sandbox));
 	}
 
 	public function objToArray($v)
