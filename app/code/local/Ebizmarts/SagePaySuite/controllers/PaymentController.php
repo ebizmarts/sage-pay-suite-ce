@@ -194,6 +194,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
         //$this->getOnepage()->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
 
         $requestParams = $this->getRequest()->getParams();
+        $this->oneStepCheckoutSaveComments($requestParams);
         if (array_key_exists('onestepcheckout_comments', $requestParams)
                 && !empty($requestParams['onestepcheckout_comments'])) {
             $this->getSageSuiteSession()->setOscOrderComments($requestParams['onestepcheckout_comments']);
