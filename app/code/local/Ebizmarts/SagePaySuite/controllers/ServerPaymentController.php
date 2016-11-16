@@ -184,14 +184,15 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
     protected function _getSuccessRedirectUrl($params = array())
     {
-        Mage::helper('sagepaysuite')->sanitizeParamsForQuery($params);
+        $encodedParams = Mage::helper('sagepaysuite')->sanitizeParamsForQuery($params);
 
         $myParams = array_merge(array(
             '_secure' => true,
             '_current' => true,
-            '_store'   => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-            'storeid'  => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-        ), $params);
+            '_store' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+            'storeid' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+            ), $encodedParams
+        );
 
         $url = Mage:: getUrl('sgps/ServerPayment/success', $myParams);
 
