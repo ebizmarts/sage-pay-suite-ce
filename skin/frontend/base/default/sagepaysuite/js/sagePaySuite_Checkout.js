@@ -221,14 +221,16 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             return this.code;
         }
 
-        var checkedPayment = null
+        var checkedPayment = null;
 
-        form.getInputs('radio', 'payment[method]').each(function (el) {
-            if (el.checked) {
-                checkedPayment = el.value;
-                throw $break;
+        var inputs =  form.getInputs('radio', 'payment[method]');
+
+        for(var i = 0; i < inputs.length; i = i + 1) {
+
+            if (inputs[i].checked) {
+                checkedPayment = inputs[i].value;
             }
-        });
+        }
 
         if (checkedPayment != null) {
             return checkedPayment;
