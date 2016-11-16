@@ -382,9 +382,8 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function undertocamel($str)
     {
-        $a = new Zend_Filter_Word_UnderscoreToCamelCase;
-
-        return $a->filter($str);
+        $str[0] = strtoupper($str[0]);
+        return preg_replace('/_([a-z])/e', "strtoupper('\\1')", $str);
     }
 
     public function cameltounder($str)
