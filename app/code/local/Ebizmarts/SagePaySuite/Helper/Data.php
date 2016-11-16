@@ -382,9 +382,11 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function undertocamel($str)
     {
-        $str[0] = strtoupper($str[0]);
-
-        return preg_replace('/_([a-z])/e', "strtoupper('\\1')", $str);
+        $pieces = explode("_", $str);
+        for ($i=0;$i<count($pieces);$i++) {
+            $pieces[$i][0] = strtoupper($pieces[$i][0]);
+        }
+        return $str = implode($pieces);
     }
 
     public function cameltounder($str)
