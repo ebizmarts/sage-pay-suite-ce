@@ -124,6 +124,7 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Transaction extends Mage_Core_Mo
                         ->setReleased(($details->getReleased() ? 1 : 0))
                         ->setAborted(($details->getAborted() ? 1 : 0))
                         ->setSurchargeAmount($details->getSurcharge())
+                        ->setRedFraudResponse($details->getFraudscreenrecommendation())
                         ->setVoided((((int)$details->getTxstateid() == 18) ? 1 : 0))
                         ->save();
 
