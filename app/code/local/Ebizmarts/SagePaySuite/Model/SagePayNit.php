@@ -378,7 +378,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
 
     protected function _postRequest(Varien_Object $request, $callback3D = false) {
 
-        $result = Mage::getModel('sagepaysuite/Sagepaysuite_result');
+        $result = Mage::getModel('sagepaysuite/sagepaysuite_result');
 
         $mode = (($request->getMode()) ? $request->getMode() : null);
 
