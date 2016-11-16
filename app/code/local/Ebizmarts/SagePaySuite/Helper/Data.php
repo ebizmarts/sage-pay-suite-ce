@@ -115,8 +115,9 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
      * Return module User-Agent string
      * @return string User agent
      */
-    public function getUserAgent() {
-        $v = (string) Mage::getConfig()->getNode('modules/Ebizmarts_SagePaySuite/version');
+    public function getUserAgent()
+    {
+        $v = (string)Mage::getConfig()->getNode('modules/Ebizmarts_SagePaySuite/version');
         return "Ebizmarts/SagePaySuite CE(v{$v})";
     }
 
@@ -189,7 +190,10 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         return (bool)in_array($code, $this->_sageMethods);
     }
 
-    public function F91B2E37D34E5DC4FFC59C324BDC1157C()  { return true; }
+    public function F91B2E37D34E5DC4FFC59C324BDC1157C()
+    {
+        return true;
+    }
 
     public function getCcImage($cname)
     {
@@ -566,7 +570,8 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         return preg_replace($patterns, $replacements, $request);
     }
 
-    public function validateQuote() {
+    public function validateQuote()
+    {
 
         if ((int)Mage::getStoreConfig('payment/sagepaysuite/validate_quote') === 1) {
             $quote = Mage::getSingleton('sagepaysuite/api_payment')->getQuote();
@@ -733,6 +738,30 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
             $output = (int)$avscv2;
         }
         return $output;
+    }
+
+    /**
+     * @param array $parameters
+     * @return array
+     */
+    public function sanitizeParamsForQuery(array $parameters)
+    {
+        $return = array();
+
+        foreach ($parameters as $_key => $_param) {
+            $return [$_key] = $this->_encodeParamForQuery($_param);
+        }
+        return $return;
+    }
+
+    private function _encodeParamForQuery($string)
+    {
+        return rawurlencode($string);
+    }
+
+    public function decodeParamFromQuery($string)
+    {
+        return rawurldecode($string);
     }
 
 }

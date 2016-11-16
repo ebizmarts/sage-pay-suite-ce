@@ -103,7 +103,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
                     ->setLastSuccessQuoteId(Mage::app()->getRequest()->getParam('qide'))
                     ->setLastQuoteId(Mage::app()->getRequest()->getParam('qide'))
                     ->setLastOrderId(Mage::app()->getRequest()->getParam('oide'))
-                    ->setLastRealOrderId(Mage::app()->getRequest()->getParam('incide'));
+                    ->setLastRealOrderId(Mage::helper('sagepaysuite')->decodeParamFromQuery(Mage::app()->getRequest()->getParam('incide')));
 
                 $autoInvoice = (int)Mage::app()->getRequest()->getParam('inv');
                 if($autoInvoice) {

@@ -91,7 +91,7 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
                     ->setLastSuccessQuoteId($this->getRequest()->getParam('qide'))
                     ->setLastQuoteId($this->getRequest()->getParam('qide'))
                     ->setLastOrderId($this->getRequest()->getParam('oide'))
-                    ->setLastRealOrderId($this->getRequest()->getParam('incide'));
+                    ->setLastRealOrderId(Mage::helper('sagepaysuite')->decodeParamFromQuery($this->getRequest()->getParam('incide')));
 
                 //set invoice flag
                 $autoInvoice = (int)$this->getRequest()->getParam('inv');
@@ -109,12 +109,14 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
                 }
             }
 
-            $successUrl = Mage::getModel('core/url')->getUrl('checkout/onepage/success', array('_secure' => true,
+            $_succuessParams = Mage::helper('sagepaysuite')->sanitizeParamsForQuery(
+                array('_secure' => true,
                 'oide' => $this->getRequest()->getParam('oide'),
                 'qide' => $this->getRequest()->getParam('qide'),
                 'incide' => $this->getRequest()->getParam('incide'),
                 'inv' => $this->getRequest()->getParam('inv')));
 
+            $successUrl = Mage::getModel('core/url')->getUrl('checkout/onepage/success', $_succuessParams);
 
             //recover multishipping data
             if($this->getRequest()->getParam('multishipping')) {
