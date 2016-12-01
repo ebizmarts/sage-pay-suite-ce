@@ -2,7 +2,7 @@
 
 class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Session extends Mage_Core_Model_Abstract
 {
-	 /** Order instance
+     /** Order instance
      *
      * @var Mage_Sales_Model_Order
      */

@@ -7,7 +7,8 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_Action {
+class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_Action
+{
 
     protected $_eoln = Ebizmarts_SagePaySuite_Model_Api_Payment::RESPONSE_DELIM_CHAR;
 
@@ -16,15 +17,18 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
      *
      * @return Mage_Customer_Model_Session
      */
-    protected function _getSession() {
+    protected function _getSession() 
+    {
         return Mage::getSingleton('customer/session');
     }
 
-    protected function _getServerRegisterCard() {
+    protected function _getServerRegisterCard() 
+    {
         return Mage::getModel('sagepaysuite/sagePayToken')->registerCard();
     }
 
-    public function serverformAction() {
+    public function serverformAction() 
+    {
         $rs = $this->_getServerRegisterCard();
 
         if (!isset($rs['NextURL'])) {
@@ -44,7 +48,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         return;
     }
 
-    public function registerAction() {
+    public function registerAction() 
+    {
 
         /*
          * DIRECT POST
@@ -66,7 +71,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
             }
 
             if ($rs['Status'] == 'OK') {
-
                 //Save token card to database
                 $tokenData = array(
                     'Token'        => $rs['Token'],
@@ -99,7 +103,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                     $rs   = array_change_key_case($rs);
                     $resp = $rs;
                 }
-
             } else {
                 $rs = array_change_key_case($rs);
                 $resp = $rs;
@@ -107,6 +110,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 
             return $this->getResponse()->setBody(Zend_Json::encode($resp));
         }
+
         /*
          * DIRECT POST
          */
@@ -114,15 +118,12 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         $url = '';
 
         if (false === Mage::getModel('sagepaysuite/sagePayToken')->customerCanAddCard()) {
-
             $url = 'ERROR';
             $text = $this->__('You can\'t add more cards, please delete one if you want to add another.');
         } else {
-
             $int = $this->_getTokenIntegrationType();
 
             if ($int == 'server') {
-
                 $rs = $this->_getServerRegisterCard();
 
                 if ($rs['Status'] == 'OK') {
@@ -146,8 +147,10 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         return $this->getResponse()->setBody(Zend_Json::encode(array('text' => $text, 'url' => $url)));
     }
 
-    public function closeserverformAction() {
-        return $this->getResponse()->setBody('<html>
+    public function closeserverformAction() 
+    {
+        return $this->getResponse()->setBody(
+            '<html>
                                                     <body>
                                                         <script type="text/javascript">
 															if ( window.parent.$(\'multishipping-billing-form\') ){
@@ -160,11 +163,14 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 																	   });
 														</script>
                                                     </body>
-                                                </html>');
+                                                </html>'
+        );
     }
 
-    public function closeserverabortformAction() {
-        return $this->getResponse()->setBody('<html>
+    public function closeserverabortformAction() 
+    {
+        return $this->getResponse()->setBody(
+            '<html>
                                                     <body>
                                                         <script type="text/javascript">
 															window.parent.Control.Window.windows.each(function(w){
@@ -175,7 +181,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 															window.parent.checkout.accordion.openSection("opc-payment");
 														</script>
                                                     </body>
-                                                </html>');
+                                                </html>'
+        );
     }
 
     public function registerSuccessAction()
@@ -185,7 +192,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
             $this->_redirect('*/card/');
             return;
         } else {
-            return $this->getResponse()->setBody('<html>
+            return $this->getResponse()->setBody(
+                '<html>
                                                     <body>
                                                         <!--<h2>' . $this->__('Redirecting') . '</h2>-->
 														<div style="background-image:url(' . Mage::helper('sagepaysuite')->getIndicator() . '); background-position: center center;background-repeat: no-repeat;height: 400px;">&nbsp;</div>
@@ -204,7 +212,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 															}
 														</script>
                                                     </body>
-                                                </html>');
+                                                </html>'
+            );
         }
     }
 
@@ -215,7 +224,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
             $this->_redirect('*/card/');
             return;
         } else {
-            return $this->getResponse()->setBody('<html>
+            return $this->getResponse()->setBody(
+                '<html>
                                                     <body>
                                                         <!--<h2>' . $this->__('Redirecting') . '</h2>-->
 														<div style="background-image:url(' . Mage::helper('sagepaysuite')->getIndicator() . '); background-position: center center;background-repeat: no-repeat;height: 400px;">&nbsp;</div>
@@ -228,7 +238,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 															}
 														</script>
                                                     </body>
-                                                </html>');
+                                                </html>'
+            );
         }
     }
 
@@ -237,16 +248,16 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
      *
      * @return string
      */
-    public function registerPostAction() {
+    public function registerPostAction() 
+    {
 
         $post = $this->getRequest()->getPost();
 
-        $paramCustomerId = $this->getRequest()->getParam('cid','');
+        $paramCustomerId = $this->getRequest()->getParam('cid', '');
 
         $response = '';
 
         if ($post['Status'] == 'OK') {
-
             $post['protocol'] = 'direct';
             if (array_key_exists('ExpiryDate', $post)) {
                 $post['protocol'] = 'server';
@@ -277,13 +288,10 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                 $response .= 'RedirectURL=' . Mage::getUrl('sgps/card/registerAbort') . '?SID=' . $this->getRequest()->getParam('SID', '') . $this->_eoln;
                 $response .= 'StatusDetail='.Mage::helper('sagepaysuite')->__('Credit card could not be saved for future use. You already have this card attached to your account or you have reached your account\'s maximum card storage capacity.') . $this->_eoln;
             }
-
         } else if ($post['Status'] == 'ABORT') {
-
             $response .= 'Status=OK' . $this->_eoln;
             $response .= 'RedirectURL=' . Mage::getUrl('sgps/card/registerAbort') . '?SID=' . $this->getRequest()->getParam('SID', '') . $this->_eoln;
             $response .= 'StatusDetail=Card registering was aborted. ' . $post['StatusDetail'] . $this->_eoln;
-
         }
 
 
@@ -291,7 +299,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         return $this->getResponse()->setBody($response);
     }
 
-    public function indexAction() {
+    public function indexAction() 
+    {
         if (!$this->_getCustomerId()) {
             Mage::getSingleton('customer/session')->authenticate($this);
             return;
@@ -304,6 +313,7 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         if ($navigationBlock = $this->getLayout()->getBlock('customer_account_navigation')) {
             $navigationBlock->setActive('sgps/card');
         }
+
         if ($block = $this->getLayout()->getBlock('customer.account.link.back')) {
             $block->setRefererUrl($this->_getRefererUrl());
         }
@@ -317,7 +327,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
      *
      * @return string(JSON)
      */
-    public function updateNicknameAction(){
+    public function updateNicknameAction()
+    {
 
 
         $resp = array('st' => 'nok', 'text' => '');
@@ -334,7 +345,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         $objCard = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->load($cardId);
 
         if ($objCard->getId()) {
-
             # Check if card is from this customer
             if ($objCard->getCustomerId() != $this->_getCustomerId()) {
                 $resp ['text'] = $this->__('Invalid Card #');
@@ -354,7 +364,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                 $this->getResponse()->setBody(Zend_Json::encode($resp));
                 return;
             }
-
         }else{
             $resp ['text'] = $this->__('The requested Card does not exist.');
             $this->getResponse()->setBody(Zend_Json::encode($resp));
@@ -367,7 +376,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
      *
      * @return string
      */
-    public function deleteAction() {
+    public function deleteAction() 
+    {
         $resp = array('st' => 'nok', 'text' => '');
 
         if (!Mage::getSingleton('customer/session')->authenticate($this)) {
@@ -380,7 +390,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 
         $objCard = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->load($cardId);
         if ($objCard->getId()) {
-
             # Check if card is from this customer
             if ($objCard->getCustomerId() != $this->_getCustomerId()) {
                 $resp ['text'] = $this->__('Invalid Card #');
@@ -392,7 +401,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                 $delete = Mage::getModel('sagepaysuite/sagePayToken')->removeCard($objCard->getToken(), $objCard->getProtocol());
 
                 if ($delete['Status'] == 'OK' || (1 === preg_match('/^4057/i', $delete['StatusDetail']))) {
-
                     $objCard->delete();
 
                     $resp ['text'] = $this->__('Success!');
@@ -405,7 +413,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                     return;
                 }
             } catch (Exception $e) {
-
                 $resp ['text'] = $this->__($e->getMessage());
                 $this->getResponse()->setBody(Zend_Json::encode($resp));
                 return;
@@ -420,7 +427,8 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
     /*
      * Set default card
      */
-    public function defaultAction() {
+    public function defaultAction() 
+    {
         $resp = array('st' => 'nok', 'text' => '');
 
         if (!Mage::getSingleton('customer/session')->authenticate($this)) {
@@ -433,7 +441,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
 
         $objCard = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->load($cardId);
         if ($objCard->getId()) {
-
             # Check if card is from this customer
             if ($objCard->getCustomerId() != $this->_getCustomerId()) {
                 $resp ['text'] = $this->__('Invalid Card #');
@@ -442,7 +449,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
             }
 
             try {
-
                 $objCard->setIsDefault(1)
                         ->save();
 
@@ -451,7 +457,6 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
                 $this->getResponse()->setBody(Zend_Json::encode($resp));
                 return;
             } catch (Exception $e) {
-
                 $resp ['text'] = $this->__($e->getMessage());
                 $this->getResponse()->setBody(Zend_Json::encode($resp));
                 return;
@@ -463,11 +468,13 @@ class Ebizmarts_SagePaySuite_CardController extends Mage_Core_Controller_Front_A
         return;
     }
 
-    protected function _getCustomerId() {
+    protected function _getCustomerId() 
+    {
         return (int) Mage::getModel('sagepaysuite/sagePayToken')->getSessionCustomerId();
     }
 
-    protected function _getTokenIntegrationType() {
+    protected function _getTokenIntegrationType() 
+    {
         return (string) Mage::getStoreConfig('payment/sagepaysuite/token_integration');
     }
 

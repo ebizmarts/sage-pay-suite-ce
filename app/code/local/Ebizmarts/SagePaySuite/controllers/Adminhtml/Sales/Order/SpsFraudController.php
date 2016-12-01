@@ -42,7 +42,6 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsFraudController extends Ma
 
             $orderIds = $this->getRequest()->getPost('order_ids', array());
             foreach ($orderIds as $orderId) {
-
                 $_order = Mage::getModel('sales/order')->load($orderId);
                 $rs = $this->getFraud()->getTransactionDetails($_order->getVendorTxCode());
 
@@ -64,9 +63,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsFraudController extends Ma
                         $this->_getSession()->addError($_order->getVendorTxCode().' '.$e->getMessage);
                     }
                 }
-
             }
-
          }else{
             $orderId = $this->getRequest()->getParam('order_id');
 
@@ -78,7 +75,6 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsFraudController extends Ma
                 $this->_redirectReferer();
                 return;
             }else{
-
                 $xml = new Varien_Simplexml_Element($rs);
 
                 if((string)$xml->errorcode != '0000'){
@@ -93,7 +89,6 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsFraudController extends Ma
                     }
                 }
             }
-
          }
 
          $this->_redirectReferer();
@@ -105,7 +100,8 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsFraudController extends Ma
         return Mage::getModel('sagepayreporting/sagepayreporting');
     }
 
-    protected function _isAllowed() {
+    protected function _isAllowed() 
+    {
         $acl = 'sales/sagepay/sagepayreporting/fraud_info_orders';
         return Mage::getSingleton('admin/session')->isAllowed($acl);
     }

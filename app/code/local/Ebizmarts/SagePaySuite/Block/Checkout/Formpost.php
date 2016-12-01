@@ -10,10 +10,10 @@
 class Ebizmarts_SagePaySuite_Block_Checkout_Formpost extends Mage_Core_Block_Template
 {
 
-	public function getFormModel()
-	{
-		return Mage::getModel('sagepaysuite/sagePayForm');
-	}
+    public function getFormModel()
+    {
+        return Mage::getModel('sagepaysuite/sagePayForm');
+    }
 
     protected function _toHtml()
     {

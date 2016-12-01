@@ -5,7 +5,8 @@ $connection = $installer->getConnection();
 
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
 
     -- -----------------------------------------------------
     -- Table `{$this->getTable('sagepaysuite_transaction_queue')}`
@@ -23,6 +24,7 @@ $installer->run("
       PRIMARY KEY (`id`) )
     ENGINE = MYISAM DEFAULT CHARSET=utf8;
 
-");
+"
+);
 
 $installer->endSetup();

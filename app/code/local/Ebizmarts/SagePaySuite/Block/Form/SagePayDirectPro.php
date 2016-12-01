@@ -22,18 +22,18 @@ class Ebizmarts_SagePaySuite_Block_Form_SagePayDirectPro extends Ebizmarts_SageP
     {
         parent::_construct();
 
-		$this->setTemplate('sagepaysuite/payment/form/sagePayDirectProWithToken.phtml');
+        $this->setTemplate('sagepaysuite/payment/form/sagePayDirectProWithToken.phtml');
     }
 
-	public function allowGiftAid()
-	{
-		return (bool)((int)$this->getMethod()->getConfigData('allow_gift_aid') === 1);
-	}
+    public function allowGiftAid()
+    {
+        return (bool)((int)$this->getMethod()->getConfigData('allow_gift_aid') === 1);
+    }
 
-	public function getCcImg($cc)
-	{
-		return $this->helper('sagepaysuite')->getCcImage($this->helper('sagepaysuite')->getCardLabel($cc->getCardType(), false));
-	}
+    public function getCcImg($cc)
+    {
+        return $this->helper('sagepaysuite')->getCcImage($this->helper('sagepaysuite')->getCardLabel($cc->getCardType(), false));
+    }
 
     /*
     * Whether switch/solo card type available
@@ -45,6 +45,7 @@ class Ebizmarts_SagePaySuite_Block_Form_SagePayDirectPro extends Ebizmarts_SageP
         if ($availableTypes && count($ssPresenations) > 0) {
             return true;
         }
+
         return false;
     }
 
@@ -62,6 +63,7 @@ class Ebizmarts_SagePaySuite_Block_Form_SagePayDirectPro extends Ebizmarts_SageP
                 }
             }
         }
+
         return $types;
     }
 
@@ -78,6 +80,7 @@ class Ebizmarts_SagePaySuite_Block_Form_SagePayDirectPro extends Ebizmarts_SageP
            $months = array_merge($months, $this->_getConfig()->getMonths());
            $this->setData('cc_start_months', $months);
        }
+
        return $months;
     }
 
@@ -116,6 +119,7 @@ class Ebizmarts_SagePaySuite_Block_Form_SagePayDirectPro extends Ebizmarts_SageP
                 }
             }
         }
+
         return $types;
     }
 

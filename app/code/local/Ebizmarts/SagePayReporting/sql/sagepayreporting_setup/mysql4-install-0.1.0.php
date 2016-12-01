@@ -4,7 +4,8 @@ $installer = $this;
 
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
 
     -- -----------------------------------------------------
     -- Table `{$this->getTable('sagepayreporting_fraud')}`
@@ -24,10 +25,13 @@ $installer->run("
       PRIMARY KEY (`id`) )
     ENGINE = MYISAM DEFAULT CHARSET=utf8;
 
-");
+"
+);
 
-$installer->run("
+$installer->run(
+    "
 	ALTER TABLE `{$this->getTable('sagepayreporting_fraud')}` ADD INDEX `IDX_SAGEPAYREPORTING_FRAUD_ORDER_ID` (`order_id`);
-");
+"
+);
 
 $installer->endSetup();

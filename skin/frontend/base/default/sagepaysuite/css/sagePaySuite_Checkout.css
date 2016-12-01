@@ -10,15 +10,15 @@ iframe#sage-pay-server-iframe {border:none;height:500px;width:600px;}
 iframe#sagepaysuite-server-incheckout-iframe { border:none;height:840px;width:100%; }
 
 #control_overlay {
-	background-color:#000;
+    background-color:#000;
 }
 
 .modal-sagepaysuite {
     -webkit-border-radius: 8px 8px 8px 8px;  /* Safari, Chrome (before WebKit version 533) */
-	-moz-border-radius: 8px 8px 8px 8px; /* Firefox up to version 3.6 */
-	background: url(../images/border-bg.png) repeat scroll 0 0 transparent;
-	padding:10px;
-	border:4px;
+    -moz-border-radius: 8px 8px 8px 8px; /* Firefox up to version 3.6 */
+    background: url(../images/border-bg.png) repeat scroll 0 0 transparent;
+    padding:10px;
+    border:4px;
 }
 
 div.lcontainer { background:#FFF; width:100%; height:100%; overflow:auto; }

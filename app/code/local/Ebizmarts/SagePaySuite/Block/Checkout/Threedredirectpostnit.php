@@ -7,15 +7,17 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Block_Checkout_Threedredirectpostnit extends Mage_Core_Block_Template {
+class Ebizmarts_SagePaySuite_Block_Checkout_Threedredirectpostnit extends Mage_Core_Block_Template
+{
 
-    protected function _getSageSession() {
+    protected function _getSageSession() 
+    {
         return Mage :: getModel('sagepaysuite/api_payment')->getSageSuiteSession();
     }
 
-    protected function _toHtml() {
+    protected function _toHtml() 
+    {
         try {
-
             $vendorTxCode = $this->getRequest()->getParam('txc');
             $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                 ->loadByVendorTxCode($vendorTxCode);
@@ -27,12 +29,16 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Threedredirectpostnit extends Mage_C
                 ->setMethod('POST')
                 ->setUseContainer(true);
 
-            $form->addField('PaReq', 'hidden', array (
+            $form->addField(
+                'PaReq', 'hidden', array (
                 'name' => 'PaReq',
-                'value' => $transaction->getPareq()));
-            $form->addField('MD', 'hidden', array (
+                'value' => $transaction->getPareq())
+            );
+            $form->addField(
+                'MD', 'hidden', array (
                 'name' => 'MD',
-                'value' => $transaction->getMd()));
+                'value' => $transaction->getMd())
+            );
 
             $params = array (
                 '_secure' => true,
@@ -40,10 +46,12 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Threedredirectpostnit extends Mage_C
                 'v'        => $vendorTxCode
             );
             $postUrl = Mage::getModel('core/url')->addSessionParam()->getUrl('sgps/nitPayment/callback3d', $params);
-            $form->addField('TermUrl', 'hidden', array (
+            $form->addField(
+                'TermUrl', 'hidden', array (
                 'name' => 'TermUrl',
                 'value' => $postUrl
-            ));
+                )
+            );
 
             $html = '<html><body>';
             $html .= '<code>' . $this->__('Loading 3D secure form...') . '</code>';
@@ -53,7 +61,6 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Threedredirectpostnit extends Mage_C
 
             Sage_Log::log($vendorTxCode, null, 'SagePaySuite_REQUEST.log');
             Sage_Log::log($html, null, 'SagePaySuite_REQUEST.log');
-
         } catch (Exception $e) {
             Sage_Log::logException($e);
         }

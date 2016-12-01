@@ -1,6 +1,7 @@
 <?php
 
-class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
+class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+{
 
     /**
      * Renders grid column
@@ -8,7 +9,8 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State ext
      * @param   Varien_Object $row
      * @return  string
      */
-    public function render(Varien_Object $row) {
+    public function render(Varien_Object $row) 
+    {
 
         $result = parent::render($row);
 
@@ -16,9 +18,7 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State ext
             ->load($row->getId(), 'id');
 
         if ($transaction->getId()) {
-
             if (((string) Mage::getStoreConfig('payment/sagepaysuite/sync_mode')) === 'sync') {
-
                 //check date, if transaction is newer than 7 days check status otherwise just show
                 $datetime1 = new DateTime($row->getCreatedAt());
                 $datetime2 = new DateTime(Mage::getModel('core/date')->gmtDate(null, "-3 day"));
@@ -49,13 +49,13 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State ext
                 $redTitle = $this->__("ReD Status: %s.", $red);
                 $result .= '&nbsp;&nbsp;<img src="' . $this->_redFraudIcon($fraud->getThirdmanScore()) . '" title="' . $redTitle . '" />';
             }
-
         }
 
         return $result;
     }
 
-    protected function _redFraudIcon($status) {
+    protected function _redFraudIcon($status) 
+    {
         switch (strtoupper($status)) {
             case 'ACCEPT':
                 return $this->_shield("check");
@@ -72,7 +72,8 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State ext
         }
     }
 
-    protected function _fraudIcon($score) {
+    protected function _fraudIcon($score) 
+    {
 
         if ($score < 30) {
             $type = "check";
@@ -85,7 +86,8 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State ext
         return $this->_shield($type);
     }
 
-    protected function _icon($txStateId) {
+    protected function _icon($txStateId) 
+    {
 
         switch ($txStateId) {
             case 1:
@@ -130,7 +132,8 @@ class Ebizmarts_SagePaysuite_Block_Adminhtml_Transaction_Grid_Renderer_State ext
         return $this->_shield($type);
     }
 
-    protected function _shield($type) {
+    protected function _shield($type) 
+    {
         return $this->getSkinUrl("sagepaysuite/images/flags/icon-shield-{$type}.png");
     }
 

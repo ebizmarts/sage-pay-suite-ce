@@ -14,7 +14,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_System_Config_Fieldset_Global
      *
      * @var string
      */
-	protected $_template = 'sagepaysuite/system/config/fieldset/global.phtml';
+    protected $_template = 'sagepaysuite/system/config/fieldset/global.phtml';
 
     /**
      * Render fieldset html
@@ -28,11 +28,14 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_System_Config_Fieldset_Global
             $htmlId = $element->getHtmlId();
             $this->_elements[$htmlId] = $element;
         }
+
         $originalData = $fieldset->getOriginalData();
-        $this->addData(array(
+        $this->addData(
+            array(
             'fieldset_label' => $fieldset->getLegend(),
             'fieldset_help_url' => isset($originalData['help_url']) ? $originalData['help_url'] : '',
-        ));
+            )
+        );
         return $this->toHtml();
     }
 }

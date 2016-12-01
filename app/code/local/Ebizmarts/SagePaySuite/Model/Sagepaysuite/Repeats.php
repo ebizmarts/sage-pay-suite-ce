@@ -11,17 +11,17 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Repeats extends Mage_Core_Model_
     }
 
 
-	public function addLog($result, $parentId, $repeated, $currency)
-	{
-		$this->setParentId($parentId)
-		->setStatus($result->getResponseStatus())
-		->setStatusDetail($result->getResponseStatusDetail())
-		->setVpsTxId($result->getVPsTxId())
-		->setTxAuthNo($result->getTxAuthNo())
-		->setAmountRepeated($repeated)
-		->setCurrency($currency)
-		->setRepeatedOn(date('Y-m-d H:i:s'))
-		->save();
-	}
+    public function addLog($result, $parentId, $repeated, $currency)
+    {
+        $this->setParentId($parentId)
+        ->setStatus($result->getResponseStatus())
+        ->setStatusDetail($result->getResponseStatusDetail())
+        ->setVpsTxId($result->getVPsTxId())
+        ->setTxAuthNo($result->getTxAuthNo())
+        ->setAmountRepeated($repeated)
+        ->setCurrency($currency)
+        ->setRepeatedOn(date('Y-m-d H:i:s'))
+        ->save();
+    }
 
 }

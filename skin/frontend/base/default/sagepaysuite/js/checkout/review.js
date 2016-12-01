@@ -16,11 +16,12 @@ OrderReviewController.prototype = {
      * @param shippingSubmitForm - form of shipping method submission (optional, requires shippingSelect)
      * @param shippingResultId - element where to update results of shipping ajax submission (optional, requires shippingSubmitForm)
      */
-    initialize : function(orderForm, orderFormSubmit, shippingSelect, shippingSubmitForm, shippingResultId, shippingSubmit)
-    {
+    initialize : function (orderForm, orderFormSubmit, shippingSelect, shippingSubmitForm, shippingResultId, shippingSubmit) {
+    
         if (!orderForm) {
             return;
         }
+
         this.form = orderForm;
         if (orderFormSubmit) {
             this.formSubmit = orderFormSubmit;
@@ -40,8 +41,8 @@ OrderReviewController.prototype = {
      * Register element that should show up when ajax request is in progress
      * @param element
      */
-    addPleaseWait : function(element)
-    {
+    addPleaseWait : function (element) {
+    
         if (element) {
             this._pleaseWait = element;
         }
@@ -53,24 +54,27 @@ OrderReviewController.prototype = {
      * @param url - url where to submit shipping method
      * @param resultId - id of element to be updated
      */
-    _submitShipping : function(event, url, resultId)
-    {
+    _submitShipping : function (event, url, resultId) {
+    
         if (this.shippingSelect && url && resultId) {
             this._updateOrderSubmit(true);
             if (this._pleaseWait) {
                 this._pleaseWait.show();
             }
+
             if ('' != this.shippingSelect.value) {
-                new Ajax.Updater(resultId, url, {
+                new Ajax.Updater(
+                    resultId, url, {
                     parameters: {isAjax:true, shipping_method:this.shippingSelect.value},
-                    onComplete: function() {
+                    onComplete: function () {
                         if (this._pleaseWait) {
                             this._pleaseWait.hide();
                         }
                     }.bind(this),
                     onSuccess: this._onSubmitShippingSuccess.bind(this),
                     evalScripts: true
-                });
+                    }
+                );
             }
         }
     },
@@ -78,8 +82,8 @@ OrderReviewController.prototype = {
     /**
      * Attempt to submit order
      */
-    _submitOrder : function()
-    {
+    _submitOrder : function () {
+    
         if (this._canSubmitOrder) {
             this.form.submit();
             this._updateOrderSubmit(true);
@@ -92,8 +96,8 @@ OrderReviewController.prototype = {
     /**
      * Explicitly enable order submission
      */
-    _onSubmitShippingSuccess : function()
-    {
+    _onSubmitShippingSuccess : function () {
+    
         this._updateOrderSubmit(false);
         if (this.onSubmitShippingSuccess) {
             this.onSubmitShippingSuccess();
@@ -105,8 +109,8 @@ OrderReviewController.prototype = {
      * Also disables form submission element, if any
      * @param shouldDisable - whether should prevent order submission explicitly
      */
-    _updateOrderSubmit : function(shouldDisable)
-    {
+    _updateOrderSubmit : function (shouldDisable) {
+    
         var isDisabled = shouldDisable || !this.shippingSelect || '' == this.shippingSelect.value;
         this._canSubmitOrder = !isDisabled;
         if (this.formSubmit) {

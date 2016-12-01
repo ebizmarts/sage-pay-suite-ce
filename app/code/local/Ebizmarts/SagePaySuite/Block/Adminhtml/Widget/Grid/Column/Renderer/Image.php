@@ -18,11 +18,11 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Widget_Grid_Column_Renderer_Image e
         $data = parent::_getValue($row);
         $string = is_null($data) ? $defaultValue : $data;
 
-		if(false !== strpos($string, 'NOT')){
-			$string = $this->getSkinUrl('sagepaysuite/images/flag_red.png');
-		}else if(false !== strpos($string, 'OK')){
-			$string = $this->getSkinUrl('sagepaysuite/images/flag_green.png');
-		}
+        if(false !== strpos($string, 'NOT')){
+            $string = $this->getSkinUrl('sagepaysuite/images/flag_red.png');
+        }else if(false !== strpos($string, 'OK')){
+            $string = $this->getSkinUrl('sagepaysuite/images/flag_green.png');
+        }
 
         return '<img src="'. $string .'" alt="' . $data . '" title="' . $data . '" />';
     }

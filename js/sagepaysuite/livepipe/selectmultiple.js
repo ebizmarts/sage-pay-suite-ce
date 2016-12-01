@@ -11,23 +11,25 @@
 
 if(typeof(Prototype) == "undefined") {
     throw "Control.SelectMultiple requires Prototype to be loaded."; }
+
 if(typeof(Object.Event) == "undefined") {
     throw "Control.SelectMultiple requires Object.Event to be loaded."; }
 
-Control.SelectMultiple = Class.create({
+Control.SelectMultiple = Class.create(
+    {
     select: false,
     container: false,
     numberOfCheckedBoxes: 0,
     checkboxes: [],
     hasExtraOption: false,
-    initialize: function(select,container,options){
+    initialize: function (select,container,options) {
         this.options = {
             checkboxSelector: 'input[type=checkbox]',
             nameSelector: 'span.name',
             labelSeparator: ', ',
             valueSeparator: ',',
             afterChange: Prototype.emptyFunction,
-            overflowString: function(str){
+            overflowString: function (str) {
                 return str.truncate();
             },
             overflowLength: 30
@@ -44,72 +46,93 @@ Control.SelectMultiple = Class.create({
             this.setValue(this.options.value);
             delete this.options.value;
         }
+
         this.hasExtraOption = false;
-        this.checkboxes.each(function(checkbox){
-         checkbox.observe('click',this.checkboxOnClick.bind(this,checkbox));
-        }.bind(this));
+        this.checkboxes.each(
+            function (checkbox) {
+            checkbox.observe('click',this.checkboxOnClick.bind(this,checkbox));
+            }.bind(this)
+        );
         this.select.observe('change',this.selectOnChange.bind(this));
         this.countAndCheckCheckBoxes();
         if(!value_was_set) {
          this.scanCheckBoxes(); }
+
         this.notify('afterChange',this.select.options[this.select.options.selectedIndex].value);
     },
-    countAndCheckCheckBoxes: function(){
-        this.numberOfCheckedBoxes = this.checkboxes.inject(0,function(number,checkbox){
+    countAndCheckCheckBoxes: function () {
+        this.numberOfCheckedBoxes = this.checkboxes.inject(
+            0,function (number,checkbox) {
             checkbox.checked = (this.select.options[this.select.options.selectedIndex].value == checkbox.value);
             var value_string = this.select.options[this.select.options.selectedIndex].value;
             var value_collection = $A(value_string.split ? value_string.split(this.options.valueSeparator) : value_string);
-            var should_check = value_collection.any(function(value) {
+            var should_check = value_collection.any(
+                function (value) {
                 if (!should_check && checkbox.value == value) {
                     return true; }
-            }.bind(this));
+                }.bind(this)
+            );
             checkbox.checked = should_check;
             if(checkbox.checked) {
                 ++number; }
+
             return number;
-        }.bind(this));
+            }.bind(this)
+        );
     },
-    setValue: function(value_string){
+    setValue: function (value_string) {
         this.numberOfCheckedBoxes = 0;
         var value_collection = $A(value_string.split ? value_string.split(this.options.valueSeparator) : value_string);
-        this.checkboxes.each(function(checkbox){
+        this.checkboxes.each(
+            function (checkbox) {
             checkbox.checked = false;
-            value_collection.each(function(value){
+            value_collection.each(
+                function (value) {
                 if(checkbox.value == value){
                     ++this.numberOfCheckedBoxes;
                     checkbox.checked = true;
                 }
-            }.bind(this));
-        }.bind(this));
+                }.bind(this)
+            );
+            }.bind(this)
+        );
         this.scanCheckBoxes();
     },
-    selectOnChange: function(){
+    selectOnChange: function () {
         this.removeExtraOption();
         this.countAndCheckCheckBoxes();
         this.notify('afterChange',this.select.options[this.select.options.selectedIndex].value);
     },
-    checkboxOnClick: function(checkbox){
-        this.numberOfCheckedBoxes = this.checkboxes.findAll(function (c) { 
+    checkboxOnClick: function (checkbox) {
+        this.numberOfCheckedBoxes = this.checkboxes.findAll(
+            function (c) { 
             return c.checked; 
-        }).length;
+            }
+        ).length;
         this.scanCheckBoxes();
-        this.notify('afterChange', this.numberOfCheckedBoxes === 0 ? "" :
-            this.select.options[this.select.options.selectedIndex].value);
+        this.notify(
+            'afterChange', this.numberOfCheckedBoxes === 0 ? "" :
+            this.select.options[this.select.options.selectedIndex].value
+        );
     },
-    scanCheckBoxes: function(){
+    scanCheckBoxes: function () {
         switch(this.numberOfCheckedBoxes){
             case 1:
-                this.checkboxes.each(function(checkbox){
+                this.checkboxes.each(
+                    function (checkbox) {
                     if(checkbox.checked){
-                        $A(this.select.options).each(function(option,i){
+                        $A(this.select.options).each(
+                            function (option,i) {
                             if(option.value == checkbox.value){
                                 this.select.options.selectedIndex = i;
                                 throw $break;
                             }
-                        }.bind(this));
+                            }.bind(this)
+                        );
                         throw $break;
                     }
-                }.bind(this));
+                    }.bind(this)
+                );
                 break;
             case 0:
                 this.removeExtraOption();
@@ -119,37 +142,44 @@ Control.SelectMultiple = Class.create({
                 break;
         }
     },
-    getLabelForExtraOption: function(){
+    getLabelForExtraOption: function () {
         var label = (typeof(this.options.nameSelector) == 'function' ? 
             this.options.nameSelector.bind(this)() : 
-            this.container.getElementsBySelector(this.options.nameSelector).inject([],function(labels,name_element,i){
+            this.container.getElementsBySelector(this.options.nameSelector).inject(
+                [],function (labels,name_element,i) {
                 if(this.checkboxes[i].checked) {
                     labels.push(name_element.innerHTML); }
+
                 return labels;
-            }.bind(this))
+                }.bind(this)
+            )
         ).join(this.options.labelSeparator);
         return (label.length >= this.options.overflowLength && this.options.overflowLength > 0) ? 
             (typeof(this.options.overflowString) == 'function' ? this.options.overflowString(label) : this.options.overflowString) : 
             label;
     },
-    getValueForExtraOption: function(){
-        return this.checkboxes.inject([],function(values,checkbox){
+    getValueForExtraOption: function () {
+        return this.checkboxes.inject(
+            [],function (values,checkbox) {
             if(checkbox.checked) {
                 values.push(checkbox.value); }
+
             return values;
-        }).join(this.options.valueSeparator);
+            }
+        ).join(this.options.valueSeparator);
     },
-    addExtraOption: function(){
+    addExtraOption: function () {
         this.removeExtraOption();
         this.hasExtraOption = true;
         this.select.options[this.select.options.length] = new Option(this.getLabelForExtraOption(),this.getValueForExtraOption());
         this.select.options.selectedIndex = this.select.options.length - 1;
     },
-    removeExtraOption: function(){
+    removeExtraOption: function () {
         if(this.hasExtraOption){
             this.select.remove(this.select.options.length - 1);
             this.hasExtraOption = false;
         }
     }
-});
+    }
+);
 Object.Event.extend(Control.SelectMultiple);

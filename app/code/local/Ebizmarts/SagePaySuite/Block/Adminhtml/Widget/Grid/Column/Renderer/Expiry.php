@@ -18,7 +18,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Widget_Grid_Column_Renderer_Expiry 
         $data = parent::_getValue($row);
         $string = is_null($data) ? $defaultValue : $data;
 
-		$string = $this->helper('sagepaysuite')->getCardNiceDate($string);
+        $string = $this->helper('sagepaysuite')->getCardNiceDate($string);
 
         return htmlspecialchars($string);
     }

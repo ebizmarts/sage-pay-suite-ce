@@ -126,6 +126,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
                 $this->_getSagePayServerSession()->setGroupId($post['order']['account']['group_id']);
                 $groupId = $post['order']['account']['group_id'];
             }
+
             if (array_key_exists('email', $post['order']['account'])) {
                 $this->_getSagePayServerSession()->setEmail(urlencode($post['order']['account']['email']));
             }
@@ -147,9 +148,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
             $resultData = $result->getData();
 
             if ($result->getResponseStatus() == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_APPROVED) {
-
                 if ($this->isPreSaveEnabled()) {
-
                     //save order process
                     $dbtrn = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')->loadByVendorTxCode($result->getVendorTxCode());
 
@@ -166,7 +165,6 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
                         $resultData['response_status'] = 'ERROR';
                         $resultData['response_status_detail'] = 'An error occurred: ' . $sOrder;
                     } else {
-
                         $orderId = Mage::registry('last_order_id');
                         $order = Mage::getModel('sales/order')->load($orderId);
                         $order->setStatus("sagepaysuite_pending_payment")->save();
@@ -175,9 +173,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
                     }
                 }
             }
-
         } catch (Exception $e) {
-
             Mage:: log($e->getMessage());
             Mage:: logException($e);
 
@@ -217,9 +213,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
     protected function _getSuccessRedirectUrl()
     {
 
-        $url = Mage:: getModel('adminhtml/url')->getUrl('adminhtml/spsServerPayment/success', array(
+        $url = Mage:: getModel('adminhtml/url')->getUrl(
+            'adminhtml/spsServerPayment/success', array(
             '_secure' => true,
-        ));
+            )
+        );
 
         return $url;
     }
@@ -227,9 +225,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
     protected function _getFailedRedirectUrl()
     {
 
-        $url = Mage:: getModel('adminhtml/url')->getUrl('adminhtml/spsServerPayment/failed', array(
+        $url = Mage:: getModel('adminhtml/url')->getUrl(
+            'adminhtml/spsServerPayment/failed', array(
             '_secure' => true,
-        ));
+            )
+        );
 
         return $url;
     }
@@ -327,11 +327,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
             $strSecurityKey = $sagePayServerSession->getSecurityKey();
             $sagePayServerSession->setVpsTxId($strVPSTxId);
         }
+
         $response = '';
         if (strlen($strSecurityKey) == 0) {
             $this->_returnInvalid('Security Key invalid');
         } else {
-
             // Mark
             if ($request->getParam('VendorTxCode')) {
                 fopen($this->_getCheckFile(), 'w');
@@ -377,7 +377,6 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
             $validSignature = (((int)$this->getSPSModel()->getConfigData('validate_md5') == 1) && ($this->getSPSModel()->getConfigData('mode') == 'live')) ? ($strMySignature !== $strVPSSignature) : false;
 
             if ($validSignature) {
-
                 Sage_Log::log("Cannot match the MD5 Hash", null, 'SagePaySuite_POST_Requests.log');
                 Sage_Log::log("My Message: $strMessage", null, 'SagePaySuite_POST_Requests.log');
                 Sage_Log::log("My Signature: $strMySignature", null, 'SagePaySuite_POST_Requests.log');
@@ -387,16 +386,13 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
 
                 $this->_returnInvalid('Cannot match the MD5 Hash. Order might be tampered with. ' . $strStatusDetail);
             } else {
-
                 $strDBStatus = $this->_getHRStatus($strStatus, $strStatusDetail);
 
                 if ($strStatus == 'OK' || $strStatus == 'AUTHENTICATED' || $strStatus == 'REGISTERED') {
-
                     try {
                         $sagePayServerSession->setTrnhData($this->_setAdditioanlPaymentInfo($strDBStatus));
 
                         if ($this->isPreSaveEnabled()) {
-
                             $orderId = $dbtrn->getOrderId();
 
                             $dbtrn->setData("vps_protocol", $this->getRequest()->getPost('VPSProtocol'))
@@ -439,9 +435,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
                             }
 
                             $sagePayServerSession->setDummyId($orderId);
-
                         } else {
-
                             $sOrder = $this->_sAdminOrder($dbtrn->getOrderEmail(), $this->getRequest()->getParam('g'));
 
                             if (is_string($sOrder)) {
@@ -451,7 +445,6 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
 
                                 $this->_returnInvalid('Couldnot save order');
                             } else {
-
                                 $orderId = Mage::registry('last_order_id');
 
                                 $dbtrn->setData("vps_protocol", $this->getRequest()->getPost('VPSProtocol'))
@@ -484,13 +477,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
                                     $sOrder->sendNewOrderEmail();
                                 }
                             }
-
                         }
 
                         Mage:: getSingleton('checkout/session')->setSagePayRewInst(null)->setSagePayCustBalanceInst(null);
 
                         $this->_returnOk();
-
                     } catch (Exception $e) {
                         Mage:: logException($e);
                         Mage:: log($e->getMessage());
@@ -518,16 +509,18 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
 
         if (!$order->canInvoice()) {
             //when order cannot create invoice, need to have some logic to take care
-            $order->addStatusToHistory($order->getStatus(), // keep order status/state
-                Mage:: helper('sagepaysuite')->__('Error in creating an invoice', true));
+            $order->addStatusToHistory(
+                $order->getStatus(), // keep order status/state
+                Mage:: helper('sagepaysuite')->__('Error in creating an invoice', true)
+            );
         } else {
-
             $status = (string)Mage::getModel('sagepaysuite/sagePayServerMoto')->getConfigData('order_status');
             $invoice = $order->prepareInvoice();
             $invoice->register()->capture();
             Mage:: getModel('core/resource_transaction')->addObject($invoice)->addObject($invoice->getOrder())->save();
             $order->setState($status, $status, Mage:: helper('sagepaysuite')->__('Invoice #%s created', $invoice->getIncrementId()));
         }
+
         return $order->save();
     }
 
@@ -597,9 +590,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
         //$groupId = $this->getRequest()->getParam('g');
 
         $order = $this->_getOrderCreateModel()
-            ->importPostData(array(
+            ->importPostData(
+                array(
                 'account' => array('group_id' => $groupId, 'email' => $email)
-            ))
+                )
+            )
             ->setIsValidate(true)
             ->createOrder();
 

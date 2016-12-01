@@ -7,14 +7,16 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_Front_Action {
+class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_Front_Action
+{
 
     /**
      * @var Mage_Sales_Model_Quote
      */
     protected $_quote = false;
 
-    public function getOnepage() {
+    public function getOnepage() 
+    {
 
         return Mage::getSingleton('checkout/type_onepage');
     }
@@ -24,7 +26,8 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
      *
      * @return Ebizmarts_SagePaySuite_Model_Session
      */
-    private function _getSession() {
+    private function _getSession() 
+    {
 
         return Mage::getSingleton('checkout/session');
     }
@@ -34,7 +37,8 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
      *
      * @return Mage_Checkout_Model_Session
      */
-    private function _getCheckoutSession() {
+    private function _getCheckoutSession() 
+    {
 
         return Mage::getSingleton('checkout/session');
     }
@@ -44,19 +48,23 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
      *
      * @return Mage_Sale_Model_Quote
      */
-    private function _getQuote() {
+    private function _getQuote() 
+    {
 
         if (!$this->_quote) {
             $this->_quote = $this->_getCheckoutSession()->getQuote();
         }
+
         return $this->_quote;
     }
 
-    private function getFormModel() {
+    private function getFormModel() 
+    {
         return Mage::getModel('sagepaysuite/sagePayForm');
     }
 
-    protected function _getTransaction() {
+    protected function _getTransaction() 
+    {
 
         return Mage::getModel('sagepaysuite2/sagepaysuite_transaction');
     }
@@ -65,7 +73,8 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
      * Instantiate quote and checkout
      * @throws Mage_Core_Exception
      */
-    private function _initCheckout() {
+    private function _initCheckout() 
+    {
 
         $quote = $this->_getQuote();
 
@@ -75,9 +84,9 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
         }
     }
 
-    public function saveOrderAction() {
+    public function saveOrderAction() 
+    {
         try {
-
             Mage::helper('sagepaysuite')->validateQuote();
 
             $this->_initCheckout();
@@ -86,7 +95,6 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
             $resultData['success']  = true;
             $resultData['error']    = false;
             $resultData['redirect'] = Mage::getUrl('sgps/formPayment/go', array('_secure' => true));
-
         } catch (Exception $e) {
             $resultData['response_status']        = 'ERROR';
             $resultData['response_status_detail'] = $e->getMessage();
@@ -100,21 +108,22 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
     /**
      * Post to SagePay form
      */
-    public function goAction() {
+    public function goAction() 
+    {
 
         $this->_initCheckout();
         $this->getResponse()->setBody($this->getLayout()->createBlock('sagepaysuite/checkout_formpost')->toHtml());
         return;
     }
 
-    public function successAction() {
+    public function successAction() 
+    {
 
         $_r = $this->getRequest();
 
         Sage_Log::log($_r->getPost(), null, 'SagePaySuite_FORM_Callback.log');
 
         if ($_r->getParam('crypt') && $_r->getParam('vtxc')) {
-
             $strDecoded = $this->getFormModel()->decrypt($_r->getParam('crypt'));
             $token = Mage::helper('sagepaysuite/form')->getToken($strDecoded);
 
@@ -130,15 +139,19 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
             if (isset($db['post_code_result'])) {
                 $trn->setPostcodeResult($db['post_code_result']);
             }
+
             if (isset($db['cv2_result'])) {
                 $trn->setCv2result($db['cv2_result']);
             }
+
             if (isset($db['3_d_secure_status'])) {
                 $trn->setThreedSecureStatus($db['3_d_secure_status']);
             }
+
             if (isset($db['last4_digits'])) {
                 $trn->setLastFourDigits($db['last4_digits']);
             }
+
             if (isset($db['gift_aid'])) {
                 $trn->setGiftAid($db['gift_aid']);
             }
@@ -152,15 +165,12 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
             //Check cart health on callback.
             if(1 === (int)Mage::getStoreConfig('payment/sagepaysuite/verify_cart_consistency')) {
                 if(Mage::helper('sagepaysuite/checkout')->cartExpire($this->getOnepage()->getQuote())) {
-
                     try {
-
                         Mage::helper('sagepaysuite')->voidTransaction($trn->getVendorTxCode(), 'sagepayform');
 
                         Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " cancelled, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
 
                         Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed, please try again. Thanks.'));
-
                     }catch(Exception $ex) {
                         Sage_Log::log("Transaction " . $trn->getVendorTxCode() . " could not be cancelled and order was not created, cart was modified while customer on payment pages.", Zend_Log::CRIT, 'SagePaySuite_FORM_Callback.log');
                         Mage::getSingleton('checkout/session')->addError($this->__('Your order could not be completed but we could not cancel the payment, please contact us and mention this transaction reference number: %s. Thanks.', $db['vendor_tx_code']));
@@ -170,6 +180,7 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
                     return;
                 }
             }
+
             //Check cart health on callback.
 
             Mage::register('sageserverpost', new Varien_Object($token));
@@ -195,7 +206,6 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
                 $this->_redirect('checkout/cart');
 
                 return;
-
             }
 
             Mage::helper('sagepaysuite/checkout')->deleteQuote();
@@ -208,12 +218,12 @@ class Ebizmarts_SagePaySuite_FormPaymentController extends Mage_Core_Controller_
         return;
     }
 
-    public function failureAction() {
+    public function failureAction() 
+    {
 
         $_r = $this->getRequest();
 
         if ($_r->getParam('crypt') && $_r->getParam('vtxc')) {
-
             # Delete orphan transaction from DB
             $trn = $this->_getTransaction()->loadByVendorTxCode($_r->getParam('vtxc'));
             if ($trn->getId()) {

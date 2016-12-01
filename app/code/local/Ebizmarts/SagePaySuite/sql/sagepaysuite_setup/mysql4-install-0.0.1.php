@@ -6,7 +6,8 @@ $connection = $installer->getConnection();
 
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
 
 	-- ------------------------------------------------------------------
 	-- MC is MasterCard, UKE is Visa Electron. MAESTRO should be
@@ -145,19 +146,19 @@ $installer->run("
       `trndate` datetime NULL,
       PRIMARY KEY (`id`) )
     ENGINE = MYISAM DEFAULT CHARSET=utf8;
-");
+"
+);
 
 
 try{
-	$connection->addColumn($this->getTable('sales_flat_quote_payment'), 'sagepay_token_cc_id', 'int(11)');
-	$installer->addAttribute('order_payment', 'sagepay_token_cc_id', array());
-	$installer->addAttribute('order_payment', 'sagepay_canceled', array());
-	$installer->addAttribute('order_payment', 'sagepay_aborted', array());
-	$installer->addAttribute('order_payment', 'sagepay_released', array());
-	$installer->addAttribute('order_payment', 'sagepay_voided', array());
-	$installer->addAttribute('quote_payment', 'sagepay_token_cc_id', array());
+    $connection->addColumn($this->getTable('sales_flat_quote_payment'), 'sagepay_token_cc_id', 'int(11)');
+    $installer->addAttribute('order_payment', 'sagepay_token_cc_id', array());
+    $installer->addAttribute('order_payment', 'sagepay_canceled', array());
+    $installer->addAttribute('order_payment', 'sagepay_aborted', array());
+    $installer->addAttribute('order_payment', 'sagepay_released', array());
+    $installer->addAttribute('order_payment', 'sagepay_voided', array());
+    $installer->addAttribute('quote_payment', 'sagepay_token_cc_id', array());
 }catch(Exception $ee){
-
 }
 
 $installer->endSetup();

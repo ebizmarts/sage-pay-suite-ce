@@ -4,6 +4,6 @@ class Ebizmarts_SagePaySuite_Helper_Paymentinfo extends Mage_Core_Helper_Abstrac
 {
     public function getFraudInfo($orderId)
     {
-    	return Mage::getModel('sagepayreporting/sagepayreporting_fraud')->loadByOrderId($orderId);
+        return Mage::getModel('sagepayreporting/sagepayreporting_fraud')->loadByOrderId($orderId);
     }
 }

@@ -11,16 +11,16 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Refunds extends Mage_Core_Model_
     }
 
 
-	public function addRefundLog($result, $parentId, $refunded)
-	{
-		$this->setParentId($parentId)
-		->setStatus($result->getResponseStatus())
-		->setStatusDetail($result->getResponseStatusDetail())
-		->setVpsTxId($result->getVPsTxId())
-		->setTxAuthNo($result->getTxAuthNo())
-		->setAmountRefunded($refunded)
-		->setRefundedOn(date('Y-m-d H:i:s'))
-		->save();
-	}
+    public function addRefundLog($result, $parentId, $refunded)
+    {
+        $this->setParentId($parentId)
+        ->setStatus($result->getResponseStatus())
+        ->setStatusDetail($result->getResponseStatusDetail())
+        ->setVpsTxId($result->getVPsTxId())
+        ->setTxAuthNo($result->getTxAuthNo())
+        ->setAmountRefunded($refunded)
+        ->setRefundedOn(date('Y-m-d H:i:s'))
+        ->save();
+    }
 
 }

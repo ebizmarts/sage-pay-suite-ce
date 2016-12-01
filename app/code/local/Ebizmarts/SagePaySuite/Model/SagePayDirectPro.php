@@ -35,11 +35,13 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             if ($result['Status'] != 'OK') {
                 Mage::throwException(Mage::helper('sagepaysuite')->__($result['StatusDetail']));
             }
+
             return $result;
         }
     }
 
-    public function directRegisterTransaction(Varien_Object $payment, $amount) {
+    public function directRegisterTransaction(Varien_Object $payment, $amount) 
+    {
         #Process invoice
         if (!$payment->getRealCapture()) {
             return $this->captureInvoice($payment, $amount);
@@ -49,7 +51,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
          * Token Transaction
          */
         if (true === $this->_tokenPresent()) {
-
             $_info = new Varien_Object(array('payment' => $payment));
             $result = $this->getTokenModel()->tokenTransaction($_info);
 
@@ -88,6 +89,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
             return $this;
         }
+
         /**
          * Token Transaction
          */
@@ -98,16 +100,19 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 Mage::throwException($this->_SageHelper()->__('Customer already exists.'));
             }
         }
+
         if ($this->_getIsAdmin()) {
             $payment->setRequestVendor($this->getConfigData('vendor', $this->_getAdminQuote()->getStoreId()));
         }
 
         if ($this->getSageSuiteSession()->getSecure3d()) {
             $this->directCallBack3D(
-                $payment, $this->getSageSuiteSession()->getPares(), $this->getSageSuiteSession()->getEmede());
+                $payment, $this->getSageSuiteSession()->getPares(), $this->getSageSuiteSession()->getEmede()
+            );
             $this->getSageSuiteSession()->setSecure3d(null);
             return $this;
         }
+
         $this->getSageSuiteSession()->setMd(null)
             ->setAcsurl(null)
             ->setPareq(null);
@@ -182,7 +187,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 if (strtoupper($this->getConfigData('payment_action')) == self::REQUEST_TYPE_PAYMENT) {
                     $this->getSageSuiteSession()->setInvoicePayment(true);
                 }
-
                 break;
             case self::RESPONSE_CODE_3DAUTH:
 
@@ -209,7 +213,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 if ($result->getResponseStatusDetail()) {
                     $error = '';
                     if ($result->getResponseStatus() == self::RESPONSE_CODE_NOTAUTHED) {
-
                         $this->getSageSuiteSession()
                             ->setAcsurl(null)
                             ->setEmede(null)
@@ -223,6 +226,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                             ->setPareq(null);
                         $error = $this->_SageHelper()->__('Your credit card was rejected: ');
                     }
+
                     $error .= $result->getResponseStatusDetail();
                 } else {
                     $error = $this->_SageHelper()->__('Error in capturing the payment');
@@ -231,7 +235,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         }
 
         if ($error !== false) {
-
             if (Mage::helper('adminhtml')->getCurrentUserId() !== FALSE) {
                 Mage::getSingleton('adminhtml/session')->addError($error);
             }
@@ -252,7 +255,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         return Mage::getStoreConfig('payment/sagepaypaypal/mode', Mage::app()->getStore()->getId());
     }
 
-    public function directCallBack3D(Varien_Object $payment, $PARes, $MD) {
+    public function directCallBack3D(Varien_Object $payment, $PARes, $MD) 
+    {
         $error = '';
 
         $request = $this->_buildRequest3D($PARes, $MD);
@@ -263,7 +267,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         Mage::register('sageserverpost', $result);
 
         if ($result->getResponseStatus() == self::RESPONSE_CODE_APPROVED || $result->getResponseStatus() == 'AUTHENTICATED') {
-
             if (strtoupper($this->getConfigData('payment_action')) == self::REQUEST_TYPE_PAYMENT) {
                 $this->getSageSuiteSession()->setInvoicePayment(true);
             }
@@ -325,7 +328,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 ->setAdditionalData($result->getResponseStatusDetail());
             $payment->save();
         } else {
-
             //Update status if 3d failed
             Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                 ->loadByVendorTxCode($this->getSageSuiteSession()->getLastVendorTxCode())
@@ -344,6 +346,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 } else if ($result->getResponseStatus() == self::RESPONSE_CODE_REJECTED) {
                     $error = $this->_sageHelper()->__('Your credit card was rejected: ');
                 }
+
                 $error .= $result->getResponseStatusDetail();
             } else {
                 $error = $this->_sageHelper()->__('Error in capturing the payment');
@@ -353,6 +356,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         if (!empty($error)) {
             Mage::throwException($error);
         }
+
         return $this;
     }
 
@@ -380,7 +384,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $amount = $this->formatAmount($quoteObj2->getGrandTotal(), $quoteObj2->getCurrencyCode());
         }
         else {
-
             $amount = $this->formatAmount($macOrder->getGrandTotal(), $macOrder->getCurrencyCode());
 
             $baseAmount = $this->formatAmount($macOrder->getBaseGrandTotal(), $macOrder->getQuoteCurrencyCode());
@@ -412,6 +415,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 $tx += $regTxCodes;
                 Mage::unregister('sagepaysuite_ms_txcodes');
             }
+
             $tx [] = $_req->getData('VendorTxCode');
             Mage::register('sagepaysuite_ms_txcodes', $tx);
         }
@@ -489,7 +493,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         $ccType = '';
 
         if ($ccNumber) {
-
             // ccNumber is not present after 3Dcallback, in this case we supose cc is already checked
 
             if (!$this->_validateExpDate($info->getCcExpYear(), $info->getCcExpMonth())) {
@@ -502,7 +505,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     // Other credit card type number validation
                     || ($this->OtherCcType($info->getCcType()) && $this->validateCcNumOther($ccNumber))
                 ) {
-
                     $ccType = 'OT';
                     $ccTypeRegExpList = array(
                         'VISA' => '/^4[0-9]{12}([0-9]{3})?$/', // Visa
@@ -518,6 +520,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                             } else {
                                 $ccType = $ccTypeMatch;
                             }
+
                             break;
                         }
                     }
@@ -584,6 +587,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             //force XML for paypal
             $force_xml = true;
         }
+
         $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote(), $force_xml);
         if (!empty($basket)) {
             if ($basket[0] == "<") {
@@ -602,7 +606,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         }
 
         if ($payment->getAmountOrdered()) {
-
             $this->_setRequestCurrencyAmount($request, $this->_getQuote());
         } else {
             Sage_Log::log('No amount on payment');
@@ -610,12 +613,14 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         }
 
         if (!empty($order)) {
-
             //set billing address
             $billing = $order->getBillingAddress();
             if (!empty($billing)) {
-                $request->setBillingAddress($this->ss($billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
-                    $billing->getRegion() . ' ' . $billing->getCountry(), 100)
+                $request->setBillingAddress(
+                    $this->ss(
+                        $billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
+                        $billing->getRegion() . ' ' . $billing->getCountry(), 100
+                    )
                 )
                     ->setBillingSurname($this->ss($billing->getLastname(), 20))
                     ->setBillingFirstnames($this->ss($billing->getFirstname(), 20))
@@ -634,6 +639,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 if (!is_null($billing_state) && strlen($billing_state) > 2) {
                     $billing_state = substr($billing_state, 0, 2);
                 }
+
                 if (!empty($billing_state)) {
                     $request->setBillingState($billing_state);
                 }
@@ -643,11 +649,11 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
             //set shipping address
             if (!$order->getIsVirtual()) {
-
                 $shipping = $order->getShippingAddress();
 
                 if (!empty($shipping)) {
-                    $request->setDeliveryAddress($shipping->getStreet(1) . ' ' . $shipping->getCity() . ' ' .
+                    $request->setDeliveryAddress(
+                        $shipping->getStreet(1) . ' ' . $shipping->getCity() . ' ' .
                         $shipping->getRegion() . ' ' . $shipping->getCountry()
                     )
                         ->setDeliverySurname($this->ss($shipping->getLastname(), 20))
@@ -664,6 +670,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     if (!is_null($shipping_state) && strlen($shipping_state) > 2) {
                         $shipping_state = substr($shipping_state, 0, 2);
                     }
+
                     if (!empty($shipping_state)) {
                         $request->setDeliveryState($shipping_state);
                     }
@@ -671,7 +678,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             } else {
                 #If the cart only has virtual products, I need to put an shipping address to Sage Pay.
                 #Then the billing address will be the shipping address to
-                $request->setDeliveryAddress($billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
+                $request->setDeliveryAddress(
+                    $billing->getStreet(1) . ' ' . $billing->getCity() . ' ' .
                     $billing->getRegion() . ' ' . $billing->getCountry()
                 )
                     ->setDeliverySurname($this->ss($billing->getLastname(), 20))
@@ -687,6 +695,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                 if (!is_null($shipping_state) && strlen($shipping_state) > 2) {
                     $shipping_state = substr($shipping_state, 0, 2);
                 }
+
                 if (!empty($shipping_state)) {
                     $request->setDeliveryState($shipping_state);
                 }
@@ -704,6 +713,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             if ($payment->getCcIssue()) {
                 $request->setIssueNumber($payment->getCcIssue());
             }
+
             if ($payment->getCcStartMonth() && $payment->getCcStartYear()) {
                 $request->setStartDate(sprintf('%02d%02d', $payment->getCcStartMonth(), substr($payment->getCcStartYear(), strlen($payment->getCcStartYear()) - 2)));
             }
@@ -730,6 +740,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         if (!$request->getDeliveryPostCode()) {
             $request->setDeliveryPostCode('000');
         }
+
         if (!$request->getBillingPostCode()) {
             $request->setBillingPostCode('000');
         }
@@ -819,6 +830,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             if (isset($r['VPSTxId'])) {
                 $result->setVpsTxId($r['VPSTxId']);
             }
+
             if (isset($r['SecurityKey'])) {
                 $result->setSecurityKey($r['SecurityKey']);
             }
@@ -905,11 +917,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
                         Mage::getModel('sagepaysuite/sagePayToken')->persistCard($tokenData);
                     }
-
                     break;
             }
         } catch (Exception $e) {
-
             Sage_Log::logException($e);
 
             $result
@@ -967,6 +977,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             $this->setSagePayResult($result);
             return $this;
         }
+
         /**
          * Token Transaction
          */
@@ -1056,6 +1067,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
                     } else if ($result->getResponseStatus() == parent::RESPONSE_CODE_REJECTED) {
                         $error = $this->_SageHelper()->__('Your credit card was rejected: ');
                     }
+
                     $error .= $result->getResponseStatusDetail();
                 } else {
                     $error = $this->_SageHelper()->__('Error in capturing the payment');
@@ -1066,6 +1078,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
         if ($error !== false) {
             Mage::throwException($error);
         }
+
         return $this;
     }
 
@@ -1104,6 +1117,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             reset($storeIds);
             $storeId = current($storeIds);
         }
+
         $toEmail = Mage::getStoreConfig('trans_email/ident_support/email', $storeId);
         $toName = Mage::getStoreConfig('trans_email/ident_support/name', $storeId);
 
@@ -1112,8 +1126,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
             ->setDesignConfig(array('area' => 'frontend', 'store' => $storeId))
             ->sendTransactional(
                 Mage::getStoreConfig('payment/sagepaydirectpro/email_timeout_template'), array('name' => Mage::getStoreConfig('trans_email/ident_general/name', $storeId), 'email' => Mage::getStoreConfig('trans_email/ident_general/email', $storeId)),
-//                Mage::getStoreConfig('payment/sagepaydirectpro/email_timeout_identity'),
-                $toEmail, $toName, $params);
+                //                Mage::getStoreConfig('payment/sagepaydirectpro/email_timeout_identity'),
+                $toEmail, $toName, $params
+            );
 
         $translate->setTranslateInline(true);
 

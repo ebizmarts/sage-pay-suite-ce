@@ -15,7 +15,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Token extends Ebizmarts_SagePaySuite
      */
     public function registerOnPayment($o)
     {
-    	$request = $o->getEvent()->getRequest();
+        $request = $o->getEvent()->getRequest();
 
         $customerSession = Mage::helper('customer')->getCustomer();
 
@@ -24,7 +24,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Token extends Ebizmarts_SagePaySuite
         Ebizmarts_SagePaySuite_Log::w($customerId, null, 'Token.log');
 
         if(!$customerId){
-        	return $o;
+            return $o;
         }
 
         $_data = $request->getData();
@@ -58,7 +58,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Token extends Ebizmarts_SagePaySuite
             Ebizmarts_SagePaySuite_Log::w($rs, null, 'SagePayToken_Errors.log');
 
             #$customerSession->addError(Mage::helper('sagepaysuite')->__('Could not save credit card token: %s', $rs['StatusDetail']));
-
         }
     }
 

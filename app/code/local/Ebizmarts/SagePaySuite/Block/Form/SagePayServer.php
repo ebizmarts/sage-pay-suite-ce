@@ -8,10 +8,12 @@
  * @author     Ebizmarts <info@ebizmarts.com>
  */
 
-class Ebizmarts_SagePaySuite_Block_Form_SagePayServer extends Ebizmarts_SagePaySuite_Block_Form_SagePayToken {
+class Ebizmarts_SagePaySuite_Block_Form_SagePayServer extends Ebizmarts_SagePaySuite_Block_Form_SagePayToken
+{
     
-    protected function _prepareLayout() {
-    	
+    protected function _prepareLayout() 
+    {
+        
         $_code = 'sagepayserver';
 
         if($this->helper('sagepaysuite')->creatingAdminOrder()) {
@@ -23,12 +25,14 @@ class Ebizmarts_SagePaySuite_Block_Form_SagePayServer extends Ebizmarts_SagePayS
         return parent::_prepareLayout();
     }
 
-    protected function _construct() {
+    protected function _construct() 
+    {
         parent::_construct();                
         $this->setTemplate('sagepaysuite/payment/form/sagePayServer.phtml');
     }
 
-    public function getQuote() {
+    public function getQuote() 
+    {
         return Mage::getSingleton('checkout/session')->getQuote();
     }
     

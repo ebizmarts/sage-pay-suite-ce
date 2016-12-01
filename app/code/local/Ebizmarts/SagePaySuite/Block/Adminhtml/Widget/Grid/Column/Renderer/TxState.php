@@ -1,6 +1,7 @@
 <?php
 
-class Ebizmarts_SagePaySuite_Block_Adminhtml_Widget_Grid_Column_Renderer_TxState extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
+class Ebizmarts_SagePaySuite_Block_Adminhtml_Widget_Grid_Column_Renderer_TxState extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+{
 
     /**
      * Renders grid column
@@ -8,7 +9,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Widget_Grid_Column_Renderer_TxState
      * @param   Varien_Object $row
      * @return  string
      */
-    public function render(Varien_Object $row) {
+    public function render(Varien_Object $row) 
+    {
         
         $value = parent::render($row);
         

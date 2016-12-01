@@ -1,8 +1,10 @@
 <?php
 
-class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Whitelistip_Edit extends Mage_Adminhtml_Block_Widget_Form_Container {
+class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Whitelistip_Edit extends Mage_Adminhtml_Block_Widget_Form_Container
+{
         
-    public function __construct() {
+    public function __construct() 
+    {
         $this->_blockGroup = 'sagepayreporting';
         $this->_controller = 'adminhtml_sagepayreporting_whitelistip';
 
@@ -11,7 +13,8 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Whitelistip_Ed
         $this->_updateButton('save', 'label', Mage::helper('sagepayreporting')->__('Add'));
     }
 
-    public function getHeaderText() {
+    public function getHeaderText() 
+    {
         return Mage::helper('sagepayreporting')->__('White List IP Address');
     }
 
@@ -20,7 +23,8 @@ class Ebizmarts_SagePayReporting_Block_Adminhtml_Sagepayreporting_Whitelistip_Ed
      *
      * @return string
      */
-    public function getFormActionUrl() {
+    public function getFormActionUrl() 
+    {
         return $this->getUrl('*/sagepayreporting_whitelistip/save', array('_current' => true));
     }    
     

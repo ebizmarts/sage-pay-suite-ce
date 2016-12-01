@@ -7,9 +7,11 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
+class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract
+{
 
-    public function grabData(){
+    public function grabData()
+    {
 
         $generalData = Array();
 
@@ -20,7 +22,7 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
         $generalData['vendorname'] = Mage::getModel('sagepaysuite/sagePayServer')->getConfigData('vendor');
         $generalData['magento_version'] = Mage::getVersion();
 
-        if(method_exists('Mage','getEdition')){ // Fix for earlier Magento versions
+        if(method_exists('Mage', 'getEdition')){ // Fix for earlier Magento versions
             $generalData['magento_edition'] = Mage::getEdition();
         }
 
@@ -46,11 +48,9 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
         $integrationData = Array();
 
         foreach($integrations as $integration){
-
             $path = 'payment/' . $integration . '/active';
 
             if(Mage::getStoreConfig($path, $generalData['store_id'])){
-
                 $integrationData[$integration] = array();
 
                 $path = 'payment/' . $integration . '/mode';
@@ -75,10 +75,10 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
         return $data;
     }
 
-    public function send(){
+    public function send()
+    {
 
         try {
-
             $data = $this->grabData();
             $url = 'https://ebizmarts.com/sagepaysuite_tracker.php';
 
@@ -92,8 +92,10 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl, CURLOPT_TIMEOUT, 4);
 
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,
-                Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+            curl_setopt(
+                $curl, CURLOPT_SSL_VERIFYPEER,
+                Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false
+            );
 
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
             if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
@@ -105,10 +107,9 @@ class Ebizmarts_SagePaySuite_Helper_Tracker extends Mage_Core_Helper_Abstract{
             if (!curl_error($curl)) {
                 return TRUE;
             }
+
             return FALSE;
-
         }catch(Exception $e){
-
             Sage_Log::logException($e);
 
             return FALSE;

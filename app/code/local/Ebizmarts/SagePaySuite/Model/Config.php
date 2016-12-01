@@ -16,6 +16,7 @@ class Ebizmarts_SagePaySuite_Model_Config extends Mage_Payment_Model_Config
             if($includePaypal === false && $data['code'] == 'PAYPAL'){
                 continue;
             }
+
             $types[$data['code']] = $data['name'];
         }
 
@@ -33,6 +34,7 @@ class Ebizmarts_SagePaySuite_Model_Config extends Mage_Payment_Model_Config
             if($data['code'] == 'PAYPAL'){
                 continue;
             }
+
             $types[$data['code']] = $data['name'];
         }
 
@@ -43,15 +45,18 @@ class Ebizmarts_SagePaySuite_Model_Config extends Mage_Payment_Model_Config
         return $types;
     }
 
-    public function cctypesSort($a, $b) {
+    public function cctypesSort($a, $b) 
+    {
         return strcmp($a, $b);
     }
 
-    public function alterY(&$item, $key) {
+    public function alterY(&$item, $key) 
+    {
         $item = $key;
     }
 
-    public function getYearsStart() {
+    public function getYearsStart() 
+    {
       $first = date('Y');
       $_y = range($first-5, $first);
       $_y = array_flip($_y);

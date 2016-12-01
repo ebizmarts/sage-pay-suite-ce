@@ -8,17 +8,20 @@
  * @author     Ebizmarts <info@ebizmarts.com>
  */
 
-class Ebizmarts_SagePaySuite_Log {
+class Ebizmarts_SagePaySuite_Log
+{
 
     /**
      * Alias methods
      */
-    public static function log($message, $level = null, $file = '') {
+    public static function log($message, $level = null, $file = '') 
+    {
         $file = str_replace('/', '-', $file);
         self::w($message, $level, $file);
     }
 
-    public static function logException(Exception $e) {
+    public static function logException(Exception $e) 
+    {
         self::we($e);
     }
 
@@ -27,7 +30,8 @@ class Ebizmarts_SagePaySuite_Log {
      *
      * @param Exception $e
      */
-    public static function we(Exception $e) {
+    public static function we(Exception $e) 
+    {
         self::w("\n" . $e->__toString(), Zend_Log::ERR, 'exceptions.log');
     }
 
@@ -38,7 +42,8 @@ class Ebizmarts_SagePaySuite_Log {
      * @param int $level Message severity level, @see Zend_Log
      * @param string $file Filename, ie: Errors.log
      */
-    public static function w($message, $level = null, $file = '') {
+    public static function w($message, $level = null, $file = '') 
+    {
         try {
             $logActive = Mage::getStoreConfig('payment/sagepaysuite/logs');
             if (empty($file)) {
@@ -63,6 +68,7 @@ class Ebizmarts_SagePaySuite_Log {
             if (!is_dir(Mage::getBaseDir('var') . DS . 'log')) {
                 mkdir(Mage::getBaseDir('var') . DS . 'log', 0777);
             }
+
             if (!is_dir(Mage::getBaseDir('var') . DS . 'log' . DS . 'SagePaySuite')) {
                 mkdir(Mage::getBaseDir('var') . DS . 'log' . DS . 'SagePaySuite', 0777);
             }
@@ -81,6 +87,7 @@ class Ebizmarts_SagePaySuite_Log {
             } else {
                 $writer = new $writerModel($logFile);
             }
+
             $writer->setFormatter($formatter);
             $logger = new Zend_Log($writer);
 
@@ -90,7 +97,6 @@ class Ebizmarts_SagePaySuite_Log {
 
             $logger->log($message, $level);
         } catch (Exception $e) {
-
         }
     }
 

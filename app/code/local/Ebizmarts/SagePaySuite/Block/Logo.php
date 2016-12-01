@@ -27,9 +27,10 @@ class Ebizmarts_SagePaySuite_Block_Logo extends Mage_Core_Block_Template
      */
     protected function _toHtml()
     {
-    	if(false === Mage::getStoreConfigFlag('payment/sagepaysuite/cms_index_logo')){
-    		return '';
-    	}
+        if(false === Mage::getStoreConfigFlag('payment/sagepaysuite/cms_index_logo')){
+            return '';
+        }
+
         $this->setLogoImageUrl($this->getSkinUrl('sagepaysuite/images/secured-by-sage-pay.png'));
         $this->setPartnerLogoImageUrl($this->getSkinUrl('sagepaysuite/images/sagelogo-partner.jpg'));
         return parent::_toHtml();

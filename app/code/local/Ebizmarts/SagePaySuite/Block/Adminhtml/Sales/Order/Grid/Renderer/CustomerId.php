@@ -1,6 +1,7 @@
 <?php
 
-class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Grid_Renderer_CustomerId extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
+class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Grid_Renderer_CustomerId extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+{
     
     /**
      * Renders grid column
@@ -8,7 +9,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Grid_Renderer_CustomerI
      * @param   Varien_Object $row
      * @return  string
      */
-    public function render(Varien_Object $row) {
+    public function render(Varien_Object $row) 
+    {
         $result = parent::render($row);
 
         $customer = Mage::getModel('customer/customer')->load($row->getCustomerId());

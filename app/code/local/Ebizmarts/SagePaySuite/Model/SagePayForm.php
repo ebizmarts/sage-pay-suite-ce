@@ -7,7 +7,8 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Model_Api_Payment {
+class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Model_Api_Payment
+{
 
     protected $_code = 'sagepayform';
     protected $_formBlockType = 'sagepaysuite/form_sagePayForm';
@@ -27,30 +28,35 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
     protected $_canUseCheckout = true;
     protected $_canUseForMultishipping = false;
 
-    public function validate() {
+    public function validate() 
+    {
         Mage_Payment_Model_Method_Abstract::validate();
         return $this;
     }
 
-    public function isAvailable($quote = null) {
+    public function isAvailable($quote = null) 
+    {
         return Mage_Payment_Model_Method_Abstract::isAvailable($quote);
     }
 
     /**
      * Return decrypted "encryption pass" from DB
      */
-    public function getEncryptionPass() {
+    public function getEncryptionPass() 
+    {
         return Mage::helper('core')->decrypt($this->getConfigData('encryption_pass'));
     }
 
-    public function base64Decode($scrambled) {
+    public function base64Decode($scrambled) 
+    {
         // Fix plus to space conversion issue
         $scrambled = str_replace(" ", "+", $scrambled);
         $output = base64_decode($scrambled);
         return $output;
     }
 
-    public function decrypt($strIn) {
+    public function decrypt($strIn) 
+    {
         $cryptPass = $this->getEncryptionPass();
 
         //** remove the first char which is @ to flag this is AES encrypted
@@ -62,7 +68,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
         return $this->removePKCS5Padding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $cryptPass, $strIn, MCRYPT_MODE_CBC, $cryptPass));
     }
 
-    public function makeCrypt() {
+    public function makeCrypt() 
+    {
 
         $cryptPass = $this->getEncryptionPass();
 
@@ -101,18 +108,22 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
 
         $data['Description'] = $this->cleanInput('product purchase', 'Text');
 
-        $data['SuccessURL'] = Mage::getUrl('sgps/formPayment/success', array(
+        $data['SuccessURL'] = Mage::getUrl(
+            'sgps/formPayment/success', array(
                     '_secure' => true,
                     '_nosid' => true,
                     'vtxc' => $data['VendorTxCode'],
                     'utm_nooverride' => 1
-                ));
-        $data['FailureURL'] = Mage::getUrl('sgps/formPayment/failure', array(
+            )
+        );
+        $data['FailureURL'] = Mage::getUrl(
+            'sgps/formPayment/failure', array(
                     '_secure' => true,
                     '_nosid' => true,
                     'vtxc' => $data['VendorTxCode'],
                     'utm_nooverride' => 1
-                ));
+            )
+        );
 
         $data['BillingSurname']    = $this->ss($billing->getLastname(), 20);
         $data['ReferrerID']        = $this->getConfigData('referrer_id');
@@ -158,7 +169,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
             $data['BillingState'] = $billing->getRegionCode();
         }
 
-        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote(),false);
+        $basket = Mage::helper('sagepaysuite')->getSagePayBasket($this->_getQuote(), false);
         if(!empty($basket)) {
             if($basket[0] == "<") {
                 $data['BasketXML'] = $basket;
@@ -242,7 +253,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
     }
 
     //** PHP's mcrypt does not have built in PKCS5 Padding, so we use this
-    public function addPKCS5Padding($input) {
+    public function addPKCS5Padding($input) 
+    {
         $blocksize = 16;
         $padding = "";
 
@@ -256,13 +268,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayForm extends Ebizmarts_SagePaySuite_Mo
     }
 
     // Need to remove padding bytes from end of decoded string
-    public function removePKCS5Padding($decrypted) {
+    public function removePKCS5Padding($decrypted) 
+    {
         $padChar = ord($decrypted[strlen($decrypted) - 1]);
 
         return substr($decrypted, 0, -$padChar);
     }
 
-    public function capture(Varien_Object $payment, $amount) {
+    public function capture(Varien_Object $payment, $amount) 
+    {
         #Process invoice
         if (!$payment->getRealCapture()) {
             return $this->captureInvoice($payment, $amount);

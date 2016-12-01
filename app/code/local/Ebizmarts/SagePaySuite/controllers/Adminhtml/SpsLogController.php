@@ -18,11 +18,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsLogController extends Mage_Adminhtml_C
         return $this;
     }
 
-	public function indexAction()
-	{
-		$this->_title($this->__('Sales'))->_title($this->__('Sage Pay'))->_title($this->__('Logs'));
-		$this->_initAction()->renderLayout();
-	}
+    public function indexAction()
+    {
+        $this->_title($this->__('Sales'))->_title($this->__('Sage Pay'))->_title($this->__('Logs'));
+        $this->_initAction()->renderLayout();
+    }
 
     public function getLogDirectoryIterator()
     {
@@ -37,6 +37,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsLogController extends Mage_Adminhtml_C
                 $ret = true;
             }
         }
+
         return $ret;
     }
     public function downloadFileAction()
@@ -54,6 +55,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsLogController extends Mage_Adminhtml_C
             $this->getResponse()->setBody('<html><head><title></title></head><body><pre>' . Mage::helper('sagepaysuite')->__('Please choose a file.') . '</pre></body></html>');
             return;
         }
+
         $fileName = $r->getParam('file');
         $f = Mage::helper('sagepaysuite')->getSagePaySuiteLogDir() . DS . $fileName;
         if ($this->isValidLogFile($fileName)) {
@@ -70,16 +72,20 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsLogController extends Mage_Adminhtml_C
                         $beginning = true;
                         break;
                     }
+
                     $t = fgetc($handle);
                     $pos--;
                 }
+
                 $linecounter--;
                 if ($beginning) {
                     rewind($handle);
                 }
+
                 $text[$numberOfLines - $linecounter - 1] = fgets($handle);
                 if ($beginning) break;
             }
+
             fclose($handle);
             $dlFile = '<a href="' . Mage::helper('adminhtml')->getUrl('adminhtml/spsLog/downloadFile', array('f' => $r->getParam('file'))) . '">' . $this->__('Download file') . '</a>';
             return $this->getResponse()->setBody('<html><head><title></title><meta http-equiv="refresh" content="10"></head><body><pre>' . $dlFile . "\r\n\n" . implode('', $text) . '</pre></body></html>');
@@ -88,7 +94,8 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsLogController extends Mage_Adminhtml_C
         }
     }
 
-    protected function _isAllowed() {
+    protected function _isAllowed() 
+    {
             $acl = 'sales/sagepay/logs';
             return Mage::getSingleton('admin/session')->isAllowed($acl);
     }

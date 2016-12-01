@@ -1,4 +1,5 @@
-document.observe('dom:loaded', function() {
+document.observe(
+    'dom:loaded', function () {
 
     if(typeof currencies != 'undefined') {
         totalsPie();
@@ -8,18 +9,19 @@ document.observe('dom:loaded', function() {
         new Control.Tabs('transactions_graph');
     }
 
-});
+    }
+);
 
 
-var transactionsBar = function() {
+var transactionsBar = function () {
     
-    currencies.each(function(currency) {
+    currencies.each(
+        function (currency) {
         
         
         var trns = new Array();
             
         for (var i = 0; i < graphData.length; i++) {
-                
             if(graphData[i].currency.toString() == currency.key) {
                 trns.push(graphData[i]);
             }        
@@ -62,19 +64,27 @@ var transactionsBar = function() {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         
-        trns.forEach(function(d) {
+        trns.forEach(
+            function (d) {
             if(d.currency == currency.key) {
                 d.price = +d.price;
             }
-        });
+            }
+        );
 
-        x.domain(trns.map(function(d) {
-            return d.date;
-        }));
+        x.domain(
+            trns.map(
+                function (d) {
+                return d.date;
+                }
+            )
+        );
         
-        var maxPrice = d3.max(trns, function(d) {
+        var maxPrice = d3.max(
+            trns, function (d) {
             return d.price;
-        });
+            }
+        );
         
         y.domain([0, maxPrice]);
 
@@ -93,57 +103,70 @@ var transactionsBar = function() {
         .style("text-anchor", "end")
         .text("Amount (" + currency.key + ")");
 
-//        svg.selectAll(".yTicks")
-//        .data(trns)
-//        .enter().append("svg:line")
-//        .attr('x1','90')
-//        .attr('y1',function(d) {
-//            return 400 - y(d);
-//        })
-//        .attr('x2',320)
-//        .attr('y2',function(d) {
-//            return 400 - y(d);
-//        })
-//        .style('stroke','lightgray');
+        //        svg.selectAll(".yTicks")
+        //        .data(trns)
+        //        .enter().append("svg:line")
+        //        .attr('x1','90')
+        //        .attr('y1',function(d) {
+        //            return 400 - y(d);
+        //        })
+        //        .attr('x2',320)
+        //        .attr('y2',function(d) {
+        //            return 400 - y(d);
+        //        })
+        //        .style('stroke','lightgray');
 
         svg.selectAll("rect")
         .data(trns)
         .enter()
         .append("rect")
         .style('fill','teal')
-        .on('mouseover', function(d, i) { 
+        .on(
+            'mouseover', function (d, i) { 
 
             d3.select(this)
             .style('fill','#eb5e00'); 
             
             d3.select("#current-amount").html(d.formatted_price);
-        }) 
-        .on('mouseout', function(d,i) { 
+            }
+        ) 
+        .on(
+            'mouseout', function (d,i) { 
             d3.select("#current-amount").html("");
             d3.select(this)
             .style('fill','teal'); 
-        })
-        .attr("x", function(d) {
+            }
+        )
+        .attr(
+            "x", function (d) {
             return x(d.date);
-        })
+            }
+        )
         .attr("width", x.rangeBand())
-        .attr("y", function(d) {
+        .attr(
+            "y", function (d) {
             return y(d.price);
-        })
-        .attr("height", function(d) {
+            }
+        )
+        .attr(
+            "height", function (d) {
             return height - y(d.price);
-        });
+            }
+        );
 
         svg.selectAll(".xaxis text")  // select all the text elements for the xaxis
-        .attr("transform", function(d) {
+        .attr(
+            "transform", function (d) {
             return "translate(" + this.getBBox().height*-2 + "," + this.getBBox().height*+1.5 + ")rotate(-45)";
-        });
+            }
+        );
         
-    });    
+        }
+    );    
     
 }
 
-var totalsPie = function() {
+var totalsPie = function () {
 
 
     var w = 300,                        //width
@@ -162,9 +185,11 @@ var totalsPie = function() {
     .outerRadius(r);
 
     var pie = d3.layout.pie()           //this will create arc data for us given a list of values
-    .value(function(d) {
+    .value(
+        function (d) {
         return d.value;
-    });    //we must tell it out to access the value of each element in our data array
+        }
+    );    //we must tell it out to access the value of each element in our data array
 
     var arcs = vis.selectAll("g.slice")     //this selects all <g> elements with class slice (there aren't any yet)
     .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties)
@@ -173,7 +198,8 @@ var totalsPie = function() {
     .attr("class", "slice");    //allow us to style things in the slices (like text)
 
     arcs.append("svg:path")
-    .attr("fill", function(d, i) {
+    .attr(
+        "fill", function (d, i) {
         var myColor = "#339900";
                     
         if(d.data.status == "nok") {
@@ -182,23 +208,29 @@ var totalsPie = function() {
                     
         return myColor;
                     
-    } ) //set the color for each slice to be chosen from the color function defined above
+        } 
+    ) //set the color for each slice to be chosen from the color function defined above
     .attr("d", arc);                                    //this creates the actual SVG path using the associated data (pie) with the arc drawing function
 
     arcs.append("svg:text")                                     //add a label to each slice
-    .attr("transform", function(d) {                    //set the label's origin to the center of the arc
+    .attr(
+        "transform", function (d) {
+                    //set the label's origin to the center of the arc
         //we have to make sure to set these before calling arc.centroid
         d.innerRadius = 0;
         d.outerRadius = r;
         return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
-    })
+        }
+    )
     .attr("text-anchor", "middle")                          //center the text on it's origin
     .attr("font-family", "sans-serif")
     .attr("font-size", "11px")
     .attr("fill", "white")
-    .text(function(d, i) {
+    .text(
+        function (d, i) {
         return totalsData[i].label;
-    });        //get the label from our original data array
+        }
+    );        //get the label from our original data array
 
 
 }

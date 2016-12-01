@@ -7,33 +7,37 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Front_Action {
+class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Front_Action
+{
 
-    protected function _expireAjax() {
+    protected function _expireAjax() 
+    {
         if (!Mage::getSingleton('checkout/session')->getQuote()->hasItems()) {
             $this->getResponse()->setHeader('HTTP/1.1', '403 Session Expired');
             exit;
         }
     }
 
-    public function getSageSuiteSession() {
+    public function getSageSuiteSession() 
+    {
         return Mage::getSingleton('sagepaysuite/session');
     }
 
-    protected function _getQuote() {
+    protected function _getQuote() 
+    {
         return Mage::getSingleton('sagepaysuite/api_payment')->getQuote();
     }
 
     /**
      * Return all customer cards list for onepagecheckout use.
      */
-    public function getTokenCardsHtmlAction() {
+    public function getTokenCardsHtmlAction() 
+    {
         $html = '';
 
         $_code = $this->getRequest()->getPost('payment_method', 'sagepaydirectpro');
 
         try {
-
             $html .= $this->getLayout()->createBlock('sagepaysuite/form_tokenList', 'token.cards.li')
                     ->setCanUseToken(true)
                     ->setPaymentMethodCode($_code)
@@ -42,17 +46,23 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             Ebizmarts_SagePaySuite_Log :: we($e);
         }
 
-        return $this->getResponse()->setBody(str_replace(array(
+        return $this->getResponse()->setBody(
+            str_replace(
+                array(
                             '<div id="tokencards-payment-' . $_code . '">',
                             '</div>'
-                                ), array(), $html));
+                ), array(), $html
+            )
+        );
     }
 
-    public function getOnepage() {
+    public function getOnepage() 
+    {
         return Mage::getSingleton('checkout/type_onepage');
     }
 
-    private function _OSCSaveBilling() {
+    private function _OSCSaveBilling() 
+    {
         $helper = Mage::helper('onestepcheckout/checkout');
 
         $billing_data = $this->getRequest()->getPost('billing', array());
@@ -64,7 +74,6 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
         $shipping_data = $helper->load_exclude_data($shipping_data);
 
         if (!Mage::helper('customer')->isLoggedIn()) {
-
             $emailExists = Mage::helper('sagepaysuite')->existsCustomerForEmail($billing_data['email']);
 
             $regWithoutPassword = (int)Mage::getStoreConfig('onestepcheckout/registration/registration_order_without_password');
@@ -74,7 +83,6 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                 Mage::getSingleton('customer/session')->setCustomerAsLoggedIn($customer);
             }
             else {
-
                 $registration_mode = Mage::getStoreConfig('onestepcheckout/registration/registration_mode');
                 if ($registration_mode == 'auto_generate_account') {
                     // Modify billing data to contain password also
@@ -108,9 +116,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                     // Trick to allow saving of
                     Mage::getSingleton('checkout/type_onepage')->saveCheckoutMethod('register');
                 }
-
             }
-
         }//Create Account hook
 
         //Thanks Dan Norris for his input about this code.
@@ -122,6 +128,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                     $billing_data = array_merge($billing_data, $billingAddress->getData());
                 }
             }
+
             //if (!empty($shippingAddressId)) {
             if (!empty($shippingAddressId) && $helper->differentShippingAvailable()) {
                 $shippingAddress = Mage::getModel('customer/address')->load($shippingAddressId);
@@ -162,7 +169,6 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                 $this->getOnepage()->getQuote()->getPayment()->getMethodInstance();
             }
         } catch (Exception $e) {
-
         }
 
         //Breaks totals
@@ -232,7 +238,8 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
         Mage::dispatchEvent('checkout_controller_onepage_save_shipping_method', array('request' => $this->getRequest(), 'quote' => $this->getOnepage()->getQuote()));
     }
 
-    public function _IWD_OPCSaveBilling(){
+    public function _IWD_OPCSaveBilling()
+    {
 
         $billing_data = $this->getRequest()->getPost('billing', array());
 
@@ -268,14 +275,16 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
         }
     }
 
-    public function sanitize_string(&$val) {
+    public function sanitize_string(&$val) 
+    {
         $val = filter_var($val, FILTER_SANITIZE_STRING);
     }
 
     /**
      * Create order action
      */
-    public function onepageSaveOrderAction() {
+    public function onepageSaveOrderAction() 
+    {
         if ($this->_expireAjax()) {
             return;
         }
@@ -284,7 +293,6 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
 
         $paymentData = $this->getRequest()->getPost('payment', array());
         if ($paymentData) {
-
             //Sanitize payment data
             array_walk($paymentData, array($this, "sanitize_string"));
 
@@ -319,16 +327,15 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                     return;
                 }
             }
+
             # Validate checkout Terms and Conditions
 
             //Fix issue #9595957091315
             if(!empty($paymentData) && !isset($paymentData['sagepay_token_cc_id'])) {
                 $this->getSageSuiteSession()->setLastSavedTokenccid(null);
             }
-
         }
         else {
-
             //reset token session
             if(!empty($paymentData) && !isset($paymentData['sagepay_token_cc_id'])) {
                 $this->getSageSuiteSession()->setLastSavedTokenccid(null);
@@ -340,6 +347,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             if (FALSE !== Mage::getConfig()->getNode('modules/Idev_OneStepCheckout')) {
                 $this->_OSCSaveBilling();
             }
+
             /**
              * OSC
              */
@@ -348,7 +356,6 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
              * IWD OPC
              */
             if (FALSE !== Mage::getConfig()->getNode('modules/IWD_OnepageCheckout')) {
-
                 # Validate checkout Terms and Conditions
                 $requiredAgreements = Mage::helper('checkout')->getRequiredAgreementIds();
 
@@ -362,8 +369,10 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                         return;
                     }
                 }
+
                 $this->_IWD_OPCSaveBilling();
             }
+
             /**
              * IWD OPC
              */
@@ -382,6 +391,7 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
                 $this->getSageSuiteSession()->setOrderComments($comment);
             }
         }
+
         //Magemaven_OrderComment
 
 
@@ -398,7 +408,6 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
             $this->_forward('saveOrder', 'nitPayment', null, $this->getRequest()->getParams());
             return;
         } else {
-
             //As of release 1.1.18. Left for history purposes, if is not sagepay, post should not reach to this controller
             $this->_forward('saveOrder', 'onepage', 'checkout', $this->getRequest()->getParams());
             return;

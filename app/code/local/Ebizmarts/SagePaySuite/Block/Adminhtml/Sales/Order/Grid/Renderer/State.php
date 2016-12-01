@@ -17,9 +17,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Grid_Renderer_State ext
             ->loadByParent($row->getId());
 
         if ($transaction->getId()) {
-
             if (((string)Mage::getStoreConfig('payment/sagepaysuite/sync_mode')) === 'sync') {
-
                 //check date, if order is newer than 24 hours check status otherwise just show
                 $datetime1 = new DateTime($row->getCreatedAt());
                 $datetime2 = new DateTime(Mage::getModel('core/date')->gmtDate(null, "-1 day"));
@@ -49,7 +47,6 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Grid_Renderer_State ext
                 $redTitle = $this->__("ReD Status: %s.", $red);
                 $result .= '&nbsp;&nbsp;<img src="' . $this->_redFraudIcon($red) . '" title="' . $redTitle . '" />';
             }
-
         }
 
         return $result;

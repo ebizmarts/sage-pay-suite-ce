@@ -63,7 +63,6 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } else {
             if ($api->getSendBasket()) {
-
                 $basketFormat = (string)$api
                     ->getConfigData('basket_format');
                 if ('sage' === $basketFormat) {
@@ -355,7 +354,6 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
             if ($this->creatingAdminOrder()) {
                 $conf ['server']['sgps_admin_registertrn_url'] = $_urlAdmin->getUrl('adminhtml/spsServerPayment/registertrn', array('_secure' => true));
             }
-
         }
 
         $conf ['form']['url'] = $_url->getUrl('sgps/formPayment/go', array('_secure' => true));
@@ -386,6 +384,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         for ($i=0;$i<count($pieces);$i++) {
             $pieces[$i][0] = strtoupper($pieces[$i][0]);
         }
+
         return $str = implode($pieces);
     }
 
@@ -471,6 +470,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         if (!is_dir($suiteLogPath)) {
             mkdir($suiteLogPath, 0755);
         }
+
         if (!is_dir($profilerPath)) {
             mkdir($profilerPath, 0755);
         }
@@ -484,7 +484,6 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         $longest = 10;
         $rows = array();
         foreach ($timers as $name => $timer) {
-
             $sum = Varien_Profiler::fetch($name, 'sum');
             $count = Varien_Profiler::fetch($name, 'count');
             $realmem = Varien_Profiler::fetch($name, 'realmem');
@@ -584,6 +583,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
                 if ($addressValidation !== true) {
                     Mage::throwException($this->__("\nPlease check shipping address information. \n%s", implode("\n", $addressValidation)));
                 }
+
                 $method = $address->getShippingMethod();
                 $rate = $address->getShippingRateByCode($method);
                 if (!$quote->isVirtual() && (!$method || !$rate)) {
@@ -602,11 +602,9 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
 
             //Stock check, redirect to cart if can't continue
             if (!$quote->getInventoryProcessed()) {
-
                 $items = $this->_getProductsQty($quote->getAllItems());
 
                 try {
-
                     Mage::getModel('cataloginventory/stock')->registerProductsSale($items);
                     //Set flag
                     $quote->setInventoryProcessed(true);
@@ -615,7 +613,6 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
                     Mage::getModel('cataloginventory/stock')->revertProductsSale($items);
                     // Clear flag
                     $quote->setInventoryProcessed(false);
-
                 } catch (Exception $ex) {
                     throw new Exception('REDIRECT_CART');
                 }
@@ -643,6 +640,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
             if (!$productId) {
                 continue;
             }
+
             $children = $item->getChildrenItems();
             if ($children) {
                 foreach ($children as $childItem) {
@@ -652,6 +650,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
                 $this->_addItemToQtyArray($item, $items);
             }
         }
+
         return $items;
     }
 
@@ -680,6 +679,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
             if ($quoteItem->getProduct()) {
                 $stockItem = $quoteItem->getProduct()->getStockItem();
             }
+
             $items[$productId] = array(
                 'item' => $stockItem,
                 'qty' => $quoteItem->getTotalQty()
@@ -739,6 +739,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $output = (int)$avscv2;
         }
+
         return $output;
     }
 
@@ -753,6 +754,7 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($parameters as $_key => $_param) {
             $return [$_key] = $this->_encodeParamForQuery($_param);
         }
+
         return $return;
     }
 

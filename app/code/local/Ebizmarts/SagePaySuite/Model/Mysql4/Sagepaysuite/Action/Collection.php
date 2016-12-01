@@ -10,16 +10,16 @@
 
 class Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Action_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
 {
-	protected function _construct()
-	{
-		$this->_init('sagepaysuite2/sagepaysuite_action');
-	}
+    protected function _construct()
+    {
+        $this->_init('sagepaysuite2/sagepaysuite_action');
+    }
 
-	public function setPaymentsFilter()
-	{
+    public function setPaymentsFilter()
+    {
         $this->addFieldToFilter('action_code', array('repeat','release','authorise'));
         return $this;
-	}
+    }
 
     public function setRepeatFilter()
     {

@@ -20,6 +20,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Deferred extends Mage_A
             $this->getLayout()->getBlock('head')
             ->addItem('skin_css', 'sagepaysuite/css/sagePaySuite.css');
         }
+
         return parent::_prepareLayout();
     }
 

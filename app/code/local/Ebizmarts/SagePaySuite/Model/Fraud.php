@@ -10,7 +10,7 @@
 
 class Ebizmarts_SagePaySuite_Model_Fraud
 {
-	public function updateThirdMan($order = null, Varien_Simplexml_Element $trn)
+    public function updateThirdMan($order = null, Varien_Simplexml_Element $trn)
     {
         $fraud = Mage::getModel('sagepaysuite2/sagepaysuite_fraud')->loadByOrderId($order);
         $fraud->setOrderId($order)
@@ -28,24 +28,24 @@ class Ebizmarts_SagePaySuite_Model_Fraud
 
     protected function _getAccessUrl()
     {
-    	switch ($this->_getCdata('mode')) {
+        switch ($this->_getCdata('mode')) {
             case 'simulator':
-			case 'test':
+            case 'test':
                 $url = 'https://test.sagepay.com/access/access.htm';
-				break;
+                break;
             case 'live':
                 $url = 'https://live.sagepay.com/access/access.htm';
                 break;
-			default:
-				break;
-		}
+            default:
+                break;
+        }
 
         return $url;
     }
 
     protected function _getCdata($key)
     {
-    	return Mage::getModel('sagepayserver/sagePayServer')->getConfigData($key);
+        return Mage::getModel('sagepayserver/sagePayServer')->getConfigData($key);
     }
 
     public function getTransactionDetail($vendorTxCode)
@@ -74,22 +74,24 @@ class Ebizmarts_SagePaySuite_Model_Fraud
         $sslversion = Mage::getStoreConfig('payment/sagepaysuite/curl_ssl_version');
         curl_setopt($curlSession, CURLOPT_SSLVERSION, $sslversion);
         // Set the URL
-        curl_setopt ($curlSession, CURLOPT_URL, $this->_getAccessUrl());
+        curl_setopt($curlSession, CURLOPT_URL, $this->_getAccessUrl());
         // No headers, please
-        curl_setopt ($curlSession, CURLOPT_HEADER, 0);
+        curl_setopt($curlSession, CURLOPT_HEADER, 0);
         // It's a POST request
-        curl_setopt ($curlSession, CURLOPT_POST, 1);
+        curl_setopt($curlSession, CURLOPT_POST, 1);
         // Set the fields for the POST
-        curl_setopt ($curlSession, CURLOPT_POSTFIELDS, 'XML='.$xml);
+        curl_setopt($curlSession, CURLOPT_POSTFIELDS, 'XML='.$xml);
         // Return it direct, don't print it out
-        curl_setopt($curlSession, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($curlSession, CURLOPT_RETURNTRANSFER, 1);
         // This connection will timeout in 30 seconds
         curl_setopt($curlSession, CURLOPT_TIMEOUT, 90);
         //The next two lines must be present for the kit to work with newer version of cURL
         //You should remove them if you have any problems in earlier versions of cURL
 
-        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER,
-            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+        curl_setopt(
+            $curlSession, CURLOPT_SSL_VERIFYPEER,
+            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false
+        );
 
         curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
 
@@ -109,7 +111,7 @@ class Ebizmarts_SagePaySuite_Model_Fraud
         }
 
         // Close the cURL session
-        curl_close ($curlSession);
+        curl_close($curlSession);
 
         return trim($rawresponse);
 

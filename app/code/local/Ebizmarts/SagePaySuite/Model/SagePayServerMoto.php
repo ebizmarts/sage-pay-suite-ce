@@ -7,7 +7,8 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Model_SagePayServerMoto extends Ebizmarts_SagePaySuite_Model_SagePayServer {
+class Ebizmarts_SagePaySuite_Model_SagePayServerMoto extends Ebizmarts_SagePaySuite_Model_SagePayServer
+{
 
     /**
      * unique internal payment method identifier
