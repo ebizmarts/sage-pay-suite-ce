@@ -592,6 +592,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends><active>1</active></depends>
+                            <depends>
+                                <active>1</active>
+                            </depends>
                         </secure3d>
                         <force_threed_cards translate="label comment">
                             <label>Force 3D checking for selected credit cards</label>
