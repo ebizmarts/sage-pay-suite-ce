@@ -32,7 +32,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Deferred_Grid extends M
             'integration'
         )
         ->where('trns.tx_type = ?', 'DEFERRED')
-        ->where('trns.released IS NULL');
+        ->where('isnull(trns.released) OR trns.released = 0');
 
         $this->setCollection($collection);
         return parent::_prepareCollection();
