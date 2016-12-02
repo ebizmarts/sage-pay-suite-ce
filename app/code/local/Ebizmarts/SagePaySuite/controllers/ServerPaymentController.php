@@ -562,7 +562,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                             Mage::register('sagepay_create_invoice', 1, true);//For Magento 1.9+ when customer is Checkout=Register
                         }
 
+                        //@codingStandardsIgnoreStart
                         $sageserverpost = new Varien_Object($_POST);
+                        //@codingStandardsIgnoreEnd
+
                         Mage::register('sageserverpost', $sageserverpost);
 
                         //1.9.1 ssl fix
@@ -765,7 +768,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         $this->_getSagePayServerSession()->setInvoicePayment(false);
                         Mage::register('sagepay_create_invoice', 0, true);
 
+                        //@codingStandardsIgnoreStart
                         $sageserverpost = new Varien_Object($_POST);
+                        //@codingStandardsIgnoreEnd
+
                         Mage::register('sageserverpost', $sageserverpost);
 
                         //1.9.1 ssl fix
