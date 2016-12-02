@@ -325,7 +325,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
     public function notifyAction()
     {
+        //@codingStandardsIgnoreStart
         Sage_Log::log($_POST, null, 'SagePaySuite_POST_Requests.log');
+        //@codingStandardsIgnoreEnd
 
         if ($this->isPreSaveEnabled()) {
             return $this->notifyActionWhenOrderPreSaved();
