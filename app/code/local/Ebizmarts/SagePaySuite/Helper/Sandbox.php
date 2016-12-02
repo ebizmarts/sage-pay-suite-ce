@@ -11,29 +11,43 @@
 class Ebizmarts_SagePaySuite_Helper_Sandbox extends Mage_Core_Helper_Abstract
 {
 
-	public function getTestDataJson()
+    public function getTestDataJson()
     {
-		return Zend_Json::encode($this->getSagePayTestData());
-	}
+        return Zend_Json::encode($this->getSagePayTestData());
+    }
 
-	public function getSandBox()
-	{
-		return new Varien_Simplexml_Element(file_get_contents(Mage::getModuleDir('etc', 'Ebizmarts_SagePaySuite').DS.'sandbox.xml'));
-	}
+    public function getSandBox()
+    {
+        $sandbox=$this->_getSandboxContent(Mage::getModuleDir('etc', 'Ebizmarts_SagePaySuite').DS, 'sandbox.xml');
+        if ($sandbox === FALSE) {
+            $r = new stdClass;
+            $r->testcards = array();
+            return $r;
+        }
 
-	public function objToArray($v)
-	{
-		return (array)$v;
-	}
+        return new Varien_Simplexml_Element($sandbox);
+    }
 
-	public function getSagePayTestData()
+    protected function _getSandboxContent($path, $filename)
+    {
+        $io = new Varien_Io_File();
+        $io->open(array('path' => $path));
+        return $io->read($filename);
+    }
+
+    public function objToArray($v)
+    {
+        return (array)$v;
+    }
+
+    public function getSagePayTestData()
     {
 
-    	$sandbox = $this->getSandBox();
+        $sandbox = $this->getSandBox();
 
-		$cardsArray = array_values(array_map(array($this, 'objToArray'), (array)$sandbox->testcards));
+        $cardsArray = array_values(array_map(array($this, 'objToArray'), (array)$sandbox->testcards));
 
-		return $cardsArray;
-	}
+        return $cardsArray;
+    }
 
 }

@@ -13,7 +13,7 @@ class Ebizmarts_SagePaySuite_Block_JavascriptVars extends Mage_Core_Block_Templa
 
     public function __construct()
     {
-    	Mage::getModel('sagepaysuite/session')->clear();
+        Mage::getModel('sagepaysuite/session')->clear();
         $this->assign('valid', $this->helper('sagepaysuite')->F91B2E37D34E5DC4FFC59C324BDC1157C());
     }
 

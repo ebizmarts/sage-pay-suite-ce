@@ -106,7 +106,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
         /**
          * Remove quote item
          */
-        if ( ($itemId = (int) $this->getRequest()->getPost('remove_item'))
+        if (($itemId = (int) $this->getRequest()->getPost('remove_item'))
              && ($from = (string) $this->getRequest()->getPost('from'))) {
             $this->_getOrderCreateModel($itemId)->removeItem($itemId, $from);
         }
@@ -114,7 +114,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
         /**
          * Move quote item
          */
-        if ( ($itemId = (int) $this->getRequest()->getPost('move_item'))
+        if (($itemId = (int) $this->getRequest()->getPost('move_item'))
             && ($moveTo = (string) $this->getRequest()->getPost('to')) ) {
             $this->_getOrderCreateModel()->moveQuoteItem($itemId, $moveTo);
         }
@@ -185,7 +185,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
 
     public function getDirectModel()
     {
-    	return Mage::getModel('sagepaysuite/sagePayDirectProMoto');
+        return Mage::getModel('sagepaysuite/sagePayDirectProMoto');
     }
 
     /**
@@ -193,12 +193,11 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
      */
     public function saveAction()
     {
-    	$paymentData = $this->getRequest()->getPost('payment');
+        $paymentData = $this->getRequest()->getPost('payment');
 
         try {
             $this->_processData();
             if ($paymentData = $this->getRequest()->getPost('payment')) {
-
                 //Added on Magento EE 1.13.0.0
                 if(Mage::helper('sagepaysuite')->isMagentoEE113OrUp()) {
                     $paymentData['checks'] = Mage_Payment_Model_Method_Abstract::CHECK_USE_INTERNAL
@@ -212,13 +211,13 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
                 $this->_getOrderCreateModel()->getQuote()->getPayment()->addData($paymentData);
             }
 
-			if($paymentData && $paymentData['method'] == 'sagepaydirectpro_moto'){
-				$result = $this->getDirectModel()->registerTransaction($this->getRequest()->getPost());
-			}
+            if($paymentData && $paymentData['method'] == 'sagepaydirectpro_moto'){
+                $result = $this->getDirectModel()->registerTransaction($this->getRequest()->getPost());
+            }
 
 
             $order = $this->_getOrderCreateModel()
-            	->setIsValidate(true)
+                ->setIsValidate(true)
                 ->importPostData($this->getRequest()->getPost('order'))
                 ->createOrder();
 
@@ -228,9 +227,10 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
         }
         catch (Mage_Core_Exception $e){
             $message = $e->getMessage();
-            if( !empty($message) ) {
+            if(!empty($message)) {
                 $this->_getSession()->addError($message);
             }
+
             $this->_redirect('adminhtml/sales_order_create/index');
         }
         catch (Exception $e){
@@ -239,7 +239,8 @@ class Ebizmarts_SagePaySuite_Adminhtml_Sales_Order_SpsCreateController extends M
         }
     }
 
-    protected function _isAllowed() {
+    protected function _isAllowed() 
+    {
             $acl = 'sales/order/actions/create';
             return Mage::getSingleton('admin/session')->isAllowed($acl);
     }

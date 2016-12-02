@@ -84,8 +84,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Fraud_Grid extends Mage
             $_c->setData('thirdman_action', $f->getThirdmanAction());
             $_c->setData('thirdman_id', $f->getThirdmanId());
             $_c->setData('tresd', $f->getTresd());
-
         }
+
         $this->setDefaultSort('increment_id');
         $this->setCollection($collection);
         return parent::_prepareCollection();
@@ -93,24 +93,29 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Fraud_Grid extends Mage
 
     protected function _prepareColumns()
     {
-        $this->addColumn('real_order_id', array(
+        $this->addColumn(
+            'real_order_id', array(
             'header'=> Mage::helper('sales')->__('Order #'),
             'width' => '80px',
             'type'  => 'text',
             'index' => 'increment_id',
-        ));
+            )
+        );
 
         if (!Mage::app()->isSingleStoreMode()) {
-            $this->addColumn('store_id', array(
+            $this->addColumn(
+                'store_id', array(
                 'header'    => Mage::helper('sales')->__('Purchased From (Store)'),
                 'index'     => 'store_id',
                 'type'      => 'store',
                 'store_view'=> true,
                 'display_deleted' => true,
-            ));
+                )
+            );
         }
 
-        $this->addColumn('cv2', array(
+        $this->addColumn(
+            'cv2', array(
             'header' => Mage::helper('sales')->__('Verification Value (CV2)'),
             'index' => 'cv2',
             'type' => 'text',
@@ -118,67 +123,85 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Fraud_Grid extends Mage
             #'renderer'  => self::IMAGE_RENDERER,
             'renderer'  => self::TEXT_FLAG_RENDERER,
             'filter' => false,
-        ));
+            )
+        );
 
-        $this->addColumn('postcode', array(
+        $this->addColumn(
+            'postcode', array(
             'header' => Mage::helper('sales')->__('Post Code'),
             'index' => 'postcode',
             'align'     => 'center',
             'renderer'  => self::TEXT_FLAG_RENDERER,
             'filter' => false,
-        ));
+            )
+        );
 
-        $this->addColumn('address_result', array(
+        $this->addColumn(
+            'address_result', array(
             'header' => Mage::helper('sales')->__('Address Numerics'),
             'index' => 'address_result',
             'align'     => 'center',
             'renderer'  => self::TEXT_FLAG_RENDERER,
             'filter' => false,
-        ));
+            )
+        );
 
-        $this->addColumn('thirdmanaction', array(
+        $this->addColumn(
+            'thirdmanaction', array(
             'header' => Mage::helper('sales')->__('The 3rdMan Action'),
             'index' => 'thirdman_action',
             'align'     => 'center',
             'renderer'  => self::TEXT_FLAG_RENDERER,
             'filter' => false,
-        ));
+            )
+        );
 
-        $this->addColumn('thirdman', array(
+        $this->addColumn(
+            'thirdman', array(
             'header' => Mage::helper('sales')->__('The 3rdMan Score'),
             'index' => 'thirdman_score',
             'align'     => 'center',
             'filter' => false,
-        ));
+            )
+        );
 
-        $this->addColumn('thirdmanid', array(
+        $this->addColumn(
+            'thirdmanid', array(
             'header' => Mage::helper('sales')->__('The 3rdMan ID'),
             'index' => 'thirdman_id',
             'align'     => 'center',
             'filter' => false,
-        ));
+            )
+        );
 
-        $this->addColumn('billing_name', array(
+        $this->addColumn(
+            'billing_name', array(
             'header' => Mage::helper('sales')->__('Bill to Name'),
             'index' => 'billing_name',
-        ));
+            )
+        );
 
-        $this->addColumn('grand_total', array(
+        $this->addColumn(
+            'grand_total', array(
             'header' => Mage::helper('sales')->__('G.T. (Purchased)'),
             'index' => 'grand_total',
             'type'  => 'currency',
             'currency' => 'order_currency_code',
-        ));
+            )
+        );
 
-        $this->addColumn('status', array(
+        $this->addColumn(
+            'status', array(
             'header' => Mage::helper('sales')->__('Status'),
             'index' => 'status',
             'type'  => 'options',
             'width' => '70px',
             'options' => Mage::getSingleton('sales/order_config')->getStatuses(),
-        ));
+            )
+        );
 
-        $this->addColumn('action',
+        $this->addColumn(
+            'action',
             array(
                 'header'    => Mage::helper('sales')->__('Action'),
                 'width'     => '70px',
@@ -195,7 +218,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Fraud_Grid extends Mage
                 'sortable'  => false,
                 'index'     => 'stores',
                 'is_system' => true,
-        ));
+            )
+        );
 
         return parent::_prepareColumns();
     }
@@ -206,10 +230,12 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Fraud_Grid extends Mage
         $this->getMassactionBlock()->setFormFieldName('order_ids');
         $this->getMassactionBlock()->setUseSelectAll(false);
 
-        $this->getMassactionBlock()->addItem('tm_check', array(
+        $this->getMassactionBlock()->addItem(
+            'tm_check', array(
              'label'=> Mage::helper('sagepaysuite')->__('Check 3rd Man'),
              'url'  => $this->getUrl('*/*/fraudCheck'),
-        ));
+            )
+        );
         return $this;
     }
 
@@ -218,6 +244,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Sales_Order_Fraud_Grid extends Mage
         if (Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/view')) {
             return $this->getUrl('adminhtml/sales_order/view', array('order_id' => $row->getId()));
         }
+
         return false;
     }
 

@@ -7,15 +7,18 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Block_Form_SagePayToken extends Mage_Payment_Block_Form_Cc {
+class Ebizmarts_SagePaySuite_Block_Form_SagePayToken extends Mage_Payment_Block_Form_Cc
+{
 
-    public function getTokenCards($methodCode = null) {
+    public function getTokenCards($methodCode = null) 
+    {
         $allCards = $this->helper('sagepaysuite/token')->loadCustomerCards($methodCode);
 
         return $allCards;
     }
 
-    public function canUseToken() {
+    public function canUseToken() 
+    {
         $ret = Mage::getModel('sagepaysuite/sagePayToken')->isEnabled();
 
         if(!$this->helper('sagepaysuite')->creatingAdminOrder()) {

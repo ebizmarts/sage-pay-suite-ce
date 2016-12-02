@@ -21,8 +21,9 @@ class Ebizmarts_SagePaySuite_Helper_Payment_Data extends Mage_Payment_Helper_Dat
         $_methods = parent::getPaymentMethods($store);
 
         if(isset($_methods['sagepaysuite'])){
-        	unset($_methods['sagepaysuite']);
+            unset($_methods['sagepaysuite']);
         }
+
         return $_methods;
     }
 }

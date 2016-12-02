@@ -6,7 +6,8 @@ $connection = $installer->getConnection();
 
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
 
     -- -----------------------------------------------------
     -- Table `{$this->getTable('sagepaysuite_paypaltransaction')}`
@@ -36,6 +37,7 @@ $installer->run("
       PRIMARY KEY (`id`) )
     ENGINE = MYISAM DEFAULT CHARSET=utf8;
 
-");
+"
+);
 
 $installer->endSetup();

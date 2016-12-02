@@ -7,9 +7,11 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySuite_Model_Observer {
+class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySuite_Model_Observer
+{
 
-    protected function _getLastOrderId() {
+    protected function _getLastOrderId() 
+    {
         return (int) (Mage::getSingleton('checkout/type_onepage')->getCheckout()->getLastOrderId());
     }
 
@@ -18,12 +20,12 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
      * @param  $observer
      * @return Ebizmarts_SagePaySuite_Model_Observer_Checkout
      */
-    public function saveMagemavenOrderComment($observer) {
+    public function saveMagemavenOrderComment($observer) 
+    {
 
         //Magemaven_OrderComment
         $comment = $this->getSession()->getOrderComments(true);
         if($comment) {
-
             $order = $observer->getEvent()->getOrder();
 
             if(is_object($order)) {
@@ -32,6 +34,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
                 $order->setCustomerNote($comment);
             }
         }
+
         //Magemaven_OrderComment
 
         return $this;
@@ -40,7 +43,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
     /**
      * Clear SagePaySuite session when loading onepage checkout
      */
-    public function controllerOnePageClear($o) {
+    public function controllerOnePageClear($o) 
+    {
 
         /**
          * Delete register and guest cards when loading checkout
@@ -50,7 +54,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
             if ($sessionCards->getSize() > 0) {
                 foreach ($sessionCards as $_c) {
                     if ($_c->getCustomerId() == 0) {
-
                         $delete = Mage::getModel('sagepaysuite/sagePayToken')
                                 ->removeCard($_c->getToken(), $_c->getProtocol());
                         if ($delete['Status'] == 'OK') {
@@ -62,6 +65,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         } catch (Exception $ex) {
             Mage::logException($ex);
         }
+
         /**
          * Delete register and guest cards when loading checkout
          */
@@ -69,13 +73,13 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $this->getSession()->clear();
     }
 
-    public function controllerMultishippingClear($o) {
+    public function controllerMultishippingClear($o) 
+    {
 
         if($this->getSession()->getCreateInvoicePayment(true)) {
             $orderIds = Mage::getSingleton('checkout/type_multishipping')->getOrderIds();
 
             if(is_array($orderIds) and !empty($orderIds)) {
-
                 for($i=0;$i<count($orderIds);$i++) {
                     Mage::getModel('sagepaysuite/api_payment')->invoiceOrder(Mage::getModel('sales/order')->load($orderIds[$i]));
                 }
@@ -85,25 +89,26 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $this->getSession()->clear();
     }
 
-    public function getOnepage() {
+    public function getOnepage() 
+    {
 
         return Mage::getSingleton('checkout/type_onepage');
     }
 
-    public function controllerOnePageSuccess($o) {
+    public function controllerOnePageSuccess($o) 
+    {
 
         //check if session is there
         $sessionCheckout = $this->getOnepage()->getCheckout();
         if(!$sessionCheckout->getLastSuccessQuoteId() && !is_null(Mage::app()->getRequest()->getParam('qide'))
             && !is_null(Mage::app()->getRequest()->getParam('incide'))
             && !is_null(Mage::app()->getRequest()->getParam('oide'))) {
-
             if(Mage::getSingleton('core/session')->getData("sagepay_server_first_arrive") == true){
                 $sessionCheckout
                     ->setLastSuccessQuoteId(Mage::app()->getRequest()->getParam('qide'))
                     ->setLastQuoteId(Mage::app()->getRequest()->getParam('qide'))
                     ->setLastOrderId(Mage::app()->getRequest()->getParam('oide'))
-                    ->setLastRealOrderId(Mage::app()->getRequest()->getParam('incide'));
+                    ->setLastRealOrderId(Mage::helper('sagepaysuite')->decodeParamFromQuery(Mage::app()->getRequest()->getParam('incide')));
 
                 $autoInvoice = (int)Mage::app()->getRequest()->getParam('inv');
                 if($autoInvoice) {
@@ -138,7 +143,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         if((int)$tokenId) {
             $token = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->load($tokenId);
             if($token->getId() && ($token->getId() == $tokenId) && !$token->getCustomerId()) {
-
                 $customerId = Mage::getModel('sales/order')->load($orderId)->getCustomerId();
 
                 $token->setCustomerId($customerId)
@@ -156,7 +160,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $this->getSession()->clear();
     }
 
-    public function sendPaymentFailedEmail($observer) {
+    public function sendPaymentFailedEmail($observer) 
+    {
         //Check if enabled in config.
         if(0 === (int)Mage::getStoreConfig('payment/sagepaysuite/send_payment_failed_emails')) {
             return $this;
@@ -166,9 +171,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $message = $observer->getEvent()->getMessage();
 
         try {
-
             Mage::helper('sagepaysuite/checkout')->sendPaymentFailedEmail($quote, $message);
-
         } catch(Exception $ex) {
             Sage_Log::logException($ex);
         }
@@ -182,7 +185,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
      * @param $observer
      * @return $this
      */
-    public function serverRegisterRecoverSession($observer) {
+    public function serverRegisterRecoverSession($observer) 
+    {
 
 //        Sage_Log::log("CHECKOUT OBS: serverRegisterRecoverSession", null, 'SagePaySuite_SERVER_RESPONSE.log');
 //

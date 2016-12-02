@@ -7,13 +7,16 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Block_Checkout_Serverfailmoto extends Mage_Core_Block_Template {
+class Ebizmarts_SagePaySuite_Block_Checkout_Serverfailmoto extends Mage_Core_Block_Template
+{
 
-    protected function _getSess() {
+    protected function _getSess() 
+    {
         return Mage::getSingleton('sagepaysuite/session');
     }
 
-    protected function _toHtml() {
+    protected function _toHtml() 
+    {
 
         $message = $this->_getSess()->getFailStatus();
         Mage::getSingleton('checkout/session')->addError(Mage::helper('sagepaysuite/error')->parseTransactionFailedError($message));

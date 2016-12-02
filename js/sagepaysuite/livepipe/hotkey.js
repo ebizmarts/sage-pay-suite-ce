@@ -11,21 +11,25 @@
 
 if(typeof(Prototype) == "undefined") {
     throw "HotKey requires Prototype to be loaded."; }
+
 if(typeof(Object.Event) == "undefined") {
     throw "HotKey requires Object.Event to be loaded."; }
 
-var HotKey = Class.create({
-    initialize: function(letter,callback,options){
+var HotKey = Class.create(
+    {
+    initialize: function (letter,callback,options) {
         letter = letter.toUpperCase();
         HotKey.hotkeys.push(this);
-        this.options = Object.extend({
+        this.options = Object.extend(
+            {
             element: false,
             shiftKey: false,
             altKey: false,
             ctrlKey: true,
             bubbleEvent : true,
             fireOnce : false // Keep repeating event while key is pressed?
-        },options || {});
+            },options || {}
+        );
         this.letter = letter;
 
         // All custom hotkey events should stop after their custom actions.
@@ -33,12 +37,14 @@ var HotKey = Class.create({
             if (!(this.options.fireOnce && this.fired) && Object.isFunction(callback)) { 
                 callback(event); 
             }
+
             if (!this.options.bubbleEvent) { event.stop(); }
+
             this.fired = true;
         };
 
         this.element = $(this.options.element || document);
-        this.handler = function(event){
+        this.handler = function (event) {
             if(!event || (
                 (Event['KEY_' + this.letter] || this.letter.charCodeAt(0)) == event.keyCode &&
                 ((!this.options.shiftKey || (this.options.shiftKey && event.shiftKey)) &&
@@ -48,27 +54,31 @@ var HotKey = Class.create({
             )){
                 if(this.notify('beforeCallback',event) === false) {
                     return; }
+
                 this.callback(event);
                 this.notify('afterCallback',event);
             }
         }.bind(this);
         this.enable();
     },
-    trigger: function(){
+    trigger: function () {
         this.handler();
     },
-    enable: function(){
+    enable: function () {
         this.element.observe('keydown',this.handler);
     },
-    disable: function(){
+    disable: function () {
         this.element.stopObserving('keydown',this.handler);
     },
-    destroy: function(){
+    destroy: function () {
         this.disable();
         HotKey.hotkeys = HotKey.hotkeys.without(this);
     }
-});
-Object.extend(HotKey,{
+    }
+);
+Object.extend(
+    HotKey,{
     hotkeys: []
-});
+    }
+);
 Object.Event.extend(HotKey);

@@ -7,7 +7,8 @@ $installer->startSetup();
 
 //Changing tables storage engine to avoid table locking, with InnoDB we get row locking.
 
-$installer->run("
+$installer->run(
+    "
 	ALTER TABLE `{$this->getTable('sagepaysuite_transaction')}` ENGINE='InnoDB';
 	ALTER TABLE `{$this->getTable('sagepaysuite_action')}` ENGINE='InnoDB';
 	ALTER TABLE `{$this->getTable('sagepaysuite_fraud')}` ENGINE='InnoDB';
@@ -16,7 +17,8 @@ $installer->run("
 	ALTER TABLE `{$this->getTable('sagepaysuite_session')}` ENGINE='InnoDB';
 	ALTER TABLE `{$this->getTable('sagepaysuite_tokencard')}` ENGINE='InnoDB';
 	ALTER TABLE `{$this->getTable('sagepaysuite_transaction_queue')}` ENGINE='InnoDB';
-");
+"
+);
 
 $connection->addColumn($this->getTable('sagepaysuite_transaction'), 'updated_at', 'timestamp');
 

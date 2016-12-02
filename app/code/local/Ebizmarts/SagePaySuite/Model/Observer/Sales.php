@@ -7,7 +7,8 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite_Model_Observer {
+class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite_Model_Observer
+{
 
 
     /**
@@ -15,7 +16,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
      *
      * @param type $o
      */
-    public function orderState($o) {
+    public function orderState($o) 
+    {
 
         $order = $o->getEvent()->getOrder();
 
@@ -50,7 +52,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
     }
 
-    public function loadAfter($o) {
+    public function loadAfter($o) 
+    {
         $order = $o->getEvent()->getOrder();
 
         $trn = $this->_getTransactionsModel()
@@ -61,7 +64,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         }
     }
 
-    public function saveAfter($o) {
+    public function saveAfter($o) 
+    {
         $order = $o->getEvent()->getOrder();
 
         $isSage = Mage::helper('sagepaysuite')->isSagePayMethod($order->getPayment()->getMethod());
@@ -88,7 +92,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
          */
         $multiShippingTxCodes = Mage::registry('sagepaysuite_ms_txcodes');
         if ($multiShippingTxCodes) {
-
             Mage::unregister('sagepaysuite_ms_txcodes');
 
             $sessionVendor = current($multiShippingTxCodes);
@@ -98,6 +101,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
             Mage::register('sagepaysuite_ms_txcodes', $multiShippingTxCodes);
         }
+
         /**
          * Multishipping vendors
          */
@@ -108,10 +112,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         }
 
         if (is_null($sessionVendor)) {
-
-
             if (!$dbtrn->getId()) {
-
                 #For empty payments or old orders (standalone payment methods).
                 if ((Mage::app()->getRequest()->getControllerModule() == 'Mage_Api') || Mage::registry('current_shipment') || Mage::registry('sales_order') || Mage::registry('current_creditmemo') || Mage::registry('current_invoice') || ($order->getPayment()->getMethod() == 'sagepayrepeat')) {
                     return $o;
@@ -119,7 +120,10 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
                 $logfileName = $order->getIncrementId() . '-' . time() . '_Payment_Failed.log';
 
+                //@codingStandardsIgnoreStart
                 $request_data = $_REQUEST;
+                //@codingStandardsIgnoreEnd
+
                 if (isset($request_data['payment'])) {
                     $request_data['payment']['cc_number'] = 'XXXXXXXXXXXXX';
                     $request_data['payment']['cc_cid'] = 'XXX';
@@ -143,7 +147,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
                 ->setOrderId($order->getId());
 
         if ($tran->getId()) {
-
             if ($tran->getToken()) {
                 $token = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->loadByToken($tran->getToken());
                 if ($token->getId()) {
@@ -169,7 +172,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         }
     }
 
-    public function saveBefore($o) {
+    public function saveBefore($o) 
+    {
         $order = $o->getEvent()->getOrder();
 
         $payment = $order->getPayment();
@@ -218,7 +222,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         }
     }
 
-    public function invoiceAdminOrder($observer) {
+    public function invoiceAdminOrder($observer) 
+    {
         $order = $observer->getEvent()->getOrder();
 
         $payment = $order->getPayment();
@@ -232,7 +237,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         }
     }
 
-    public function updateButton($observer) {
+    public function updateButton($observer) 
+    {
         $block = $observer->getEvent()->getBlock();
 
         if (get_class($block) == 'Mage_Adminhtml_Block_Widget_Button') {
@@ -246,7 +252,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         return $observer;
     }
 
-    public function quoteToOrder(Varien_Event_Observer $observer) {
+    public function quoteToOrder(Varien_Event_Observer $observer) 
+    {
         $sessionOrderId = $this->getSession()->getReservedOrderId();
 
         $orderExists = Mage::getModel('sales/order')->loadByIncrementId($sessionOrderId);
@@ -265,7 +272,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
     /**
      * Handle OneStepCheckout callbacks
      */
-    protected function _handleOscCallbacks($order) {
+    protected function _handleOscCallbacks($order) 
+    {
         $newsletterEmail = $this->getSession()->getOscNewsletterEmail();
         if ($newsletterEmail) {
             $this->_oscSuscribeNewsletter($newsletterEmail);
@@ -273,7 +281,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
     }
 
-    protected function _oscSuscribeNewsletter($customerEmail) {
+    protected function _oscSuscribeNewsletter($customerEmail) 
+    {
         try {
             $model = Mage::getModel('newsletter/subscriber');
             $result = $model->loadByEmail($customerEmail);
@@ -287,43 +296,45 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
         }
     }
 
-    public function addColumnToSalesOrderGrid($observer) {
+    public function addColumnToSalesOrderGrid($observer) 
+    {
 
         $block = $observer->getEvent()->getBlock();
         //if (get_class($block) == 'Mage_Adminhtml_Block_Sales_Order_Grid') {
         if($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid) { //Thanks Paul Ketelle for your feedback on this
 
-            $block->addColumnAfter('sagepay_transaction_state', array(
+            $block->addColumnAfter(
+                'sagepay_transaction_state', array(
                 'header' => Mage::helper('sagepaysuite')->__('Sage Pay'),
                 'index' => 'sagepay_transaction_state',
                 'align' => 'center',
                 'filter' => false,
                 'renderer' => 'sagepaysuite/adminhtml_sales_order_grid_renderer_state',
                 'sortable' => false,
-                    )
-                    , 'real_order_id');
+                    ), 'real_order_id'
+            );
         }
 
         return $observer;
     }
 
-    public function addButtonToOrderView($observer) {
+    public function addButtonToOrderView($observer) 
+    {
         $block = $observer->getEvent()->getBlock();
 
         //if (get_class($block) == 'Mage_Adminhtml_Block_Sales_Order_View') {
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_View) {
-
             $sagePayData = $block->getOrder()->getSagepayInfo();
             if ($sagePayData) {
-
                 //Sage Pay - Sync from Api
-                $block->addButton('update_from_api', array(
+                $block->addButton(
+                    'update_from_api', array(
                     'label' => Mage::helper('sagepaysuite')->__('Sage Pay - Sync from Api'),
                     'onclick' => 'setLocation(\'' . $block->getUrl('adminhtml/spsTransaction/sync', array('_secure' => true, 'trn_id' => $sagePayData->getId())) . '\')',
                     'class' => 'go'
-                ));
+                    )
+                );
             }
-
         }
     }
 

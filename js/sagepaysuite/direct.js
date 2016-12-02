@@ -1,16 +1,17 @@
-addValidationClass = function(obj){
+addValidationClass = function (obj) {
     if(obj.hasClassName('validation-passed')){
         obj.removeClassName('validation-passed');
     }
+
     obj.addClassName('validate-issue-number');
 }
-changecsvclass = function(obj) {
+changecsvclass = function (obj) {
 
-	var methodCode = 'sagepaydirectpro';
+    var methodCode = 'sagepaydirectpro';
 
-	if((typeof FORM_KEY) != 'undefined'){
-		methodCode = 'sagepaydirectpro_moto';
-	}
+    if((typeof FORM_KEY) != 'undefined'){
+        methodCode = 'sagepaydirectpro_moto';
+    }
 
     var ccTypeContainer = $(methodCode + '_cc_type');
     var ccCVNContainer = $(methodCode + '_cc_cid');
@@ -25,6 +26,7 @@ changecsvclass = function(obj) {
                 ccCVNContainer.removeClassName('required-entry');
             }
         }
+
         if(ccTypeContainer.value != 'LASER' && !ccCVNContainer.hasClassName('required-entry'))
         {
             if(ccCVNContainer) {
@@ -34,8 +36,9 @@ changecsvclass = function(obj) {
     }
 }
 
-Validation.addAllThese([
-    ['validate-ccsgpdp-number', 'Please enter a valid credit card number.', function(v, elm) {
+Validation.addAllThese(
+    [
+    ['validate-ccsgpdp-number', 'Please enter a valid credit card number.', function (v, elm) {
         // remove non-numerics
 
         var ccTypeContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_number')) + '_cc_type');
@@ -54,7 +57,7 @@ Validation.addAllThese([
 
         return validateCreditCard(v);
     }],
-    ['validate-ccsgpdp-cvn', 'Please enter a valid credit card verification number.', function(v, elm) {
+    ['validate-ccsgpdp-cvn', 'Please enter a valid credit card verification number.', function (v, elm) {
         var ccTypeContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_cid')) + '_cc_type');
         var ccCVNContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_cid')) + '_cc_cid');
         if(ccTypeContainer)
@@ -65,6 +68,7 @@ Validation.addAllThese([
                     ccCVNContainer.removeClassName('required-entry');
                 }
             }
+
             if(ccTypeContainer.value != 'LASER' && !ccCVNContainer.hasClassName('required-entry'))
             {
                 if(ccCVNContainer) {
@@ -76,9 +80,11 @@ Validation.addAllThese([
         {
             return true;
         }
+
         if (!ccTypeContainer && ccTypeContainer.value != 'LASER') {
             return true;
         }
+
         var ccType = ccTypeContainer.value;
 
         switch (ccType) {
@@ -105,7 +111,7 @@ Validation.addAllThese([
 
         return false;
     }],
-    ['validate-ccsgpdp-type', 'Credit card number doesn\'t match credit card type', function(v, elm) {
+    ['validate-ccsgpdp-type', 'Credit card number doesn\'t match credit card type', function (v, elm) {
         // remove credit card number delimiters such as "-" and space
         elm.value = removeDelimiters(elm.value);
         v         = removeDelimiters(v);
@@ -114,12 +120,14 @@ Validation.addAllThese([
         if (!ccTypeContainer) {
             return true;
         }
+
         var ccType = ccTypeContainer.value;
 
         // Other card type or switch or solo card
         if (ccType == 'MCDEBIT' || ccType == 'OT' ||  ccType == 'UKE' || ccType == 'DELTA' || ccType == 'MAESTRO' || ccType == 'SOLO' || ccType == 'SWITCH' || ccType == 'LASER' || ccType == 'JCB' || ccType == 'DC') {
             return true;
         }
+
         // Credit card type detecting regexp
         var ccTypeRegExp = {
             'VISA': new RegExp('^4[0-9]{12}([0-9]{3})?$'),
@@ -130,12 +138,14 @@ Validation.addAllThese([
 
         // Matched credit card type
         var ccMatchedType = '';
-        $H(ccTypeRegExp).each(function (pair) {
+        $H(ccTypeRegExp).each(
+            function (pair) {
             if (v.match(pair.value)) {
                 ccMatchedType = pair.key;
                 throw $break;
             }
-        });
+            }
+        );
 
         if(ccMatchedType != ccType) {
             return false;
@@ -143,11 +153,11 @@ Validation.addAllThese([
 
         return true;
     }],
-    ['validate-ccsgpdp-type-select', 'Card type doesn\'t match credit card number', function(v, elm) {
+    ['validate-ccsgpdp-type-select', 'Card type doesn\'t match credit card number', function (v, elm) {
         var ccNumberContainer = $(elm.id.substr(0,elm.id.indexOf('_cc_type')) + '_cc_number');
         return Validation.get('validate-ccsgpdp-type').test(ccNumberContainer.value, ccNumberContainer);
     }],
-    ['validate-issue-number', 'Issue Number must have at least two characters', function(v, elm) {
+    ['validate-issue-number', 'Issue Number must have at least two characters', function (v, elm) {
 
         if(v.length > 0 && !(v.match(new RegExp('^([0-9]{1}|[0-9]{2})$')))){
             return false;
@@ -160,15 +170,18 @@ Validation.addAllThese([
             if (isNaN(v)) {
                 return true;
             }
+
             return false;
         } catch (_error) {
             return true;
         }
     }]
-]);
+    ]
+);
 
-Validation.addAllThese([
-    ['validate-cc-ukss', 'Please enter issue number or start date for switch/solo card type.', function(v,elm) {
+Validation.addAllThese(
+    [
+    ['validate-cc-ukss', 'Please enter issue number or start date for switch/solo card type.', function (v,elm) {
               var endposition;
 
               if (elm.id.match(/(.)+_cc_issue$/)) {
@@ -186,6 +199,7 @@ Validation.addAllThese([
               if (!ccTypeContainer) {
                     return true;
               }
+
               var ccType = ccTypeContainer.value;
 
               if(ccType!='SS'){
@@ -211,4 +225,5 @@ Validation.addAllThese([
               return true;
 
     }]
-]);
+    ]
+);

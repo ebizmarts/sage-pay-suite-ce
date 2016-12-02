@@ -1,8 +1,10 @@
 <?php
 
-class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Mage_Adminhtml_Controller_Action {
+class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Mage_Adminhtml_Controller_Action
+{
 
-    protected function _initAction() {
+    protected function _initAction() 
+    {
         $this->loadLayout()
                 ->_setActiveMenu('sagepayreporting/transaction_detail')
                 ->_addBreadcrumb(Mage::helper('adminhtml')->__('Items Manager'), Mage::helper('adminhtml')->__('Item Manager'));
@@ -10,7 +12,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         return $this;
     }
 
-    public function editAction() {
+    public function editAction() 
+    {
         $id = $this->getRequest()->getParam('id');
         $model = Mage::getModel('sagepayreporting/sagepayreporting')->load($id);
 
@@ -40,13 +43,14 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         }
     }
 
-    public function newAction() {
+    public function newAction() 
+    {
         $this->_forward('edit');
     }
 
-    public function saveAction() {
+    public function saveAction() 
+    {
         if ($data = $this->getRequest()->getPost()) {
-
             if (isset($_FILES['filename']['name']) && $_FILES['filename']['name'] != '') {
                 try {
                     /* Starting upload */
@@ -66,7 +70,6 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                     $path = Mage::getBaseDir('media') . DS;
                     $uploader->save($path, $_FILES['filename']['name']);
                 } catch (Exception $e) {
-
                 }
 
                 //this way the name is saved in DB
@@ -94,6 +97,7 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                     $this->_redirect('*/*/edit', array('id' => $model->getId()));
                     return;
                 }
+
                 $this->_redirect('*/*/');
                 return;
             } catch (Exception $e) {
@@ -103,11 +107,13 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 return;
             }
         }
+
         Mage::getSingleton('adminhtml/session')->addError(Mage::helper('sagepayreporting')->__('Unable to find item to save'));
         $this->_redirect('*/*/');
     }
 
-    public function deleteAction() {
+    public function deleteAction() 
+    {
         if ($this->getRequest()->getParam('id') > 0) {
             try {
                 $model = Mage::getModel('sagepayreporting/sagepayreporting');
@@ -122,10 +128,12 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
             }
         }
+
         $this->_redirect('*/*/');
     }
 
-    public function massDeleteAction() {
+    public function massDeleteAction() 
+    {
         $sagepayreportingIds = $this->getRequest()->getParam('sagepayreporting');
         if (!is_array($sagepayreportingIds)) {
             Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select item(s)'));
@@ -135,19 +143,22 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                     $sagepayreporting = Mage::getModel('sagepayreporting/sagepayreporting')->load($sagepayreportingId);
                     $sagepayreporting->delete();
                 }
+
                 Mage::getSingleton('adminhtml/session')->addSuccess(
-                        Mage::helper('adminhtml')->__(
-                                'Total of %d record(s) were successfully deleted', count($sagepayreportingIds)
-                        )
+                    Mage::helper('adminhtml')->__(
+                        'Total of %d record(s) were successfully deleted', count($sagepayreportingIds)
+                    )
                 );
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         }
+
         $this->_redirect('*/*/index');
     }
 
-    public function massStatusAction() {
+    public function massStatusAction() 
+    {
         $sagepayreportingIds = $this->getRequest()->getParam('sagepayreporting');
         if (!is_array($sagepayreportingIds)) {
             Mage::getSingleton('adminhtml/session')->addError($this->__('Please select item(s)'));
@@ -160,17 +171,20 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                             ->setIsMassupdate(true)
                             ->save();
                 }
+
                 $this->_getSession()->addSuccess(
-                        $this->__('Total of %d record(s) were successfully updated', count($sagepayreportingIds))
+                    $this->__('Total of %d record(s) were successfully updated', count($sagepayreportingIds))
                 );
             } catch (Exception $e) {
                 $this->_getSession()->addError($e->getMessage());
             }
         }
+
         $this->_redirect('*/*/index');
     }
 
-    public function exportCsvAction() {
+    public function exportCsvAction() 
+    {
         $fileName = 'sagepayreporting.csv';
         $content = $this->getLayout()->createBlock('sagepayreporting/adminhtml_sagepayreporting_grid')
                 ->getCsv();
@@ -178,7 +192,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         $this->_sendUploadResponse($fileName, $content);
     }
 
-    public function exportXmlAction() {
+    public function exportXmlAction() 
+    {
         $fileName = 'sagepayreporting.xml';
         $content = $this->getLayout()->createBlock('sagepayreporting/adminhtml_sagepayreporting_grid')
                 ->getXml();
@@ -186,7 +201,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         $this->_sendUploadResponse($fileName, $content);
     }
 
-    protected function _sendUploadResponse($fileName, $content, $contentType = 'application/octet-stream') {
+    protected function _sendUploadResponse($fileName, $content, $contentType = 'application/octet-stream') 
+    {
         $response = $this->getResponse();
         $response->setHeader('HTTP/1.1 200 OK', '');
         $response->setHeader('Pragma', 'public', true);
@@ -201,9 +217,9 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         die;
     }
 
-    public function transactionDetailAction() {
+    public function transactionDetailAction() 
+    {
         if ($this->getRequest()->getParam('vendortxcode')) {
-
             $paramStore = $this->getRequest()->getParam('store');
             if (!is_null($paramStore)) {
                 Mage::register('reporting_store_id', $paramStore);
@@ -224,7 +240,6 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 else {
                     $this->_getSession()->addError($response->getError());
                 }
-
             }
         }
         else {
@@ -237,12 +252,12 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 ->renderLayout();
     }
 
-    public function transactionDetailModalAction() {
+    public function transactionDetailModalAction() 
+    {
         if ($this->getRequest()->getParam('vendortxcode') || $this->getRequest()->getParam('vpstxid')) {
             $id = $this->getRequest()->getParam('vendortxcode') ? $this->getRequest()->getParam('vendortxcode') : $this->getRequest()->getParam('vpstxid');
 
             try {
-
                 if ($this->getRequest()->getParam('vpstxid')) {
                     $response = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionDetails(null, urldecode($id));
                     $relatedTrns = Mage::getModel('sagepayreporting/sagepayreporting')->getRelatedTransactions(urldecode($id));
@@ -258,7 +273,6 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                     Mage::register('sagepay_related_transactions', new Varien_Object);
                     $response = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionDetails($id, null);
                 }
-
             } catch(Exception $exc) {
                 //$this->_getSession()->addError($exc->getMessage());
                 $response = new Varien_Object;
@@ -269,8 +283,12 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
             if ($response->getErrorcode() == '0000') {
                 Mage::register('sagepay_detail', $response);
             } else {
-                $this->_getSession()->addError(Mage::helper('sagepayreporting/error')->parseError($response->getError(),
-                    Mage::getStoreConfig('sagepayreporting/account/vendor')));
+                $this->_getSession()->addError(
+                    Mage::helper('sagepayreporting/error')->parseError(
+                        $response->getError(),
+                        Mage::getStoreConfig('sagepayreporting/account/vendor')
+                    )
+                );
             }
         } else {
             Mage::register('sagepay_detail', null);
@@ -280,7 +298,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 ->renderLayout();
     }
 
-    public function threedstatusAction() {
+    public function threedstatusAction() 
+    {
         $this->_title($this->__('Sales'))->_title($this->__('Sage Pay'))
                 ->_title($this->__('Admin & Access API'))
                 ->_title($this->__('3D Secure Administration'));
@@ -291,7 +310,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 ->renderLayout();
     }
 
-    public function avscvstatusAction() {
+    public function avscvstatusAction() 
+    {
 
         $this->_title($this->__('Sales'))->_title($this->__('Sage Pay'))
                 ->_title($this->__('Admin & Access API'))
@@ -303,20 +323,20 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
                 ->renderLayout();
     }
 
-    public function avscvtoggleAction() {
+    public function avscvtoggleAction() 
+    {
         $currentStatus = $this->getRequest()->getParam('st');
 
         if ($currentStatus) {
             $newStatus = ($currentStatus == 'ON' ? 'OFF' : 'ON');
             try {
-
                 $paramStore = $this->getRequest()->getParam('store');
                 if (!is_null($paramStore)) {
                     Mage::register('reporting_store_id', $paramStore);
                 }
 
                 $result = Mage::getModel('sagepayreporting/sagepayreporting')->setAVSCV2Status($newStatus);
-                if($result['ok'] === true ){
+                if($result['ok'] === true){
                     $this->_getSession()->addSuccess(Mage::helper('sagepayreporting')->__('Status changed successfully'));
                 }else{
                     $this->_getSession()->addError($result['result']);
@@ -330,13 +350,13 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         return;
     }
 
-    public function threedtoggleAction() {
+    public function threedtoggleAction() 
+    {
         $currentStatus = $this->getRequest()->getParam('st');
 
         if ($currentStatus) {
             $newStatus = ($currentStatus == 'ON' ? 'OFF' : 'ON');
             try {
-
                 $paramStore = $this->getRequest()->getParam('store');
                 if (!is_null($paramStore)) {
                     Mage::register('reporting_store_id', $paramStore);
@@ -357,7 +377,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         return;
     }
 
-    public function showpostAction() {
+    public function showpostAction() 
+    {
         $postVendor = Mage::getModel('sagepaysuite/api_payment')->showPost();
 
         $this->_getSession()->addSuccess(Mage::helper('sagepayreporting')->__('Vendorname used: %s', $postVendor));
@@ -366,7 +387,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
         return;
     }
 
-    public function massThirdmanCheckAction(){
+    public function massThirdmanCheckAction()
+    {
 
         $fraudTblName = Mage::getSingleton('core/resource')->getTableName('sagepayreporting_fraud');
         $transactions = Mage::getResourceModel('sagepaysuite2/sagepaysuite_transaction_collection');
@@ -379,15 +401,14 @@ class Ebizmarts_SagePayReporting_Adminhtml_SagePayReportingController extends Ma
             ->limit(30);
 
         foreach($transactions as $_trn) {
-
             $update = $_trn->updateFromApi();
-
         }
 
         $this->_redirect('adminhtml/sagepayreporting_fraud');
     }
 
-    protected function _isAllowed() {
+    protected function _isAllowed() 
+    {
             $acl = 'sales/sagepay/sagepayreporting';
             return Mage::getSingleton('admin/session')->isAllowed($acl);
     }

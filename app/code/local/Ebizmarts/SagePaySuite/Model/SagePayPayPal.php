@@ -8,7 +8,8 @@
  * @author     Ebizmarts <info@ebizmarts.com>
  */
 
-class Ebizmarts_SagePaySuite_Model_SagePayPayPal extends Ebizmarts_SagePaySuite_Model_SagePayDirectPro {
+class Ebizmarts_SagePaySuite_Model_SagePayPayPal extends Ebizmarts_SagePaySuite_Model_SagePayDirectPro
+{
 
     protected $_code  = 'sagepaypaypal';
 

@@ -19,11 +19,11 @@ class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Action extends Mage_Core_Model_A
 
     public function getLastAuthorise($orderId)
     {
-		return $this->getCollection()
-    	->setOrderFilter($orderId)
+        return $this->getCollection()
+        ->setOrderFilter($orderId)
                     ->setAuthoriseFilter()
-    				->addOrder('action_date')
-    				->load()->getFirstItem();
+                    ->addOrder('action_date')
+                    ->load()->getFirstItem();
     }
 
 }

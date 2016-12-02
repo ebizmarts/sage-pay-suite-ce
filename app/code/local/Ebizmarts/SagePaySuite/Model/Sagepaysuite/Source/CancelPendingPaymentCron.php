@@ -4,9 +4,11 @@
  * See LICENSE.txt for license details.
  */
 
-class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Source_CancelPendingPaymentCron {
+class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Source_CancelPendingPaymentCron
+{
 
-    public function toOptionArray() {
+    public function toOptionArray() 
+    {
         return array(
             '0'  => Mage::helper('sagepaysuite')->__('Disabled'),
             '10' => Mage::helper('sagepaysuite')->__('Cancel order after 10 min'),

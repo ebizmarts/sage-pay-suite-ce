@@ -1,8 +1,10 @@
 <?php
 
-class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipController extends Mage_Adminhtml_Controller_Action {
+class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipController extends Mage_Adminhtml_Controller_Action
+{
 
-    public function whitelistIpAction() {
+    public function whitelistIpAction() 
+    {
         $this->_title($this->__('Sales'))
                 ->_title(Mage::helper('sagepayreporting')->__('Sage Pay Suite'))
                 ->_title(Mage::helper('sagepayreporting')->__('White list IP address'));
@@ -19,7 +21,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipControlle
         $this->renderLayout();
     }
 
-    public function saveAction() {
+    public function saveAction() 
+    {
         if (!$this->getRequest()->isPost()) {
             $this->_redirect('adminhtml/sagepayreporting_whitelistip/whitelistIp');
             return;
@@ -46,7 +49,8 @@ class Ebizmarts_SagePayReporting_Adminhtml_Sagepayreporting_WhitelistipControlle
         return;
     }
 
-    protected function _isAllowed() {
+    protected function _isAllowed() 
+    {
             $acl = 'sales/sagepay/sagepayreporting/add_ip_to_whitelist';
             return Mage::getSingleton('admin/session')->isAllowed($acl);
     }

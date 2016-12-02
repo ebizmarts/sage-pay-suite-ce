@@ -1,6 +1,7 @@
 <?php
 
-class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_Template {
+class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_Template
+{
 
     protected $_arrayTransactions = null;
     protected $_varObjSuccessTransactionsCount = null;
@@ -13,13 +14,15 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
     public $startDate = null;
     public $daysAgo = 7;
 
-    protected function _prepareLayout() {
+    protected function _prepareLayout() 
+    {
         $this->setChild('reporting.switcher', $this->getLayout()->createBlock('sagepayreporting/adminhtml_sagepayreporting_switcher', 'reporting.switcher'));
 
         return parent::_prepareLayout();
     }
 
-    public function __construct() {
+    public function __construct() 
+    {
         parent::__construct();
 
         $paramStore = $this->getRequest()->getParam('store');
@@ -38,13 +41,15 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
         $this->_varObjFailedTransactionsCount  = $this->getTransactionsDetails("FAILURE");
     }
 
-    public function getOnlyDate($date) {
+    public function getOnlyDate($date) 
+    {
         $_date = explode(" ", $date);
 
         return $_date[0];
     }
 
-    private function _getDate($sageDate) {
+    private function _getDate($sageDate) 
+    {
 
         // Listing all the variables
         $sageDate = explode("/", $sageDate);
@@ -65,7 +70,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
         return $time;
     }
 
-    private function _mktime($date) {
+    private function _mktime($date) 
+    {
 
         $fecha = explode(" ", $date);
 
@@ -94,7 +100,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
 
     }
 
-    public function _sortDate($a, $b) {
+    public function _sortDate($a, $b) 
+    {
 
         $timeA = mktime($_hora[0], $_hora[1], $second, $month, $day, $_fecha[2]);
         $timeB = mktime($_hora[0], $_hora[1], $second, $month, $day, $_fecha[2]);
@@ -107,7 +114,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
 
     }
 
-    public function _sortByDate($a, $b) {
+    public function _sortByDate($a, $b) 
+    {
 
         $timeA = $this->_mktime($a['started']);
         $timeB = $this->_mktime($b['started']);
@@ -120,7 +128,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
 
     }
 
-    public function getTotals() {
+    public function getTotals() 
+    {
 
         $data = "var totalsData = new Array();";
 
@@ -133,7 +142,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
         return $data;
     }
 
-    public function getCurrencies() {
+    public function getCurrencies() 
+    {
 
         $currencies = $this->_currencies;
 
@@ -145,13 +155,14 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
         return $currencies;
     }
 
-    public function getTabLabel($currencyCode, $amount) {
+    public function getTabLabel($currencyCode, $amount) 
+    {
         return Mage::app()->getLocale()->currency($currencyCode)->toCurrency($amount);
     }
 
-    public function getTransactionList($daysAgo) {
+    public function getTransactionList($daysAgo) 
+    {
         try {
-
             $paramStore = $this->getRequest()->getParam('store');
 
             $tsStart   = Mage::getModel('core/date')->timestamp(" -" . $daysAgo . " days");
@@ -179,13 +190,11 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
 
             $returnArray = Mage::app()->loadCache($cacheKey);
             if (false === $returnArray) {
-
                 $rowCount = 0;
                 $totalRows = 0;
                 $returnArray = array();
 
                 do {
-
                     $APIReturn = Mage::getModel('sagepayreporting/sagepayreporting')->getTransactionList($startDate, $endDate, $rowCount + 1, $rowCount + 50);
                     if($APIReturn['ok'] === true){
                         $APIReturn = $APIReturn['result'];
@@ -203,11 +212,9 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                     else {
                         $returnArray = array_merge($returnArray, $this->_mapTransactions($APIReturn->transactions->transaction));
                     }
-
                 } while ($rowCount < $totalRows);
 
                 if(count($returnArray) > 0) {
-
                     foreach($this->_currencies as $curr => $amount) {
                         if(!floatval($amount)) {
                             unset($this->_currencies[$curr]);
@@ -219,7 +226,6 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                     $graphData = array_fill_keys(array_keys($this->_currencies), array());
 
                     foreach($returnArray as $data) {
-
                         if($data['result'] != 'SUCCESS') {
                             continue;
                         }
@@ -232,7 +238,6 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                         }
 
                         $graphData[$currency][$stamp] += $data['amount'];
-
                     }
 
                     foreach($this->_currencies as $curr => $amount) {
@@ -253,9 +258,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                     Mage::app()->saveCache(serialize($returnArray), $cacheKey, array(), $this->_cacheLife);
 
                     Mage::app()->saveCache(serialize($this->_currencies), $cacheKeyCurrency, array(), $this->_cacheLife);
-
                 }
-
             }
             else {
                 $returnArray = unserialize($returnArray);
@@ -264,32 +267,31 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
             }
 
             return $returnArray;
-
         } catch (Exception $e) {
             $this->_errors[] = $e->getMessage();
             return null;
         }
     }
 
-    public function getGraphJson() {
+    public function getGraphJson() 
+    {
 
         $jsArrayAsString = "var graphData = new Array();";
 
         foreach ($this->_graphData as $currency => $value) {
-
             foreach($value as $date => $amount) {
                 $jsArrayAsString .= "graphData.push({date:\"" . $date . "\",currency:\"" . $currency . "\",price:" . $amount . ",formatted_price:\"" . $this->getTabLabel($currency, $amount) . "\"});";
             }
 
             $jsArrayAsString .= "\n";
-
         }
 
         return $jsArrayAsString;
 
     }
 
-    public function getBankLogo($id, $label) {
+    public function getBankLogo($id, $label) 
+    {
 
         $logosFolder = Mage::getBaseDir('skin') . DS . 'adminhtml' . DS . 'default' . DS . 'default' . DS . 'sagepaysuite' . DS . 'images' . DS . 'bank_logos' . DS;
 
@@ -303,7 +305,8 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
         return $html;
     }
 
-    public function getSettlements() {
+    public function getSettlements() 
+    {
 
         $paramStore = $this->getRequest()->getParam('store');
         $cacheKey = 'SAGEPAY_settlements_' . $this->startDate . $this->endDate . 'days' . $paramStore;
@@ -311,7 +314,6 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
         $_batches = Mage::app()->loadCache($cacheKey);
 
         if(false === $_batches) {
-
             $_batches = array();
 
             try {
@@ -332,7 +334,6 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                 $batches = (array)$settlements->batches;
 
                 if(count($batches) > 0) {
-
                     foreach($batches['batch'] as $batch) {
                         $keyname = strtolower(uc_words((string)$batch->authprocessorname));
 
@@ -341,6 +342,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                             foreach ($this->getCurrencies() as $code => $cvalue) {
                                 $_batches[$keyname][$code] = 0.00;
                             }
+
                             $_batches[$keyname]['label'] = (string)$batch->authprocessorname;
                         }
 
@@ -350,14 +352,11 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                                 $_batches[$keyname][((string)$trn->currency)] += $value;
                             }
                         }
-
                     }
 
                     Mage::app()->saveCache(serialize($_batches), $cacheKey, array(), $this->_cacheLife);
-
                 }
             }
-
         }
         else {
             $_batches = unserialize(Mage::app()->loadCache($cacheKey));
@@ -367,12 +366,12 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
 
     }
 
-    private function _mapTransactions(SimpleXMLElement $xml) {
+    private function _mapTransactions(SimpleXMLElement $xml) 
+    {
 
         $arrayObjects = array();
 
         for ($i = 0; $i < count($xml); $i++) {
-
             $amount = (float) $xml[$i]->amount;
             $currency = (string) $xml[$i]->currency;
 
@@ -400,26 +399,26 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
         return $arrayObjects;
     }
 
-    public function getTransactionsArrayAsJsString($jsArrayVar, $transactionsArray) {
+    public function getTransactionsArrayAsJsString($jsArrayVar, $transactionsArray) 
+    {
 
         $jsArrayAsString = "var " . $jsArrayVar . " = new Array();";
 
         if ($transactionsArray <> null) {
             for ($i = 0; $i < sizeof($transactionsArray); $i++) {
-
                 if($transactionsArray[$i]["result"] == 'SUCCESS') {
                     $jsArrayAsString .= $jsArrayVar . ".push({date:\"" . substr($transactionsArray[$i]["started"], 0, 10) . "\",
                                                                    currency:\"" . $transactionsArray[$i]["currency"] . "\",
                                                                    price:" . $transactionsArray[$i]["amount"] . "});\n";
                 }
-
             }
         }
 
         return $jsArrayAsString;
     }
 
-    public function getTransactionsDetails($status) {
+    public function getTransactionsDetails($status) 
+    {
         $objTransactionsCount = new Varien_Object();
         $objTransactionsCount->setData("total", 0);
         $objTransactionsCount->setData("Authenticate", 0);
@@ -439,21 +438,23 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Dashboard extends Mage_Core_Block_T
                     if ($type <> "") {
                         $objTransactionsCount->setData($type, $objTransactionsCount->getData($type) + 1);
                     }
+
                     $objTransactionsCount->setData('total', $objTransactionsCount->getData('total') + 1);
                 }
             }
         }
+
         return $objTransactionsCount;
     }
 
-    public function getDateRangeSelect() {
+    public function getDateRangeSelect() 
+    {
 
         $html = '<select name="daysago" id="daystoshow" onchange="setLocation($(\'daystoshow\').getValue());">';
 
         $array = array(1, 7, 15, 30);
 
         for ($i = 0; $i < count($array); $i++) {
-
             $label = $this->__('Last ' . $array[$i] . ' days');
 
             if($array[$i] === 1) {

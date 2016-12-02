@@ -7,9 +7,11 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySuite_Model_Observer {
+class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySuite_Model_Observer
+{
 
-    public function addInfo($o) {
+    public function addInfo($o) 
+    {
         $payment = $o->getEvent()->getPayment();
 
         if (Mage::helper('sagepaysuite')->isSagePayMethod($payment->getMethod()) === false) {
@@ -36,7 +38,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySui
      * @see Mage_Sales_Model_Order_Payment::cancel
      * Mage::dispatchEvent('sales_order_payment_cancel', array('payment' => $this));
      */
-    public function cancel($o) {
+    public function cancel($o) 
+    {
         $payment = $o->getEvent()->getPayment();
 
         $_c = $payment->getMethodInstance()->getCode();
@@ -47,7 +50,8 @@ class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySui
         Mage::getModel('sagepaysuite/api_payment')->setMcode($_c)->cancelOrder($payment);
     }
 
-    public function multiShipping($observer) {
+    public function multiShipping($observer) 
+    {
 
         $order = $observer->getEvent()->getOrder();
         $pmethod = (string) $order->getPayment()->getMethod();
@@ -59,16 +63,13 @@ class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySui
         $tokenEnabled = Mage::getModel('sagepaysuite/sagePayToken')->isEnabled();
 
         if ($pmethod == 'sagepayserver') {
-
             if (is_null(Mage::registry('first_server_ms_trn'))) {
-
                 $trn = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                         ->loadByVendorTxCode($_request->getPost('VendorTxCode'));
                 Mage::register('first_server_ms_trn', $trn->getId());
 
                 $this->getSession()->setReservedOrderId(null);
             } else {
-
                 $trn = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                         ->setParentTrnId(Mage::registry('first_server_ms_trn'))
                         ->setIntegration('server')
@@ -83,7 +84,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySui
         }
 
         if (true === $tokenEnabled) {
-
             if (isset($_paymentPost['token_cvv']) && isset($_paymentPost['sagepay_token_cc_id'])) { //Use Token
                 $this->getSession()
                         ->setLastSavedTokenccid($_paymentPost['sagepay_token_cc_id'])
@@ -103,7 +103,6 @@ class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySui
 
                 $tokenDb = Mage::getModel('sagepaysuite2/sagepaysuite_tokencard')->loadByToken($resultToken['Token']);
                 if ($tokenDb->getId()) {
-
                     Mage::register('ms_token_reguse', $tokenDb);
 
                     $this->getSession()
@@ -120,12 +119,12 @@ class Ebizmarts_SagePaySuite_Model_Observer_Payment extends Ebizmarts_SagePaySui
         $this->_directMultiShippingTrn($_post, $order);
     }
 
-    protected function _directMultiShippingTrn($_post, $order) {
+    protected function _directMultiShippingTrn($_post, $order) 
+    {
         $result = Mage::getModel('sagepaysuite/sagePayDirectPro')->registerTransaction($_post, FALSE, $order);
 
         if ($result->getResponseStatus() != Ebizmarts_SagePaySuite_Model_Api_Payment::RESPONSE_CODE_APPROVED &&
                 $result->getResponseStatus() != Ebizmarts_SagePaySuite_Model_Api_Payment::RESPONSE_CODE_REGISTERED) {
-
             Mage::throwException($result->getResponseStatusDetail());
         }
     }

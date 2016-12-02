@@ -37,7 +37,7 @@
             	<?php echo $_card->getLabel(); ?>
             </td>
             <td class="nickname" id="nickname_<?php echo $_card->getId(); ?>" >
-                <div style="cursor: pointer" title="<?php echo $this->helper('sagepaysuite')->__("Click to edit the credit card description.") ?>"><?php if($_card->getNickname()) {echo $_card->getNickname();}else{ echo 'Click to add a Description';} ?></div>
+                <div style="cursor: pointer" title="<?php echo $this->helper('sagepaysuite')->__("Click to edit the credit card description.") ?>"><?php if($this->htmlEscape($_card->getNickname())) {echo $_card->getNickname();}else{ echo 'Click to add a Description';} ?></div>
             </td>
             <td>
             	<?php echo $_card->getCcNumber(); ?>

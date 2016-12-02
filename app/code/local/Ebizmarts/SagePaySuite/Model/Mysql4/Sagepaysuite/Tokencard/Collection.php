@@ -1,12 +1,15 @@
 <?php
 
-class Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Tokencard_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract {
+class Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Tokencard_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
+{
 
-    protected function _construct() {
+    protected function _construct() 
+    {
         $this->_init('sagepaysuite2/sagePaySuite_tokencard');
     }
 
-    public function addCustomerFilter($customer) {
+    public function addCustomerFilter($customer) 
+    {
 
         if (is_string($customer)) {
             $this->addFieldToFilter('visitor_session_id', $customer);
@@ -31,7 +34,8 @@ class Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Tokencard_Collection exte
      *
      * @param Ebizmarts_SagePaySuite_Model_Mysql4_SagePaySuite_Tokencard_Collection
      */
-    public function addVendorFilter($vendorname) {
+    public function addVendorFilter($vendorname) 
+    {
 
       $this->getSelect()->where("`main_table`.`vendor` IS NULL OR `main_table`.`vendor` = '". $vendorname ."'");
 

@@ -4,7 +4,8 @@
  * Cron processor object
  *
  */
-class Ebizmarts_SagePaySuite_Model_Cron {
+class Ebizmarts_SagePaySuite_Model_Cron
+{
     
     /**
      * Sync Data from API for each new transaction within the last 24 hours.
@@ -12,12 +13,12 @@ class Ebizmarts_SagePaySuite_Model_Cron {
      * @param type $cron
      * @return \Ebizmarts_SagePaySuite_Model_Cron
      */
-    public function syncFromApi($cron) {        
+    public function syncFromApi($cron) 
+    {        
         
         $syncMode = (string)Mage::getStoreConfig('payment/sagepaysuite/sync_mode');
         
         if($syncMode === 'async') {
-            
             $transactions = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                                 ->getCollection()
                                 ->getApproved();
@@ -28,23 +29,20 @@ class Ebizmarts_SagePaySuite_Model_Cron {
             $transactions->addFieldToFilter('created_at', array("from" => gmdate("Y-m-d H:i:s", strtotime("-1 day")), "to" => $ts));
             
             if($transactions->getSize()) {
-                
                 foreach($transactions as $trn) {
                     $trn->updateFromApi();
                 }
-                
             }
-            
         }
         
         return $this;
     }
 
-    public function cancelPendingPaymentOrders($cron){
+    public function cancelPendingPaymentOrders($cron)
+    {
 
         if((int)Mage::getStoreConfig('payment/sagepayserver/pre_save') === 1 &&
             (int)Mage::getStoreConfig('payment/sagepayserver/cancel_pending_payment') > 0){
-
             $minutes = (int)Mage::getStoreConfig('payment/sagepayserver/cancel_pending_payment');
 
             $orders = Mage::getModel('sales/order')->getCollection()

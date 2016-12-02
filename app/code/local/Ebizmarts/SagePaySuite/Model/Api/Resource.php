@@ -5,7 +5,8 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Model_Api_Resource extends Mage_Api_Model_Resource_Abstract {
+class Ebizmarts_SagePaySuite_Model_Api_Resource extends Mage_Api_Model_Resource_Abstract
+{
 
     /**
      * Default ignored attribute codes per entity type
@@ -29,7 +30,7 @@ class Ebizmarts_SagePaySuite_Model_Api_Resource extends Mage_Api_Model_Resource_
         'global'    => array()
     );
 
-	/**
+    /**
      * Update attributes for entity
      *
      * @param array $data

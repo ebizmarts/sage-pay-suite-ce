@@ -1,13 +1,15 @@
 <?php
 
-class Ebizmarts_SagePaysuite_Block_Adminhtml_Sales_Order_Grid_Renderer_OrderId extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
+class Ebizmarts_SagePaysuite_Block_Adminhtml_Sales_Order_Grid_Renderer_OrderId extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+{
     /**
      * Renders grid column
      *
      * @param   Varien_Object $row
      * @return  string
      */
-    public function render(Varien_Object $row) {
+    public function render(Varien_Object $row) 
+    {
         $result = parent::render($row);
 
         $order = Mage::getModel('sales/order')->load($row->getOrderId());

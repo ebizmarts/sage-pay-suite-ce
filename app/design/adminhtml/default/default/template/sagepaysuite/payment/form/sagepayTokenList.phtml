@@ -17,7 +17,7 @@
 
 		<li class="tokencard-radio">
 			<input<?php if($isDef): ?> checked="checked"<?php endif; ?> type="radio" id="<?php echo $radioId; ?>" name="payment[sagepay_token_cc_id]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-radio" value="<?php echo $_tcard->getId(); ?>" onclick="switchToken(this,'<?php echo $_tcard->getCardType(); ?>');" />
-			<label class="token" for="<?php echo $radioId; ?>"><?php echo $this->__('%s, Exp. %s', $_tcard->getCcNumber(), $_tcard->getExpireDate()); ?> <?php if($_tcard->Nickname !== NULL){ echo ' - '.$_tcard->Nickname; } ?></label>
+			<label class="token" for="<?php echo $radioId; ?>"><?php echo $this->__('%s, Exp. %s', $_tcard->getCcNumber(), $_tcard->getExpireDate()); ?> <?php if($_tcard->Nickname !== NULL){ echo ' - '. $this->htmlEscape($_tcard->Nickname); } ?></label>
 			<img width="35" src="<?php echo $this->helper('sagepaysuite')->getCcImage($this->helper('sagepaysuite')->getCardLabel($_tcard->getCardType(), false)); ?>" />&nbsp;&nbsp;&nbsp;
 
                         <?php if($c != 'sagepayserver_moto'): ?>

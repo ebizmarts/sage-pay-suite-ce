@@ -12,7 +12,7 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_Paymentransaction extends Mage_Admi
 
     public function __construct()
     {
-    	$this->_blockGroup = 'sagepaysuite';
+        $this->_blockGroup = 'sagepaysuite';
         $this->_controller = 'adminhtml_paymentransaction';
         $this->_headerText = Mage::helper('sagepaysuite')->__('Sage Pay Transactions');
 

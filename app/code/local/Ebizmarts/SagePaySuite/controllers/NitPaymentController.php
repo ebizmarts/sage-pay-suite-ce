@@ -1,15 +1,18 @@
 <?php
 
-class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_Front_Action {
+class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_Front_Action
+{
 
-    protected function _expireAjax() {
+    protected function _expireAjax() 
+    {
         if (!Mage :: getSingleton('checkout/session')->getQuote()->hasItems()) {
             $this->getResponse()->setHeader('HTTP/1.1', '403 Session Expired');
             exit;
         }
     }
 
-    public function preDispatch() {
+    public function preDispatch() 
+    {
         $storeId = $this->getRequest()->getParam('storeid');
         if ($storeId) {
             Mage :: app()->setCurrentStore((int) $storeId);
@@ -19,14 +22,14 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
         return $this;
     }
 
-    public function saveOrderAction() {
+    public function saveOrderAction() 
+    {
 
         $this->_expireAjax();
 
         $resultData = array();
 
         try {
-
             Mage::helper('sagepaysuite')->validateQuote();
 
             $result = $this->getNitModel()->registerTransaction($this->getRequest()->getPost());
@@ -39,11 +42,11 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
                 $resultData = array(
                     'success' => 'true',
                     'response_status' => 'threed',
-                    'redirect' => Mage :: getModel('core/url'
-                        )->getUrl('sgps/NitPayment/threedPost', array('_secure' => true, 'txc' => $vendorTxCode)));
+                    'redirect' => Mage :: getModel(
+                        'core/url'
+                    )->getUrl('sgps/NitPayment/threedPost', array('_secure' => true, 'txc' => $vendorTxCode)));
             } else if ($response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_APPROVED ||
                 $response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_REGISTERED) {
-
                 $op = Mage :: getSingleton('checkout/type_onepage');
                 $op->getQuote()->collectTotals();
 
@@ -63,20 +66,18 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
             $resultData['response_status_detail'] = $e->getMessage();
 
             Mage::dispatchEvent('sagepay_payment_failed', array('quote' => Mage::getSingleton('checkout/type_onepage')->getQuote(), 'message' => $e->getMessage()));
-
         }
 
         return $this->getResponse()->setBody(Zend_Json :: encode($resultData));
     }
 
-    public function generateMerchantKeyAction(){
+    public function generateMerchantKeyAction()
+    {
 
         $resultData = array();
 
         try {
-
             $resultData = $this->getNitModel()->postForMerchantKey();
-
         } catch (Exception $e){
             Sage_Log :: logException($e);
             $resultData['response_status'] = 'ERROR';
@@ -86,15 +87,18 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
         return $this->getResponse()->setBody(Zend_Json :: encode($resultData));
     }
 
-    public function threedPostAction() {
+    public function threedPostAction() 
+    {
         $this->getResponse()->setBody($this->_getThreedPostHtml());
     }
 
-    protected function _getThreedPostHtml() {
+    protected function _getThreedPostHtml() 
+    {
         return $this->getLayout()->createBlock('sagepaysuite/checkout_threedredirectpostnit')->toHtml();
     }
 
-    public function callback3dAction() {
+    public function callback3dAction() 
+    {
 
         $vendorTxCode = $this->getRequest()->getParam('v');
         $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
@@ -118,17 +122,15 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
         $quote = Mage::getSingleton('checkout/type_onepage')->getQuote();
 
         try {
-
             //Check cart health on callback.
             if(1 === (int)Mage::getStoreConfig('payment/sagepaysuite/verify_cart_consistency')) {
                 if(Mage::helper('sagepaysuite/checkout')->cartExpire($quote)) {
-
                     Sage_Log::log("Transaction " . $transaction->getVendorTxCode() . " not completed, cart was modified while customer on 3D payment pages.", Zend_Log::CRIT, 'SagePaySuite_REQUEST.log');
 
                     Mage::throwException($this->__('Your order could not be completed, please try again. Thanks.'));
-
                 }
             }
+
             //Check cart health on callback.
 
             if ($pares && $emede) {
@@ -136,13 +138,11 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
                 echo $this->__('<small>%s</small>', "Done. Redirecting...");
             }
             else {
-
                 Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $quote, 'message' => $this->__("3D callback error.")));
 
                 Mage::throwException($this->__("Invalid request. PARes and MD are empty."));
             }
         } catch (Exception $e) {
-
             Mage::getSingleton('sagepaysuite/session')->setAcsurl(null)
                 ->setPareq(null)
                 ->setSageOrderId(null)
@@ -175,7 +175,6 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
             }
 
             echo '</body></html>';
-
         }
 
         if (!$error) {
@@ -190,11 +189,13 @@ class Ebizmarts_SagePaySuite_NitPaymentController extends Mage_Core_Controller_F
         }
     }
 
-    public function getNitModel() {
+    public function getNitModel() 
+    {
         return Mage :: getModel('sagepaysuite/sagePayNit');
     }
 
-    public function errorAction() {
+    public function errorAction() 
+    {
         $this->_redirect('checkout/onepage');
     }
 }

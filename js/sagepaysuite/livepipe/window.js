@@ -10,7 +10,7 @@
 //adds onDraw and constrainToViewport option to draggable
 if(typeof(Draggable) != 'undefined'){
     //allows the point to be modified with an onDraw callback
-    Draggable.prototype.draw = function(point) {
+    Draggable.prototype.draw = function (point) {
         var pos = Position.cumulativeOffset(this.element);
         if(this.options.ghosting) {
             var r = Position.realOffset(this.element);
@@ -25,18 +25,26 @@ if(typeof(Draggable) != 'undefined'){
             pos[1] -= this.options.scroll.scrollTop-this.originalScrollTop;
         }
 
-        var p = [0,1].map(function(i){
+        var p = [0,1].map(
+            function (i) {
             return (point[i]-pos[i]-this.offset[i])
-        }.bind(this));
+            }.bind(this)
+        );
 
         if(this.options.snap) {
             if(typeof this.options.snap == 'function') {
                 p = this.options.snap(p[0],p[1],this);
             } else {
                 if(this.options.snap instanceof Array) {
-                    p = p.map( function(v, i) {return Math.round(v/this.options.snap[i])*this.options.snap[i] }.bind(this))
+                    p = p.map(
+                        function (v, i) {
+                        return Math.round(v/this.options.snap[i])*this.options.snap[i] }.bind(this)
+                    )
                 } else {
-                    p = p.map( function(v) {return Math.round(v/this.options.snap)*this.options.snap }.bind(this))
+                    p = p.map(
+                        function (v) {
+                        return Math.round(v/this.options.snap)*this.options.snap }.bind(this)
+                    )
                   }
             }
         }
@@ -63,6 +71,7 @@ if(typeof(Draggable) != 'undefined'){
                     else
                         this.element.style.left = ((p[0] < boundary[0][0]) ? boundary[0][0] : boundary[1][0]) + "px";
                 }
+
                 if((!this.options.constraint) || (this.options.constraint=='vertical')){
                     if((p[1] >= boundary[0][1] ) && (p[1] <= boundary[1][1]))
                         this.element.style.top = p[1] + "px";
@@ -75,6 +84,7 @@ if(typeof(Draggable) != 'undefined'){
                 if((!this.options.constraint) || (this.options.constraint=='vertical'))
                   style.top     = p[1] + "px";
             }
+
             if(style.visibility=="hidden")
                 style.visibility = ""; // fix gecko rendering
         }
@@ -98,8 +108,9 @@ if(typeof(Object.Event) == "undefined")
         - setting constrainToViewport only works when the page is not scrollable
         - setting draggable: true will negate the effects of position: center
 */
-Control.Window = Class.create({
-    initialize: function(container,options){
+Control.Window = Class.create(
+    {
+    initialize: function (container,options) {
         Control.Window.windows.push(this);
 
         //attribute initialization
@@ -121,7 +132,8 @@ Control.Window = Class.create({
         };
 
         //options
-        this.options = Object.extend({
+        this.options = Object.extend(
+            {
             //lifecycle
             beforeOpen: Prototype.emptyFunction,
             afterOpen: Prototype.emptyFunction,
@@ -164,7 +176,8 @@ Control.Window = Class.create({
             //any element with an href (image,iframe,ajax) will call this after it is done loading
             onRemoteContentLoaded: Prototype.emptyFunction,
             insertRemoteContentAt: false //false will set this to this.container, can be string selector (first returned will be selected), or an Element that must be a child of this.container
-        },options || {});
+            },options || {}
+        );
 
         //container setup
         this.indicator = this.options.indicator ? $(this.options.indicator) : false;
@@ -190,16 +203,17 @@ Control.Window = Class.create({
                         }else
                             this.container = false;
                     }
+
                     //hover or click handling
-                    this.sourceContainerOpenHandler = function(event){
+                    this.sourceContainerOpenHandler = function (event) {
                         this.open(event);
                         event.stop();
                         return false;
                     }.bindAsEventListener(this);
-                    this.sourceContainerCloseHandler = function(event){
+                    this.sourceContainerCloseHandler = function (event) {
                         this.close(event);
                     }.bindAsEventListener(this);
-                    this.sourceContainerMouseMoveHandler = function(event){
+                    this.sourceContainerMouseMoveHandler = function (event) {
                         this.position(event);
                     }.bindAsEventListener(this);
                     if(this.options.hover){
@@ -212,6 +226,7 @@ Control.Window = Class.create({
                 }
             }
         }
+
         this.createDefaultContainer(container);
         if(this.options.insertRemoteContentAt === false)
             this.options.insertRemoteContentAt = this.container;
@@ -238,6 +253,7 @@ Control.Window = Class.create({
             this.iFrameShim = new IframeShim();
             this.iFrameShim.hide();
         }
+
         //resizable support
         this.applyResizable();
         //draggable support
@@ -248,11 +264,12 @@ Control.Window = Class.create({
 
         this.notify('afterInitialize');
     },
-    open: function(event){
+    open: function (event) {
         if(this.isOpen){
             this.bringToFront();
             return false;
         }
+
         if(this.notify('beforeOpen') === false)
             return false;
         //closeOnClick
@@ -268,12 +285,14 @@ Control.Window = Class.create({
                 this.closeOnClickContainer = $(this.options.closeOnClick);
             this.closeOnClickContainer.observe('click',this.closeHandler);
         }
+
         if(this.href && !this.options.iframe && !this.remoteContentLoaded){
             //link to image
             this.remoteContentLoaded = true;
             if(this.href.match(/\.(jpe?g|gif|png|tiff?)$/i)){
                 var img = new Element('img');
-                img.observe('load',function(img){
+                img.observe(
+                    'load',function (img) {
                     this.getRemoteContentInsertionTarget().insert(img);
                     this.position();
                     if(this.notify('onRemoteContentLoaded') !== false){
@@ -281,21 +300,23 @@ Control.Window = Class.create({
                             this.hideIndicator();
                         this.finishOpen();
                     }
-                }.bind(this,img));
+                    }.bind(this,img)
+                );
                 img.writeAttribute('src',this.href);
             }else{
                 //if this is an ajax window it will only open if the request is successful
                 if(!this.ajaxRequest){
                     if(this.options.indicator)
                         this.showIndicator();
-                    this.ajaxRequest = new Ajax.Request(this.href,{
+                    this.ajaxRequest = new Ajax.Request(
+                        this.href,{
                         method: this.options.method,
                         parameters: this.options.parameters,
-                        onComplete: function(request){
+                        onComplete: function (request) {
                             this.notify('onComplete',request);
                             this.ajaxRequest = false;
                         }.bind(this),
-                        onSuccess: function(request){
+                        onSuccess: function (request) {
                             this.getRemoteContentInsertionTarget().insert(request.responseText);
                             this.notify('onSuccess',request);
                             if(this.notify('onRemoteContentLoaded') !== false){
@@ -304,46 +325,55 @@ Control.Window = Class.create({
                                 this.finishOpen();
                             }
                         }.bind(this),
-                        onFailure: function(request){
+                        onFailure: function (request) {
                             this.notify('onFailure',request);
                             if(this.options.indicator)
                                 this.hideIndicator();
                         }.bind(this),
-                        onException: function(request,e){
+                        onException: function (request,e) {
                             this.notify('onException',request,e);
                             if(this.options.indicator)
                                 this.hideIndicator();
                         }.bind(this)
-                    });
+                        }
+                    );
                 }
             }
+
             return true;
         }else if(this.options.iframe && !this.remoteContentLoaded){
             //iframe
             this.remoteContentLoaded = true;
             if(this.options.indicator)
                 this.showIndicator();
-            this.getRemoteContentInsertionTarget().insert(Control.Window.iframeTemplate.evaluate({
-                href: this.href
-            }));
+            this.getRemoteContentInsertionTarget().insert(
+                Control.Window.iframeTemplate.evaluate(
+                    {
+                    href: this.href
+                    }
+                )
+            );
             var iframe = this.container.down('iframe');
-            iframe.onload = function(){
+            iframe.onload = function () {
                 this.notify('onRemoteContentLoaded');
                 if(this.options.indicator)
                     this.hideIndicator();
                 iframe.onload = null;
             }.bind(this);
         }
+
         this.finishOpen(event);
         return true
     },
-    close: function(event){ //event may or may not be present
+    close: function (event) {
+    //event may or may not be present
         if(!this.isOpen || this.notify('beforeClose',event) === false)
             return false;
         if(this.options.closeOnClick)
             this.closeOnClickContainer.stopObserving('click',this.closeHandler);
         if(this.options.fade){
-            this.effects.fade = new Effect.Fade(this.container,{
+            this.effects.fade = new Effect.Fade(
+                this.container,{
                 queue: {
                     position: 'front',
                     scope: 'Control.Window' + this.numberInSequence
@@ -351,18 +381,20 @@ Control.Window = Class.create({
                 from: 1,
                 to: 0,
                 duration: this.options.fadeDuration / 2,
-                afterFinish: function(){
+                afterFinish: function () {
                     if(this.iFrameShim)
                         this.iFrameShim.hide();
                     this.isOpen = false;
                     this.notify('afterClose');
                 }.bind(this)
-            });
+                }
+            );
         }else{
             this.container.hide();
             if(this.iFrameShim)
                 this.iFrameShim.hide();
         }
+
         if(this.ajaxRequest)
             this.ajaxRequest.transport.abort();
         if(!(this.options.draggable || this.options.resizable) && this.options.position == 'center')
@@ -375,53 +407,64 @@ Control.Window = Class.create({
             this.isOpen = false;
             this.notify('afterClose');
         }
+
         return true;
     },
-    position: function(event){
+    position: function (event) {
 
         if(this.isMobile() && (typeof event != 'undefined' && (event.type == 'resize' || event.type == 'scroll'))){
-        	return;
+            return;
         }
 
         //this is up top for performance reasons
         if(this.options.position == 'mouse'){
             var xy = [Event.pointerX(event),Event.pointerY(event)];
-            this.container.setStyle({
+            this.container.setStyle(
+                {
                 top: xy[1] + $value(this.options.offsetTop) + 'px',
                 left: xy[0] + $value(this.options.offsetLeft) + 'px'
-            });
+                }
+            );
             return;
         }
+
         var container_dimensions = this.container.getDimensions();
         var viewport_dimensions = document.viewport.getDimensions();
         Position.prepare();
         var offset_left = (Position.deltaX + Math.floor((viewport_dimensions.width - container_dimensions.width) / 2));
         var offset_top = (Position.deltaY + ((viewport_dimensions.height > container_dimensions.height) ? Math.floor((viewport_dimensions.height - container_dimensions.height) / 2) : 0));
         if(this.options.position == 'center' || this.options.position == 'center_once'){
-            this.container.setStyle({
+            this.container.setStyle(
+                {
                 top: (container_dimensions.height <= viewport_dimensions.height) ? ((offset_top != null && offset_top > 0) ? offset_top : 0) + 'px' : 0,
                 left: (container_dimensions.width <= viewport_dimensions.width) ? ((offset_left != null && offset_left > 0) ? offset_left : 0) + 'px' : 0
-            });
+                }
+            );
         }else if(this.options.position == 'relative'){
             var xy = this.sourceContainer.cumulativeOffset();
             var top = xy[1] + $value(this.options.offsetTop);
             var left = xy[0] + $value(this.options.offsetLeft);
-            this.container.setStyle({
+            this.container.setStyle(
+                {
                 top: (container_dimensions.height <= viewport_dimensions.height) ? (this.options.constrainToViewport ? Math.max(0,Math.min(viewport_dimensions.height - (container_dimensions.height),top)) : top) + 'px' : 0,
                 left: (container_dimensions.width <= viewport_dimensions.width) ? (this.options.constrainToViewport ? Math.max(0,Math.min(viewport_dimensions.width - (container_dimensions.width),left)) : left) + 'px' : 0
-            });
+                }
+            );
         }else if(this.options.position.length){
             var top = $value(this.options.position[1]) + $value(this.options.offsetTop);
             var left = $value(this.options.position[0]) + $value(this.options.offsetLeft);
-            this.container.setStyle({
+            this.container.setStyle(
+                {
                 top: (container_dimensions.height <= viewport_dimensions.height) ? (this.options.constrainToViewport ? Math.max(0,Math.min(viewport_dimensions.height - (container_dimensions.height),top)) : top) + 'px' : 0,
                 left: (container_dimensions.width <= viewport_dimensions.width) ? (this.options.constrainToViewport ? Math.max(0,Math.min(viewport_dimensions.width - (container_dimensions.width),left)) : left) + 'px' : 0
-            });
+                }
+            );
         }
+
         if(this.iFrameShim)
             this.updateIFrameShimZIndex();
     },
-    isMobile: function(){
+    isMobile: function () {
 
         if(typeof sagePayIsMobile == 'undefined') {
             return false;
@@ -429,44 +472,51 @@ Control.Window = Class.create({
 
         return sagePayIsMobile();
     },
-    ensureInBounds: function(){
+    ensureInBounds: function () {
         if(!this.isOpen)
             return;
 
         if(this.isMobile()){
-        	return;
+            return;
         }
 
         var viewport_dimensions = document.viewport.getDimensions();
         var container_offset = this.container.cumulativeOffset();
         var container_dimensions = this.container.getDimensions();
         if(container_offset.left + container_dimensions.width > viewport_dimensions.width){
-            this.container.setStyle({
+            this.container.setStyle(
+                {
                 left: (Math.max(0,viewport_dimensions.width - container_dimensions.width)) + 'px'
-            });
+                }
+            );
         }
+
         if(container_offset.top + container_dimensions.height > viewport_dimensions.height){
-            this.container.setStyle({
+            this.container.setStyle(
+                {
                 top: (Math.max(0,viewport_dimensions.height - container_dimensions.height)) + 'px'
-            });
+                }
+            );
         }
     },
-    bringToFront: function(){
+    bringToFront: function () {
         Control.Window.bringToFront(this);
         this.notify('bringToFront');
     },
-    destroy: function(){
+    destroy: function () {
         this.container.stopObserving('mousedown',this.bringToFrontHandler);
         if(this.draggable){
             Draggables.removeObserver(this.container);
             this.draggable.handle.stopObserving('mousedown',this.bringToFrontHandler);
             this.draggable.destroy();
         }
+
         if(this.resizable){
             Resizables.removeObserver(this.container);
             this.resizable.handle.stopObserving('mousedown',this.bringToFrontHandler);
             this.resizable.destroy();
         }
+
         if(this.container && !this.sourceContainer)
             this.container.remove();
         if(this.sourceContainer){
@@ -478,6 +528,7 @@ Control.Window = Class.create({
             }else
                 this.sourceContainer.stopObserving('click',this.sourceContainerOpenHandler);
         }
+
         if(this.iFrameShim)
             this.iFrameShim.destroy();
         Event.stopObserving(window,'resize',this.outOfBoundsPositionHandler);
@@ -485,94 +536,113 @@ Control.Window = Class.create({
         this.notify('afterDestroy');
     },
     //private
-    applyResizable: function(){
+    applyResizable: function () {
         if(this.options.resizable){
             if(typeof(Resizable) == "undefined")
                 throw "Control.Window requires resizable.js to be loaded.";
             var resizable_handle = null;
             if(this.options.resizable === true){
-                resizable_handle = new Element('div',{
+                resizable_handle = new Element(
+                    'div',{
                     className: 'resizable_handle'
-                });
+                    }
+                );
                 this.container.insert(resizable_handle);
             }else
                 resizable_handle = $(this.options.resziable);
-            this.resizable = new Resizable(this.container,{
+            this.resizable = new Resizable(
+                this.container,{
                 handle: resizable_handle,
                 minHeight: this.options.minHeight,
                 minWidth: this.options.minWidth,
-                maxHeight: this.options.constrainToViewport ? function(element){
+                maxHeight: this.options.constrainToViewport ? function (element) {
                     //viewport height - top - total border height
                     return (document.viewport.getDimensions().height - parseInt(element.style.top || 0)) - (element.getHeight() - parseInt(element.style.height || 0));
                 } : this.options.maxHeight,
-                maxWidth: this.options.constrainToViewport ? function(element){
+                maxWidth: this.options.constrainToViewport ? function (element) {
                     //viewport width - left - total border width
                     return (document.viewport.getDimensions().width - parseInt(element.style.left || 0)) - (element.getWidth() - parseInt(element.style.width || 0));
                 } : this.options.maxWidth
-            });
+                }
+            );
             this.resizable.handle.observe('mousedown',this.bringToFrontHandler);
-            Resizables.addObserver(new Control.Window.LayoutUpdateObserver(this,function(){
-                if(this.iFrameShim)
+            Resizables.addObserver(
+                new Control.Window.LayoutUpdateObserver(
+                    this,function () {
+                    if(this.iFrameShim)
                     this.updateIFrameShimZIndex();
-                this.notify('onResize');
-            }.bind(this)));
+                    this.notify('onResize');
+                    }.bind(this)
+                )
+            );
         }
     },
-    applyDraggable: function(){
+    applyDraggable: function () {
         if(this.options.draggable){
             if(typeof(Draggables) == "undefined")
                 throw "Control.Window requires dragdrop.js to be loaded.";
             var draggable_handle = null;
             if(this.options.draggable === true){
-                draggable_handle = new Element('div',{
+                draggable_handle = new Element(
+                    'div',{
                     className: 'draggable_handle'
-                });
+                    }
+                );
                 this.container.insert(draggable_handle);
             }else
                 draggable_handle = $(this.options.draggable);
-            this.draggable = new Draggable(this.container,{
+            this.draggable = new Draggable(
+                this.container,{
                 handle: draggable_handle,
                 constrainToViewport: this.options.constrainToViewport,
                 zindex: this.container.getStyle('z-index'),
-                starteffect: function(){
+                starteffect: function () {
                     if(Prototype.Browser.IE){
                         this.old_onselectstart = document.onselectstart;
-                        document.onselectstart = function(){
+                        document.onselectstart = function () {
                             return false;
                         };
                     }
                 }.bind(this),
-                endeffect: function(){
+                endeffect: function () {
                     document.onselectstart = this.old_onselectstart;
                 }.bind(this)
-            });
+                }
+            );
             this.draggable.handle.observe('mousedown',this.bringToFrontHandler);
-            Draggables.addObserver(new Control.Window.LayoutUpdateObserver(this,function(){
-                if(this.iFrameShim)
+            Draggables.addObserver(
+                new Control.Window.LayoutUpdateObserver(
+                    this,function () {
+                    if(this.iFrameShim)
                     this.updateIFrameShimZIndex();
-                this.notify('onDrag');
-            }.bind(this)));
+                    this.notify('onDrag');
+                    }.bind(this)
+                )
+            );
         }
     },
-    createDefaultContainer: function(container){
+    createDefaultContainer: function (container) {
         if(!this.container){
             //no container passed or found, create it
-            this.container = new Element('div',{
+            this.container = new Element(
+                'div',{
                 id: 'control_window_' + this.numberInSequence
-            });
+                }
+            );
             $(document.body).insert(this.container);
             if(typeof(container) == "string" && $(container) == null && !container.match(/^#(.+)$/) && !container.match(Control.Window.uriRegex))
                 this.container.update(container);
         }
     },
-    finishOpen: function(event){
+    finishOpen: function (event) {
         this.bringToFront();
         if(this.options.fade){
             if(typeof(Effect) == "undefined")
                 throw "Control.Window requires effects.js to be loaded."
             if(this.effects.fade)
                 this.effects.fade.cancel();
-            this.effects.appear = new Effect.Appear(this.container,{
+            this.effects.appear = new Effect.Appear(
+                this.container,{
                 queue: {
                     position: 'end',
                     scope: 'Control.Window.' + this.numberInSequence
@@ -580,13 +650,14 @@ Control.Window = Class.create({
                 from: 0,
                 to: 1,
                 duration: this.options.fadeDuration / 2,
-                afterFinish: function(){
+                afterFinish: function () {
                     if(this.iFrameShim)
                         this.updateIFrameShimZIndex();
                     this.isOpen = true;
                     this.notify('afterOpen');
                 }.bind(this)
-            });
+                }
+            );
         }else
             this.container.show();
         this.position(event);
@@ -598,12 +669,15 @@ Control.Window = Class.create({
             this.isOpen = true;
             this.notify('afterOpen');
         }
+
         return true;
     },
-    showIndicator: function(){
-        this.showIndicatorTimeout = window.setTimeout(function(){
+    showIndicator: function () {
+        this.showIndicatorTimeout = window.setTimeout(
+            function () {
             if(this.options.fade){
-                this.indicatorEffects.appear = new Effect.Appear(this.indicator,{
+                this.indicatorEffects.appear = new Effect.Appear(
+                    this.indicator,{
                     queue: {
                         position: 'front',
                         scope: 'Control.Window.indicator.' + this.numberInSequence
@@ -611,80 +685,92 @@ Control.Window = Class.create({
                     from: 0,
                     to: 1,
                     duration: this.options.fadeDuration / 2
-                });
+                    }
+                );
             }else
                 this.indicator.show();
-        }.bind(this),Control.Window.indicatorTimeout);
+            }.bind(this),Control.Window.indicatorTimeout
+        );
     },
-    hideIndicator: function(){
+    hideIndicator: function () {
         if(this.showIndicatorTimeout)
             window.clearTimeout(this.showIndicatorTimeout);
         this.indicator.hide();
     },
-    getRemoteContentInsertionTarget: function(){
+    getRemoteContentInsertionTarget: function () {
         return typeof(this.options.insertRemoteContentAt) == "string" ? this.container.down(this.options.insertRemoteContentAt) : $(this.options.insertRemoteContentAt);
     },
-    updateIFrameShimZIndex: function(){
+    updateIFrameShimZIndex: function () {
         if(this.iFrameShim)
             this.iFrameShim.positionUnder(this.container);
     }
-});
+    }
+);
 //class methods
-Object.extend(Control.Window,{
+Object.extend(
+    Control.Window,{
     windows: [],
     baseZIndex: 9999,
     indicatorTimeout: 250,
     iframeTemplate: new Template('<iframe src="#{href}" width="100%" height="100%" frameborder="0"></iframe>'),
     uriRegex: /^(\/|\#|https?\:\/\/|[\w]+\/)/,
-    bringToFront: function(w){
+    bringToFront: function (w) {
         Control.Window.windows = Control.Window.windows.without(w);
         Control.Window.windows.push(w);
-        Control.Window.windows.each(function(w,i){
+        Control.Window.windows.each(
+            function (w,i) {
             var z_index = Control.Window.baseZIndex + i;
-            w.container.setStyle({
+            w.container.setStyle(
+                {
                 zIndex: z_index
-            });
+                }
+            );
             if(w.isOpen){
                 if(w.iFrameShim)
                 w.updateIFrameShimZIndex();
             }
+
             if(w.options.draggable)
                 w.draggable.options.zindex = z_index;
-        });
+            }
+        );
     },
-    open: function(container,options){
+    open: function (container,options) {
         var w = new Control.Window(container,options);
         w.open();
         return w;
     },
     //protected
-    initialZIndexForWindow: function(w){
+    initialZIndexForWindow: function (w) {
         return Control.Window.baseZIndex + (Control.Window.windows.length - 1);
     }
-});
+    }
+);
 Object.Event.extend(Control.Window);
 
 //this is the observer for both Resizables and Draggables
-Control.Window.LayoutUpdateObserver = Class.create({
-    initialize: function(w,observer){
+Control.Window.LayoutUpdateObserver = Class.create(
+    {
+    initialize: function (w,observer) {
         this.w = w;
         this.element = $(w.container);
         this.observer = observer;
     },
     onStart: Prototype.emptyFunction,
-    onEnd: function(event_name,instance){
+    onEnd: function (event_name,instance) {
         if(instance.element == this.element && this.iFrameShim)
             this.w.updateIFrameShimZIndex();
     },
-    onResize: function(event_name,instance){
+    onResize: function (event_name,instance) {
         if(instance.element == this.element)
             this.observer(this.element);
     },
-    onDrag: function(event_name,instance){
+    onDrag: function (event_name,instance) {
         if(instance.element == this.element)
             this.observer(this.element);
     }
-});
+    }
+);
 
 //overlay for Control.Modal
 Control.Overlay = {
@@ -692,7 +778,7 @@ Control.Overlay = {
     loaded: false,
     container: false,
     lastOpacity: 0,
-    getStyles: function() {
+    getStyles: function () {
         return {
             position: 'fixed',
             top: 0,
@@ -702,7 +788,7 @@ Control.Overlay = {
             zIndex: Control.Window.baseZIndex - 1
         };
     },
-    getIeStyles: function() {
+    getIeStyles: function () {
         return {
             position: 'absolute',
             top: 0,
@@ -714,13 +800,15 @@ Control.Overlay = {
         fade: false,
         appear: false
     },
-    load: function(){
+    load: function () {
         if(Control.Overlay.loaded)
             return false;
         Control.Overlay.loaded = true;
-        Control.Overlay.container = new Element('div',{
+        Control.Overlay.container = new Element(
+            'div',{
             id: Control.Overlay.id
-        });
+            }
+        );
         $(document.body).insert(Control.Overlay.container);
         if(Prototype.Browser.IE){
             Control.Overlay.container.setStyle(Control.Overlay.getIeStyles());
@@ -735,7 +823,7 @@ Control.Overlay = {
         Control.Overlay.container.hide();
         return true;
     },
-    unload: function(){
+    unload: function () {
         if(!Control.Overlay.loaded)
             return false;
         Event.stopObserving(window,'resize',Control.Overlay.positionOverlay);
@@ -746,7 +834,7 @@ Control.Overlay = {
         Control.Overlay.loaded = false;
         return true;
     },
-    show: function(opacity,fade){
+    show: function (opacity,fade) {
         if(Control.Overlay.notify('beforeShow') === false)
             return false;
         Control.Overlay.lastOpacity = opacity;
@@ -757,107 +845,128 @@ Control.Overlay = {
                 throw "Control.Window requires effects.js to be loaded."
             if(Control.Overlay.effects.fade)
                 Control.Overlay.effects.fade.cancel();
-            Control.Overlay.effects.appear = new Effect.Appear(Control.Overlay.container,{
+            Control.Overlay.effects.appear = new Effect.Appear(
+                Control.Overlay.container,{
                 queue: {
                     position: 'end',
                     scope: 'Control.Overlay'
                 },
-                afterFinish: function(){
+                afterFinish: function () {
                     Control.Overlay.notify('afterShow');
                 },
                 from: 0,
                 to: Control.Overlay.lastOpacity,
                 duration: (fade === true ? 0.75 : fade) / 2
-            });
+                }
+            );
         }else{
-            Control.Overlay.container.setStyle({
+            Control.Overlay.container.setStyle(
+                {
                 opacity: opacity || 1
-            });
+                }
+            );
             Control.Overlay.container.show();
             Control.Overlay.notify('afterShow');
         }
+
         return true;
     },
-    hide: function(fade){
+    hide: function (fade) {
         if(Control.Overlay.notify('beforeHide') === false)
             return false;
         if(Control.Overlay.effects.appear)
             Control.Overlay.effects.appear.cancel();
         Control.Overlay.iFrameShim.hide();
         if(fade){
-            Control.Overlay.effects.fade = new Effect.Fade(Control.Overlay.container,{
+            Control.Overlay.effects.fade = new Effect.Fade(
+                Control.Overlay.container,{
                 queue: {
                     position: 'front',
                     scope: 'Control.Overlay'
                 },
-                afterFinish: function(){
+                afterFinish: function () {
                     Control.Overlay.notify('afterHide');
                 },
                 from: Control.Overlay.lastOpacity,
                 to: 0,
                 duration: (fade === true ? 0.75 : fade) / 2
-            });
+                }
+            );
         }else{
             Control.Overlay.container.hide();
             Control.Overlay.notify('afterHide');
         }
+
         return true;
     },
-    positionIFrameShim: function(){
+    positionIFrameShim: function () {
         if(Control.Overlay.container.visible())
             Control.Overlay.iFrameShim.positionUnder(Control.Overlay.container);
     },
     //IE only
-    positionOverlay: function(){
-        Control.Overlay.container.setStyle({
+    positionOverlay: function () {
+        Control.Overlay.container.setStyle(
+            {
             width: document.body.clientWidth + 'px',
             height: document.body.clientHeight + 'px'
-        });
+            }
+        );
     }
 };
 Object.Event.extend(Control.Overlay);
 
-Control.ToolTip = Class.create(Control.Window,{
-    initialize: function($super,container,tooltip,options){
-        $super(tooltip,Object.extend(Object.extend(Object.clone(Control.ToolTip.defaultOptions),options || {}),{
-            position: 'mouse',
-            hover: container
-        }));
+Control.ToolTip = Class.create(
+    Control.Window,{
+    initialize: function ($super,container,tooltip,options) {
+        $super(
+            tooltip,Object.extend(
+                Object.extend(Object.clone(Control.ToolTip.defaultOptions),options || {}),{
+                position: 'mouse',
+                hover: container
+                }
+            )
+        );
     }
-});
-Object.extend(Control.ToolTip,{
+    }
+);
+Object.extend(
+    Control.ToolTip,{
     defaultOptions: {
         offsetLeft: 10
     }
-});
+    }
+);
 
-Control.Modal = Class.create(Control.Window,{
-    initialize: function($super,container,options){
+Control.Modal = Class.create(
+    Control.Window,{
+    initialize: function ($super,container,options) {
         Control.Modal.InstanceMethods.beforeInitialize.bind(this)();
         $super(container,Object.extend(Object.clone(Control.Modal.defaultOptions),options || {}));
     },
-    closeWithoutOverlay: function(){
+    closeWithoutOverlay: function () {
         this.keepOverlay = true;
         this.close();
     }
-});
-Object.extend(Control.Modal,{
+    }
+);
+Object.extend(
+    Control.Modal,{
     defaultOptions: {
         overlayOpacity: 0.5,
         closeOnClick: 'overlay'
     },
     current: false,
-    open: function(container,options){
+    open: function (container,options) {
         var modal = new Control.Modal(container,options);
         modal.open();
         return modal;
     },
-    close: function(){
+    close: function () {
         if(Control.Modal.current)
             Control.Modal.current.close();
     },
     InstanceMethods: {
-        beforeInitialize: function(){
+        beforeInitialize: function () {
             Control.Overlay.load();
             this.observe('beforeOpen',Control.Modal.Observers.beforeOpen.bind(this));
             this.observe('afterOpen',Control.Modal.Observers.afterOpen.bind(this));
@@ -865,41 +974,48 @@ Object.extend(Control.Modal,{
         }
     },
     Observers: {
-        beforeOpen: function(){
-            Control.Window.windows.without(this).each(function(w){
+        beforeOpen: function () {
+            Control.Window.windows.without(this).each(
+                function (w) {
                 if(w.closeWithoutOverlay && w.isOpen){
                     w.closeWithoutOverlay();
                 }else{
                     w.close();
                 }
-            });
+                }
+            );
             if(!Control.Overlay.overlayFinishedOpening){
-                Control.Overlay.observeOnce('afterShow',function(){
+                Control.Overlay.observeOnce(
+                    'afterShow',function () {
                     Control.Overlay.overlayFinishedOpening = true;
                     this.open();
-                }.bind(this));
+                    }.bind(this)
+                );
                 Control.Overlay.show(this.options.overlayOpacity,this.options.fade ? this.options.fadeDuration : false);
                 throw $break;
             }
         },
-        afterOpen: function(){
+        afterOpen: function () {
             Control.Overlay.show(this.options.overlayOpacity);
             Control.Overlay.overlayFinishedOpening = true;
             Control.Modal.current = this;
         },
-        afterClose: function(){
+        afterClose: function () {
             if(!this.keepOverlay){
                 Control.Overlay.hide(this.options.fade ? this.options.fadeDuration : false);
                 Control.Overlay.overlayFinishedOpening = false;
             }
+
             this.keepOverlay = false;
             Control.Modal.current = false;
         }
     }
-});
+    }
+);
 
-Control.LightBox = Class.create(Control.Window,{
-    initialize: function($super,container,options){
+Control.LightBox = Class.create(
+    Control.Window,{
+    initialize: function ($super,container,options) {
         this.allImagesLoaded = false;
         if(options.modal){
             var options = Object.extend(Object.clone(Control.LightBox.defaultOptions),options || {});
@@ -915,25 +1031,31 @@ Control.LightBox = Class.create(Control.Window,{
             this.applyImageObservers();
         this.observe('beforeOpen',Control.LightBox.Observers.beforeOpen.bind(this));
     },
-    applyImageObservers:function(){
+    applyImageObservers:function () {
         var images = this.getImages();
         this.numberImagesToLoad = images.length;
         this.numberofImagesLoaded = 0;
-        images.each(function(image){
-            image.observe('load',function(image){
+        images.each(
+            function (image) {
+            image.observe(
+                'load',function (image) {
                 ++this.numberofImagesLoaded;
                 if(this.numberImagesToLoad == this.numberofImagesLoaded){
                     this.allImagesLoaded = true;
                     this.onAllImagesLoaded();
                 }
-            }.bind(this,image));
+                }.bind(this,image)
+            );
             image.hide();
-        }.bind(this));
+            }.bind(this)
+        );
     },
-    onAllImagesLoaded: function(){
-        this.getImages().each(function(image){
+    onAllImagesLoaded: function () {
+        this.getImages().each(
+            function (image) {
             this.showImage(image);
-        }.bind(this));
+            }.bind(this)
+        );
         if(this.hasRemoteContent){
             if(this.options.indicator)
                 this.hideIndicator();
@@ -941,25 +1063,28 @@ Control.LightBox = Class.create(Control.Window,{
         }else
             this.open();
     },
-    getImages: function(){
+    getImages: function () {
         return this.container.select(Control.LightBox.imageSelector);
     },
-    showImage: function(image){
+    showImage: function (image) {
         image.show();
     }
-});
-Object.extend(Control.LightBox,{
+    }
+);
+Object.extend(
+    Control.LightBox,{
     imageSelector: 'img',
     defaultOptions: {},
     Observers: {
-        beforeOpen: function(){
+        beforeOpen: function () {
             if(!this.hasRemoteContent && !this.allImagesLoaded)
                 throw $break;
         },
-        onRemoteContentLoaded: function(){
+        onRemoteContentLoaded: function () {
             this.applyImageObservers();
             if(!this.allImagesLoaded)
                 throw $break;
         }
     }
-});
+    }
+);

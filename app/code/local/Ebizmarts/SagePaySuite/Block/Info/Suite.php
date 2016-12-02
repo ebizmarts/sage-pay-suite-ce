@@ -7,9 +7,11 @@
  * @package    Ebizmarts_SagePaySuite
  * @author     Ebizmarts <info@ebizmarts.com>
  */
-class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc {
+class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
+{
 
-    public function getSpecificInformation() {
+    public function getSpecificInformation() 
+    {
         $tokenId = $this->isTokenInfo();
         if (!$tokenId) {
             return parent::getSpecificInformation();
@@ -18,7 +20,8 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
         return $this->helper('sagepaysuite/token')->getDataAsArray($tokenId);
     }
 
-    protected function _construct() {
+    protected function _construct() 
+    {
         parent::_construct();
 
         if (Mage::getSingleton('core/translate')->getTranslateInline() === false && Mage::app()->getStore()->isAdmin()) { //For Emails
@@ -28,17 +31,20 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
         }
     }
 
-    public function getOnMemo() {
+    public function getOnMemo() 
+    {
         $r = $this->getRequest();
         return (bool) (!is_null(Mage::registry('current_creditmemo')) || ($r->getControllerName() == 'sales_order_creditmemo' && $r->getActionName() == 'view'));
     }
 
-    public function getOnInvoice() {
+    public function getOnInvoice() 
+    {
         $r = $this->getRequest();
         return (bool) (!is_null(Mage::registry('current_invoice')) || ($r->getControllerName() == 'sales_order_invoice' && $r->getActionName() == 'view'));
     }
 
-    public function getTokenCard() {
+    public function getTokenCard() 
+    {
         $token = $this->isTokenInfo();
         if ($token) {
             if (is_object($this->getInfo()->getOrder()) && is_object($this->getInfo()->getOrder()->getSagepayInfo()) && $this->getInfo()->getOrder()->getSagepayInfo()->getToken()) {
@@ -53,20 +59,22 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
         return new Varien_Object;
     }
 
-    public function isTokenInfo() {
+    public function isTokenInfo() 
+    {
         if (is_object($this->getInfo()->getOrder()) && is_object($this->getInfo()->getOrder()->getSagepayInfo())) {
             return (bool) (strlen($this->getInfo()->getOrder()->getSagepayInfo()->getToken()) > 0);
         } else if ($this->getInfo()->getSagepayTokenCcId()) {
             return true;
         }
+
         return false;
     }
 
-    public function getCcTypeName($type = null, $textOnly = false) {
+    public function getCcTypeName($type = null, $textOnly = false) 
+    {
         $types = Mage::getSingleton('sagepaysuite/config')->getCcTypesSagePayDirect(true);
         $ccType = ($type === null) ? $this->getInfo()->getCcType() : $type;
         if (isset($types[$ccType])) {
-
             if (true === $textOnly) {
                 return $types[$ccType];
             }
@@ -75,20 +83,24 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
 
             return $name;
         }
+
         return (empty($ccType)) ? Mage::helper('payment')->__('N/A') : $ccType;
     }
 
-    public function getBasicRealTitle() {
+    public function getBasicRealTitle() 
+    {
         $title = $this->getMethod()->getTitle();
 
         return $title;
     }
 
-    protected function _getDetailUrl($vpsTxId) {
+    protected function _getDetailUrl($vpsTxId) 
+    {
         return $this->helper('adminhtml')->getUrl('adminhtml/sagepayreporting/transactionDetailModal/', array('vpstxid' => $vpsTxId));
     }
 
-    public function getStoppedLabel($trn) {
+    public function getStoppedLabel($trn) 
+    {
         $txt = '-';
 
         if ($trn->getVoided()) {
@@ -98,12 +110,14 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
         return $txt;
     }
 
-    public function detailLink($vpsTxId) {
+    public function detailLink($vpsTxId) 
+    {
         $title = $this->__('Click here to view Transaction detail.');
         return sprintf('<a title="%s" id="%s" class="trn-detail-modal" href="%s">%s</a>', $title, str_replace(array('{', '}'), '', $vpsTxId), $this->_getDetailUrl($vpsTxId), $vpsTxId);
     }
 
-    public function getParentOrderLink($sagepay) {
+    public function getParentOrderLink($sagepay) 
+    {
         $lnk = '';
 
         if ($sagepay->getParentTrnId()) {
@@ -118,16 +132,19 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
         return $lnk;
     }
 
-    public function cs($str) {
+    public function cs($str) 
+    {
         return Mage::helper('sagepaysuite')->cs($str);
     }
 
-    public function toPdf() {
+    public function toPdf() 
+    {
         $this->setTemplate('sagepaysuite/payment/info/pdf/base-basic.phtml');
         return $this->toHtml();
     }
 
-    public function getThirdmanBreakdown($thirdmanId) {
+    public function getThirdmanBreakdown($thirdmanId) 
+    {
         try {
             $breakdown = Mage::getModel('sagepayreporting/sagepayreporting')->getT3MDetail($thirdmanId);
             if($breakdown['ok'] === true){
@@ -139,6 +156,7 @@ class Ebizmarts_SagePaySuite_Block_Info_Suite extends Mage_Payment_Block_Info_Cc
             $breakdown = null;
             Mage::logException($e);
         }
+
         return $breakdown;
     }
 

@@ -36,7 +36,6 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
         $resultData = array();
 
         try {
-
             Mage::helper('sagepaysuite')->validateQuote();
 
             $result = $this->getDirectModel()->registerTransaction($this->getRequest()->getPost());
@@ -49,12 +48,12 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
                 $resultData = array(
                     'success' => 'true',
                     'response_status' => 'threed',
-                    'redirect' => Mage:: getModel('core/url'
+                    'redirect' => Mage:: getModel(
+                        'core/url'
                     )->getUrl('sgps/DirectPayment/threedPost', array('_secure' => true, 'txc' => $vendorTxCode)));
             } else if ($response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_APPROVED ||
                 $response_status == Ebizmarts_SagePaySuite_Model_Api_Payment :: RESPONSE_CODE_REGISTERED
             ) {
-
                 $op = Mage:: getSingleton('checkout/type_onepage');
 
                 if (Mage::getSingleton('customer/session')->getCreateAccount()) {
@@ -81,7 +80,6 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
             $resultData['response_status_detail'] = $e->getMessage();
 
             Mage::dispatchEvent('sagepay_payment_failed', array('quote' => Mage::getSingleton('checkout/type_onepage')->getQuote(), 'message' => $e->getMessage()));
-
         }
 
         return $this->getResponse()->setBody(Zend_Json:: encode($resultData));
@@ -100,10 +98,14 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
             Ebizmarts_SagePaySuite_Log:: we($e);
         }
 
-        return $this->getResponse()->setBody(str_replace(array(
-            '<div id="tokencards-payment-sagepaydirectpro">',
-            '</div>'
-        ), array(), $html));
+        return $this->getResponse()->setBody(
+            str_replace(
+                array(
+                '<div id="tokencards-payment-sagepaydirectpro">',
+                '</div>'
+                ), array(), $html
+            )
+        );
     }
 
     public function getDirectModel()
@@ -177,30 +179,26 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
         $quote = Mage::getSingleton('checkout/type_onepage')->getQuote();
 
         try {
-
             //Check cart health on callback.
             if (1 === (int)Mage::getStoreConfig('payment/sagepaysuite/verify_cart_consistency')) {
                 if (Mage::helper('sagepaysuite/checkout')->cartExpire($quote)) {
-
                     Sage_Log::log("Transaction " . $transaction->getVendorTxCode() . " not completed, cart was modified while customer on 3D payment pages.", Zend_Log::CRIT, 'SagePaySuite_REQUEST.log');
 
                     Mage::throwException($this->__('Your order could not be completed, please try again. Thanks.'));
-
                 }
             }
+
             //Check cart health on callback.
 
             if ($pares && $emede) {
                 Mage::getModel('sagepaysuite/sagePayDirectPro')->saveOrderAfter3dSecure($pares, $emede);
                 echo $this->__('<small>%s</small>', "Done. Redirecting...");
             } else {
-
                 Mage::dispatchEvent('sagepay_payment_failed', array('quote' => $quote, 'message' => $this->__("3D callback error.")));
 
                 Mage::throwException($this->__("Invalid request. PARes and MD are empty."));
             }
         } catch (Exception $e) {
-
             Mage::getSingleton('sagepaysuite/session')->setAcsurl(null)
                 ->setPareq(null)
                 ->setSageOrderId(null)
@@ -232,7 +230,6 @@ class Ebizmarts_SagePaySuite_DirectPaymentController extends Mage_Core_Controlle
             }
 
             echo '</body></html>';
-
         }
 
         if (!$error) {

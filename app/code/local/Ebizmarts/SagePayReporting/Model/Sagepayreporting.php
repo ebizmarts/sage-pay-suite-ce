@@ -1,19 +1,22 @@
 <?php
 
-class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_Abstract {
+class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_Abstract
+{
 
     protected $_vendor;
     protected $_username;
     protected $_password;
     protected $_enviroment;
 
-    public function _construct() {
+    public function _construct() 
+    {
         parent::_construct();
         $this->_init('sagepayreporting/sagepayreporting');
         $this->_setConfiguration();
     }
 
-    protected function _getRepStoreId() {
+    protected function _getRepStoreId() 
+    {
         return Mage::registry('reporting_store_id');
     }
 
@@ -22,7 +25,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      *
      * @return void
      */
-    private function _setConfiguration($moto = '') {
+    private function _setConfiguration($moto = '') 
+    {
         $_configuration = Mage::app()->getStore($this->_getRepStoreId())->getConfig("sagepayreporting{$moto}/account");
 
         $this->setVendor($_configuration['vendor']);
@@ -31,35 +35,43 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         $this->setEnvironment($_configuration['enviroment']);
     }
 
-    public function setVendor($vendor) {
+    public function setVendor($vendor) 
+    {
         $this->_vendor = $vendor;
     }
 
-    public function getVendor() {
+    public function getVendor() 
+    {
         return $this->_vendor;
     }
 
-    public function setUsername($username) {
+    public function setUsername($username) 
+    {
         $this->_username = $username;
     }
 
-    public function getUsername() {
+    public function getUsername() 
+    {
         return $this->_username;
     }
 
-    public function setPassword($password) {
+    public function setPassword($password) 
+    {
         $this->_password = $password;
     }
 
-    public function getPassword() {
+    public function getPassword() 
+    {
         return $this->_password;
     }
 
-    public function setEnvironment($enviroment) {
+    public function setEnvironment($enviroment) 
+    {
         $this->_enviroment = $enviroment;
     }
 
-    public function getEnvironment() {
+    public function getEnvironment() 
+    {
         return $this->_enviroment;
     }
 
@@ -69,7 +81,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      * @param integer $url Url id.
      * @return  string      Url for enviroment.
      */
-    private function _getServiceUrl($id) {
+    private function _getServiceUrl($id) 
+    {
 
         $url = null;
 
@@ -92,7 +105,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      * @param string $command Param request to the API.
      * @return string MD5 hash signature.
      */
-    private function _getXmlSignature($command, $params) {
+    private function _getXmlSignature($command, $params) 
+    {
         $xml = '<command>' . $command . '</command>';
         $xml .= '<vendor>' . $this->getVendor() . '</vendor>';
         $xml .= '<user>' . $this->getUsername() . '</user>';
@@ -109,7 +123,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      * @param string $params  Parameters used for each command.
      * @return string Xml string to be used into the API connection.
      */
-    private function _createXml($command, $params = null) {
+    private function _createXml($command, $params = null) 
+    {
         $xml = '';
         $xml .= '<vspaccess>';
         $xml .= '<command>' . $command . '</command>';
@@ -125,13 +140,15 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         return $xml;
     }
 
-    public function addValidIPs($vendor, $address, $mask, $note, $mode, $apiuser = '', $apipassword = '') {
+    public function addValidIPs($vendor, $address, $mask, $note, $mode, $apiuser = '', $apipassword = '') 
+    {
         $this->setEnvironment($mode);
         $this->setVendor($vendor);
 
         if (!empty($apiuser)) {
             $this->setUsername($apiuser);
         }
+
         if (!empty($apipassword)) {
             $this->setPassword($apipassword);
         }
@@ -156,7 +173,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      * @param string $vpstxid      The VPSTxID (transactionid) of the transaction.
      * @return object Xml object with the transaction details.
      */
-    public function getTransactionDetails($vendortxcode, $vpstxid = null) {
+    public function getTransactionDetails($vendortxcode, $vpstxid = null) 
+    {
         $trnModel = Mage::getModel('sagepaysuite2/sagepaysuite_transaction');
 
         if (is_null($vpstxid)) {
@@ -201,39 +219,48 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         return $response;
     }
 
-    public function getValidIPs() {
+    public function getValidIPs() 
+    {
         return $this->basicOperation('getValidIPs');
     }
 
-    public function getAvsCv2Rules() {
+    public function getAvsCv2Rules() 
+    {
         return $this->basicOperation('getAVSCV2Rules');
     }
 
-    public function getAVSCV2Status() {
+    public function getAVSCV2Status() 
+    {
         return $this->basicOperation('getAVSCV2Status');
     }
 
-    public function setAVSCV2Status($status) {
+    public function setAVSCV2Status($status) 
+    {
         return $this->basicOperation('setAVSCV2Status', ('<status>' . $status . '</status>'));
     }
 
-    public function get3dSecureRules() {
+    public function get3dSecureRules() 
+    {
         return $this->basicOperation('get3DSecureRules');
     }
 
-    public function get3dSecureStatus() {
+    public function get3dSecureStatus() 
+    {
         return $this->basicOperation('get3DSecureStatus');
     }
 
-    public function set3dSecureStatus($status) {
+    public function set3dSecureStatus($status) 
+    {
         return $this->basicOperation('set3DSecureStatus', ('<status>' . $status . '</status>'));
     }
 
-    public function getTokenCount() {
+    public function getTokenCount() 
+    {
         return $this->basicOperation('getTokenCount');
     }
 
-    public function getRelatedTransactions($vpstxid, $startDate = null) {
+    public function getRelatedTransactions($vpstxid, $startDate = null) 
+    {
         if (is_null($startDate)) {
             $startDate = Mage::getModel('core/date')->date('d/m/Y 00:00:00', strtotime('-1 year'));
         }
@@ -243,7 +270,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         return $this->basicOperation('getRelatedTransactions', $params);
     }
 
-    public function getBatchList($startDate, $endDate) {
+    public function getBatchList($startDate, $endDate) 
+    {
         $params  = '<startdate>' . $startDate . '</startdate>';
         $params .= '<enddate>' . $endDate . '</enddate>';
 
@@ -255,7 +283,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      * @param string Thirdman ID
      * @return mixed
      */
-    public function getT3MDetail($t3mid) {
+    public function getT3MDetail($t3mid) 
+    {
         $params = '<t3mtxid>' . $t3mid . '</t3mtxid>';
         return $this->basicOperation('getT3MDetail', $params);
     }
@@ -266,13 +295,13 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      * @param SimpleXMLElement $xml Xml response from the API.
      * @return object Api response into a Varien object.
      */
-    private function _mapTranscationDetails(SimpleXMLElement $xml) {
+    private function _mapTranscationDetails(SimpleXMLElement $xml) 
+    {
         $object = new Varien_Object;
         $object->setErrorcode($xml->errorcode);
         $object->setTimestamp($xml->timestamp);
 
         if ((string) $xml->errorcode === '0000') {
-
             foreach ($xml as $key => $value) {
                 $object->setData($key, ((string) $value));
             }
@@ -285,7 +314,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         return $object;
     }
 
-    public function basicOperation($opname, $params = null) {
+    public function basicOperation($opname, $params = null) 
+    {
         $xml          = $this->_createXml($opname, $params);
         $api_response = $this->_executeRequest($xml);
 
@@ -300,7 +330,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         return $response;
     }
 
-    public function getTransactionList($startDate, $endDate, $startRow = 1, $endRow = 50) {
+    public function getTransactionList($startDate, $endDate, $startRow = 1, $endRow = 50) 
+    {
         $params  = '<startdate>' . $startDate . '</startdate>';
         $params .= '<enddate>' . $endDate . '</enddate>';
         $params .= '<startrow>' . $startRow . '</startrow>';
@@ -314,7 +345,8 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
      *
      * @param string $xml description
      */
-    private function _executeRequest($xml) {
+    private function _executeRequest($xml) 
+    {
         $url = $this->_getServiceUrl($this->getEnvironment());
 
         //Sage_Log::log($url, null, 'SagePay_Reporting.log');
@@ -327,6 +359,7 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
             curl_setopt($curlSession, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));
         }
+
         curl_setopt($curlSession, CURLOPT_URL, $url);
         curl_setopt($curlSession, CURLOPT_HEADER, 0);
         curl_setopt($curlSession, CURLOPT_POST, 1);
@@ -334,8 +367,10 @@ class Ebizmarts_SagePayReporting_Model_SagePayReporting extends Mage_Core_Model_
         curl_setopt($curlSession, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curlSession, CURLOPT_TIMEOUT, 120);
 
-        curl_setopt($curlSession, CURLOPT_SSL_VERIFYPEER,
-            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+        curl_setopt(
+            $curlSession, CURLOPT_SSL_VERIFYPEER,
+            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false
+        );
 
         curl_setopt($curlSession, CURLOPT_SSL_VERIFYHOST, 2);
 

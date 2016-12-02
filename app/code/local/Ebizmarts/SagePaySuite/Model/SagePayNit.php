@@ -1,6 +1,7 @@
 <?php
 
-class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Model_Api_Payment {
+class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Model_Api_Payment
+{
 
     protected $_code = 'sagepaynit';
     protected $_formBlockType = 'sagepaysuite/form_sagePayNit';
@@ -21,7 +22,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
     protected $_canUseForMultishipping = true;
 
 
-    public function registerTransaction($params = null, $macOrder = null) {
+    public function registerTransaction($params = null, $macOrder = null) 
+    {
 
         $quoteObj = $this->_getQuote();
         $quoteObj2 = $this->getQuoteDb($quoteObj);
@@ -35,7 +37,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
             $amount = $this->formatAmount($quoteObj2->getGrandTotal()-$session_surcharge, $quoteObj2->getCurrencyCode());
         }
         else {
-
             $amount = $this->formatAmount($macOrder->getGrandTotal()-$session_surcharge, $macOrder->getCurrencyCode());
 
             $baseAmount = $this->formatAmount($macOrder->getBaseGrandTotal()-$session_surcharge, $macOrder->getQuoteCurrencyCode());
@@ -64,12 +65,14 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
                 $tx += $regTxCodes;
                 Mage::unregister('sagepaysuite_ms_txcodes');
             }
+
             $tx [] = $_req->getData('VendorTxCode');
             Mage::register('sagepaysuite_ms_txcodes', $tx);
         }
 
         Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
             ->loadByVendorTxCode($_req->getData('VendorTxCode'))
+            ->setReferrerID($this->getConfigData('referrer_id'))
             ->setVendorTxCode($_req->getData('VendorTxCode'))
             ->setToken($_req->getData('Token'))
             ->setTrnCurrency($_req->getData('Currency'))
@@ -96,7 +99,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         return $_res;
     }
 
-    public function nitRegisterTransaction(Varien_Object $payment, $amount) {
+    public function nitRegisterTransaction(Varien_Object $payment, $amount) 
+    {
 
 
         #Process invoice
@@ -144,13 +148,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
             return $this;
     }
 
-    public function validate() {
+    public function validate() 
+    {
         $info = $this->getInfoInstance();
 
         return $this;
     }
 
-    public function nitTransaction(Varien_Object $info) {
+    public function nitTransaction(Varien_Object $info) 
+    {
 
         $postData                   = array();
         $postData                   += $this->_getGeneralTrnData($info->getPayment(), $info->getParameters())->getData();
@@ -163,19 +169,23 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         $postData['Vendor']         = $this->getConfigData('vendor'); //@TODO: Check this for token MOTO transactions.
 
         //remove unused fields
-        if(array_key_exists("c_v2",$postData)){
+        if(array_key_exists("c_v2", $postData)){
             unset($postData["c_v2"]);
         }
-        if(array_key_exists("card_holder",$postData)){
+
+        if(array_key_exists("card_holder", $postData)){
             unset($postData["card_holder"]);
         }
-        if(array_key_exists("card_number",$postData)){
+
+        if(array_key_exists("card_number", $postData)){
             unset($postData["card_number"]);
         }
-        if(array_key_exists("card_type",$postData)){
+
+        if(array_key_exists("card_type", $postData)){
             unset($postData["card_type"]);
         }
-        if(array_key_exists("expiry_date",$postData)){
+
+        if(array_key_exists("expiry_date", $postData)){
             unset($postData["expiry_date"]);
         }
 
@@ -204,7 +214,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         return $rs;
     }
 
-    public function postForMerchantKey(){
+    public function postForMerchantKey()
+    {
 
         $url = $this->getUrl("api") . "merchant-session-keys";
 
@@ -218,13 +229,16 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_TIMEOUT, 8);
 
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,
-            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false);
+        curl_setopt(
+            $curl, CURLOPT_SSL_VERIFYPEER,
+            Mage::getStoreConfigFlag('payment/sagepaysuite/curl_verifypeer') == 1 ? true : false
+        );
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
         if(Mage::getStoreConfigFlag('payment/sagepaysuite/curl_proxy') == 1){
             curl_setopt($curl, CURLOPT_PROXY, Mage::getStoreConfig('payment/sagepaysuite/curl_proxy_port'));
         }
+
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
 
         //auth
@@ -238,9 +252,9 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         }else{
             $response_data = json_decode($response);
 
-            if($response_data && array_key_exists("code",$response_data)){
+            if($response_data && array_key_exists("code", $response_data)){
                 Mage::throwException("ERROR " . $response_data->code . " " . $response_data->description);
-            }elseif($response_data && array_key_exists("merchantSessionKey",$response_data)){
+            }elseif($response_data && array_key_exists("merchantSessionKey", $response_data)){
                 return $response_data;
             }else{
                 Mage::throwException("Unable to request merchant key: Invalid response from SagePay");
@@ -248,7 +262,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         }
     }
 
-    public function saveOrderAfter3dSecure($pares, $md) {
+    public function saveOrderAfter3dSecure($pares, $md) 
+    {
 
         $this->getSageSuiteSession()->setSecure3d(true);
         $this->getSageSuiteSession()->setPares($pares);
@@ -270,7 +285,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         return $order;
     }
 
-    public function nitCallBack3D(Varien_Object $payment, $PARes, $MD) {
+    public function nitCallBack3D(Varien_Object $payment, $PARes, $MD) 
+    {
         $error = '';
 
         $request = $this->_buildRequest3D($PARes, $MD);
@@ -282,15 +298,15 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
             //save surcharge to server post for later use
             $session_surcharge_amount = Mage::getSingleton('sagepaysuite/session')->getSurcharge();
             if(!is_null($session_surcharge_amount) && $session_surcharge_amount > 0){
-                $result->setData('Surcharge',$session_surcharge_amount);
+                $result->setData('Surcharge', $session_surcharge_amount);
             }
         }
+
         Mage::register('sageserverpost', $result);
 
         if ($result->getResponseStatus() == self::RESPONSE_CODE_APPROVED ||
             $result->getResponseStatus() == 'AUTHENTICATED' ||
             $result->getResponseStatus() == self::RESPONSE_CODE_REGISTERED) {
-
             if (strtoupper($this->getConfigData('payment_action')) == self::REQUEST_TYPE_PAYMENT) {
                 $this->getSageSuiteSession()->setInvoicePayment(true);
             }
@@ -338,7 +354,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
             $payment->save();
         }
         else {
-
             //Update status if 3d failed
             Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
                 ->loadByVendorTxCode($this->getSageSuiteSession()->getLastVendorTxCode())
@@ -357,6 +372,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
                 } else if ($result->getResponseStatus() == self::RESPONSE_CODE_REJECTED) {
                     $error = $this->_sageHelper()->__('Your credit card was rejected: ');
                 }
+
                 $error .= $result->getResponseStatusDetail();
             } else {
                 $error = $this->_sageHelper()->__('Error in capturing the payment');
@@ -366,16 +382,19 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         if (!empty($error)) {
             Mage::throwException($error);
         }
+
         return $this;
     }
 
-    protected function _buildRequest3D($PARes, $MD) {
+    protected function _buildRequest3D($PARes, $MD) 
+    {
         return $this->_getRequest()
             ->setMD($MD)
             ->setPARes($PARes);
     }
 
-    protected function _postRequest(Varien_Object $request, $callback3D = false) {
+    protected function _postRequest(Varien_Object $request, $callback3D = false) 
+    {
 
         $result = Mage::getModel('sagepaysuite/sagepaysuite_result');
 
@@ -415,6 +434,7 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
             if (isset($r['VPSTxId'])) {
                 $result->setVpsTxId($r['VPSTxId']);
             }
+
             if (isset($r['SecurityKey'])) {
                 $result->setSecurityKey($r['SecurityKey']);
             }
@@ -494,7 +514,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
                     break;
             }
         } catch (Exception $e) {
-
             Sage_Log::logException($e);
 
             $result
@@ -506,7 +525,8 @@ class Ebizmarts_SagePaySuite_Model_SagePayNit extends Ebizmarts_SagePaySuite_Mod
         return $result;
     }
 
-    public function getConfigSafeFields() {
+    public function getConfigSafeFields() 
+    {
         return array('active', 'mode', 'title');
     }
 }

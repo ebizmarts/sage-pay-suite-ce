@@ -4,14 +4,17 @@
 })();
 
 notifyThreedError = function (msg) {
-    Control.Window.windows.each(function (w) {
+    Control.Window.windows.each(
+        function (w) {
         if (w.container.visible()) {
             w.close();
         }
-    });
+        }
+    );
     if ((typeof checkout.accordion == 'object')) {
         checkout.accordion.openSection('opc-payment');
     }
+
     alert(msg);
 }
 
@@ -23,7 +26,6 @@ getOneStepCheckoutId = function () {
 
 
     for (var i = 0; i < possibleIds.length; i++) {
-
         var ele = document.getElementById(possibleIds[i].form);
 
         if ((typeof ele) != "undefined" && ele != null) {
@@ -80,6 +82,7 @@ restoreOscLoad = function () {
 if (typeof EbizmartsSagePaySuite == 'undefined') {
     var EbizmartsSagePaySuite = {};
 }
+
 EbizmartsSagePaySuite.Checkout = Class.create();
 EbizmartsSagePaySuite.Checkout.prototype = {
 
@@ -105,7 +108,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             this.getConfig('review').saveUrl = SuiteConfig.getConfig('global', 'sgps_saveorder_url');
             this.getConfig('review').onSave = this.reviewSave.bindAsEventListener(this);
         } else if (this.getConfig('osc')) {
-
 //            if("BUTTON" == window._sagepayonepageTriggerId.tagName) {
 //                var oncl = window._sagepayonepageTriggerId.readAttribute("onclick");
 //
@@ -139,20 +141,23 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             $(window._sagepayonepageFormId).submit = function () {
                 this.reviewSave();
             }.bind(this);
-
         } else if (this.getConfig('msform')) {
-            this.getConfig('msform').observe('submit', function (evmsc) {
+            this.getConfig('msform').observe(
+                'submit', function (evmsc) {
                 Event.stop(evmsc);
                 this.reviewSave(evmsc);
-            }.bind(this));
+                }.bind(this)
+            );
         }
 
         var blFormMAC = $('multishipping-billing-form');
         if (blFormMAC) {
-            blFormMAC.observe('submit', function (_event_) {
+            blFormMAC.observe(
+                'submit', function (_event_) {
                 Event.stop(_event_);
                 this.setPaymentMethod();
-            }.bind(this));
+                }.bind(this)
+            );
         }
 
         var paymentSubmit = this.getPaymentSubmit();
@@ -170,6 +175,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
         } catch (e) {
             response = {}
         }
+
         return response;
     },
     getConfig: function (instance) {
@@ -189,6 +195,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 }
             }
         }
+
         return false;
     },
     getShippingMethodSubmit: function () {
@@ -201,6 +208,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 }
             }
         }
+
         return false;
     },
     getPaymentMethod: function () {
@@ -221,14 +229,15 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             return this.code;
         }
 
-        var checkedPayment = null
+        var checkedPayment = null;
 
-        form.getInputs('radio', 'payment[method]').each(function (el) {
-            if (el.checked) {
-                checkedPayment = el.value;
-                throw $break;
+        var inputs =  form.getInputs('radio', 'payment[method]');
+
+        for(var i = 0; i < inputs.length; i = i + 1) {
+            if (inputs[i].checked) {
+                checkedPayment = inputs[i].value;
             }
-        });
+        }
 
         if (checkedPayment != null) {
             return checkedPayment;
@@ -261,30 +270,10 @@ EbizmartsSagePaySuite.Checkout.prototype = {
     growlError: function (msg) {
         alert(msg);
         return;
-        try {
-            var ng = new k.Growler({
-                location: "tc"
-            });
-            ng.error(msg, {
-                life: 10
-            });
-        } catch (grwlerror) {
-            alert(msg);
-        }
     },
     growlWarn: function (msg) {
         alert(msg);
         return;
-        try {
-            var ng = new k.Growler({
-                location: "tc"
-            });
-            ng.warn(msg, {
-                life: 10
-            });
-        } catch (grwlerror) {
-            alert(msg);
-        }
     },
     isDirectTokenTransaction: function () {
         var tokenRadios = $$('div#payment_form_sagepaydirectpro ul.tokensage li.tokencard-radio input');
@@ -293,6 +282,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 return true;
             }
         }
+
         return false;
     },
     isServerTokenTransaction: function () {
@@ -302,13 +292,16 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 return true;
             }
         }
+
         return false;
     },
     getServerSecuredImage: function () {
-        return new Element('img', {
+        return new Element(
+            'img', {
             'src': SuiteConfig.getConfig('server', 'secured_by_image'),
             'style': 'margin-bottom:5px'
-        });
+            }
+        );
     },
     setShippingMethod: function () {
         try {
@@ -348,18 +341,22 @@ EbizmartsSagePaySuite.Checkout.prototype = {
     },
     getTokensHtml: function () {
 
-        new Ajax.Updater(('tokencards-payment-' + this.getPaymentMethod()), SuiteConfig.getConfig('global', 'html_paymentmethods_url'), {
+        new Ajax.Updater(
+            ('tokencards-payment-' + this.getPaymentMethod()), SuiteConfig.getConfig('global', 'html_paymentmethods_url'), {
             parameters: {
                 payment_method: this.getPaymentMethod()
             },
             onComplete: function () {
                 if ($$('a.addnew').length > 1) {
-                    $$('a.addnew').each(function (el) {
+                    $$('a.addnew').each(
+                        function (el) {
                         if (!el.visible()) {
                             el.remove();
                         }
-                    })
+                        }
+                    )
                 }
+
                 toggleNewCard(2);
 
                 if ($(window._sagepayonepageFormId) && this.isServerPaymentMethod()) {
@@ -367,20 +364,22 @@ EbizmartsSagePaySuite.Checkout.prototype = {
 
                     var tokens = $$('div#payment_form_sagepayserver ul li.tokencard-radio input');
                     if (tokens.length) {
-                        tokens.each(function (radiob) {
+                        tokens.each(
+                            function (radiob) {
                             radiob.disabled = true;
                             radiob.removeAttribute('checked');
-                        });
+                            }
+                        );
                         tokens.first().writeAttribute('checked', 'checked');
                         tokens.first().disabled = false;
                         $(window._sagepayonepageFormId).submit();
                     } else {
                         this.resetOscLoading();
                     }
-
                 }
             }.bind(this)
-        });
+            }
+        );
 
     },
     resetOscLoading: function () {
@@ -392,9 +391,11 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             var step = 'review';
             Element.hide(step + '-please-wait');
             $(step + '-buttons-container').setStyle({opacity: 1});
-            $(step + '-buttons-container').descendants().each(function (s) {
+            $(step + '-buttons-container').descendants().each(
+                function (s) {
                 s.disabled = false;
-            });
+                }
+            );
         }
     },
     reviewSave: function (transport) {
@@ -409,7 +410,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
 
         //OSC\\
         if ((typeof transport.responseText) == 'undefined' && $(window._sagepayonepageFormId)) {
-
             var gotNITToken = document.getElementById("nit_card_identifier") != null && document.getElementById("nit_card_identifier").value != "";
 
             if (!gotNITToken) {
@@ -430,7 +430,8 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             window._sagepayprocessingorder = true;
 
             if (this.isFormPaymentMethod()) {
-                new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
+                new Ajax.Request(
+                    SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
                     method: "post",
                     parameters: Form.serialize($(window._sagepayonepageFormId)),
                     onSuccess: function (f) {
@@ -448,14 +449,16 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                     onLoading: function (r) {
                         setOscLoad();
                     }
-                });
+                    }
+                );
                 return;
             }
 
             var slPayM = this.getPaymentMethod();
 
             if(slPayM == this.servercode || slPayM == this.directcode){
-                new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_saveorder_url'),{
+                new Ajax.Request(
+                    SuiteConfig.getConfig('global', 'sgps_saveorder_url'),{
                     method:"post",
                     parameters: Form.serialize($(window._sagepayonepageFormId)),
                     onSuccess: function (f) {
@@ -465,17 +468,16 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                     onLoading: function (r) {
                         setOscLoad();
                     }
-                });
+                    }
+                );
                 return;
             }
             else if (slPayM == this.nitcode) {
-
                 try {
-
                     if (gotNITToken) {
-
                         //if token was generated continue as direct
-                        new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
+                        new Ajax.Request(
+                            SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
                             method: "post",
                             parameters: Form.serialize($(window._sagepayonepageFormId)),
                             onSuccess: function (f) {
@@ -485,20 +487,20 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                             onLoading: function (r) {
                                 setOscLoad();
                             }
-                        });
+                            }
+                        );
                         return;
                     } else {
                         this.nitGenerateMerchantKeyOSC();
                         return;
                     }
-
                 } catch (err) {
                     console.log(err);
                 }
+
                 return;
             }
             else {
-
                 $(window._sagepayonepageFormId)._submit();
                 window._sagepayprocessingorder = false;
                 return;
@@ -509,7 +511,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             //OSC\\
         }
         else if ((typeof transport.responseText) == 'undefined' && this.getConfig('msform')) {
-
             var ps = $H(this.getConfig('msform').serialize(true));
 
             ps.set('payment[method]', 'sagepayserver');
@@ -523,15 +524,16 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 ps.set('payment[remembertoken]', $('token-remembertoken').getValue());
             }
 
-            new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
+            new Ajax.Request(
+                SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
                 method: "post",
                 parameters: ps,
                 onSuccess: function (f) {
                     this.reviewSave(f);
                 }.bind(this)
-            });
+                }
+            );
             return;
-
         }
         else {
             try {
@@ -543,7 +545,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
 
         //an error occurred
         if ((typeof response.response_status != 'undefined') && response.response_status != 'OK' && response.response_status != 'threed' && response.response_status != 'paypal_redirect') {
-
             this.resetOscLoading();
 
             //reset nit
@@ -580,7 +581,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
         }
 
         if (this.isServerPaymentMethod()) {
-
             if (this._mobile) {
                 setLocation(response.redirect);
                 return;
@@ -590,9 +590,11 @@ EbizmartsSagePaySuite.Checkout.prototype = {
 
             var rbButtons = $('review-buttons-container');
 
-            var lcont = new Element('div', {
+            var lcont = new Element(
+                'div', {
                 className: 'lcontainer'
-            });
+                }
+            );
             var height_container = parseInt(SuiteConfig.getConfig('server', 'iframe_height'));
             if (Prototype.Browser.IE) {
                 height_container = height_container - 65;
@@ -600,8 +602,8 @@ EbizmartsSagePaySuite.Checkout.prototype = {
 
             var wtype = SuiteConfig.getConfig('server', 'payment_iframe_position').toString();
             if (wtype == 'modal') {
-
-                var wm = new Control.Modal('sagepayserver-dummy-link', {
+                var wm = new Control.Modal(
+                    'sagepayserver-dummy-link', {
                     className: 'modal-sagepaysuite',
                     iframe: true,
                     closeOnClick: false,
@@ -619,36 +621,39 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                             rbButtons.removeClassName('disabled');
                         }
                     }
-                });
+                    }
+                );
                 wm.container.insert(lcont);
-                wm.container.down().setStyle({
+                wm.container.down().setStyle(
+                    {
                     'height': height_container.toString() + 'px'
-                });
+                    }
+                );
                 wm.container.down().insert(this.getServerSecuredImage());
                 wm.open();
                 //scroll to top
                 scroll(0, 0);
-
             } else if (wtype == 'incheckout') {
-
                 var iframeId = 'sagepaysuite-server-incheckout-iframe';
-                var paymentIframe = new Element('iframe', {
+                var paymentIframe = new Element(
+                    'iframe', {
                     'src': response.redirect,
                     'id': iframeId
-                });
+                    }
+                );
 
                 if (this.getConfig('osc')) {
                     var placeBtn = $('onestepcheckout-place-order');
 
                     placeBtn.hide();
 
-                    $(window._sagepayonepageFormId).insert({
+                    $(window._sagepayonepageFormId).insert(
+                        {
                         after: paymentIframe
-                    });
+                        }
+                    );
                     $(iframeId).scrollTo();
-
                 } else {
-
                     if ((typeof $('checkout-review-submit')) == 'undefined') {
                         var btnsHtml = $$('div.content.button-set').first();
                     } else {
@@ -656,20 +661,18 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                     }
 
                     btnsHtml.hide();
-                    btnsHtml.insert({
+                    btnsHtml.insert(
+                        {
                         after: paymentIframe
-                    });
-
+                        }
+                    );
                 }
-
             } else if (wtype == 'full_redirect') {
                 setLocation(response.redirect);
                 return;
             }
-
         }
         else if (this.isDirectPaymentMethod() && (typeof response.response_status != 'undefined') && response.response_status == 'threed') {
-
             var threedLayout = SuiteConfig.getConfig('direct', 'threed_layout');
 
             if (threedLayout == 'redirect' || this._mobile) {
@@ -677,14 +680,16 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 return;
             }
             else {
-
                 $('sagepaydirectpro-dummy-link').writeAttribute('href', response.redirect);
 
-                var lcontdtd = new Element('div', {
+                var lcontdtd = new Element(
+                    'div', {
                     className: 'lcontainer'
-                });
+                    }
+                );
 
-                var dtd = new Control.Modal('sagepaydirectpro-dummy-link', {
+                var dtd = new Control.Modal(
+                    'sagepaydirectpro-dummy-link', {
                     className: 'modal-sagepaysuite sagepaymodal',
                     closeOnClick: false,
                     insertRemoteContentAt: lcontdtd,
@@ -706,41 +711,53 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                             var daiv = this.container;
 
                             if ($$('.sagepaymodal').length > 1) {
-                                $$('.sagepaymodal').each(function (elem) {
+                                $$('.sagepaymodal').each(
+                                    function (elem) {
                                     if (elem.visible()) {
                                         daiv = elem;
                                         throw $break;
                                     }
-                                });
+                                    }
+                                );
                             }
 
                             if (!this._mobile) {
-                                daiv.down().down('iframe').insert({
-                                    before: new Element('div', {
+                                daiv.down().down('iframe').insert(
+                                    {
+                                    before: new Element(
+                                        'div', {
                                         'id': 'sage-pay-direct-ddada',
                                         'style': 'background:#FFF'
-                                    }).update(
-                                        SuiteConfig.getConfig('direct', 'threed_after').toString() + SuiteConfig.getConfig('direct', 'threed_before').toString())
-                                });
+                                        }
+                                    ).update(
+                                        SuiteConfig.getConfig('direct', 'threed_after').toString() + SuiteConfig.getConfig('direct', 'threed_before').toString()
+                                    )
+                                    }
+                                );
                             }
-
                         } catch (er) {
                         }
 
                         if (false === Prototype.Browser.IE) {
                             if (!this._mobile) {
-                                daiv.down().down('iframe').setStyle({
+                                daiv.down().down('iframe').setStyle(
+                                    {
                                     'height': (parseInt(daiv.down().getHeight()) - 60) + 'px'
-                                });
-                                daiv.setStyle({
+                                    }
+                                );
+                                daiv.setStyle(
+                                    {
                                     'height': (parseInt(daiv.down().getHeight()) + 57) + 'px'
-                                });
+                                    }
+                                );
                             }
                         }
                         else {
-                            daiv.down().down('iframe').setStyle({
+                            daiv.down().down('iframe').setStyle(
+                                {
                                 'height': (parseInt(daiv.down().getHeight()) + 116) + 'px'
-                            });
+                                }
+                            );
                         }
 
                     },
@@ -748,9 +765,11 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                         if ($('sage-pay-direct-ddada')) {
                             $('sage-pay-direct-ddada').remove();
                         }
+
                         $('sagepaydirectpro-dummy-link').writeAttribute('href', '');
                     }
-                });
+                    }
+                );
 
                 if (this._mobile) {
                     var offset_left = (Position.deltaX + Math.floor((document.viewport.getDimensions().width - parseInt(dtd.container.getDimensions().width)) / 2));
@@ -761,14 +780,13 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 dtd.container.insert(lcontdtd);
                 dtd.open();
             }
-
         }
         else if (this.isDirectPaymentMethod()) {
-            new Ajax.Request(SuiteConfig.getConfig('direct', 'sgps_registertrn_url'), {
+            new Ajax.Request(
+                SuiteConfig.getConfig('direct', 'sgps_registertrn_url'), {
                 onSuccess: function (f) {
 
                     try {
-
                         var d = f.responseText.evalJSON();
 
                         if (d.response_status == "INVALID" || d.response_status == "MALFORMED" || d.response_status == "ERROR" || d.response_status == "FAIL") {
@@ -777,16 +795,15 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                         } else if (d.response_status == 'threed') {
                             $('sagepaydirectpro-dummy-link').writeAttribute('href', d.url);
                         }
-
                     } catch (alfaEr) {
                         this.growlError(f.responseText.toString());
                     }
 
                 }.bind(this)
-            });
+                }
+            );
         }
         else if (this.isNitPaymentMethod() && (typeof response.response_status != 'undefined') && response.response_status == 'threed') {
-
             var threedLayout = SuiteConfig.getConfig('direct', 'threed_layout');
 
             if (threedLayout == 'redirect' || this._mobile) {
@@ -794,14 +811,16 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 return;
             }
             else {
-
                 $('sagepaydirectpro-dummy-link').writeAttribute('href', response.redirect);
 
-                var lcontdtd = new Element('div', {
+                var lcontdtd = new Element(
+                    'div', {
                     className: 'lcontainer'
-                });
+                    }
+                );
 
-                var dtd = new Control.Modal('sagepaydirectpro-dummy-link', {
+                var dtd = new Control.Modal(
+                    'sagepaydirectpro-dummy-link', {
                     className: 'modal-sagepaysuite sagepaymodal',
                     closeOnClick: false,
                     insertRemoteContentAt: lcontdtd,
@@ -823,41 +842,53 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                             var daiv = this.container;
 
                             if ($$('.sagepaymodal').length > 1) {
-                                $$('.sagepaymodal').each(function (elem) {
+                                $$('.sagepaymodal').each(
+                                    function (elem) {
                                     if (elem.visible()) {
                                         daiv = elem;
                                         throw $break;
                                     }
-                                });
+                                    }
+                                );
                             }
 
                             if (!this._mobile) {
-                                daiv.down().down('iframe').insert({
-                                    before: new Element('div', {
+                                daiv.down().down('iframe').insert(
+                                    {
+                                    before: new Element(
+                                        'div', {
                                         'id': 'sage-pay-direct-ddada',
                                         'style': 'background:#FFF'
-                                    }).update(
-                                        SuiteConfig.getConfig('direct', 'threed_after').toString() + SuiteConfig.getConfig('direct', 'threed_before').toString())
-                                });
+                                        }
+                                    ).update(
+                                        SuiteConfig.getConfig('direct', 'threed_after').toString() + SuiteConfig.getConfig('direct', 'threed_before').toString()
+                                    )
+                                    }
+                                );
                             }
-
                         } catch (er) {
                         }
 
                         if (false === Prototype.Browser.IE) {
                             if (!this._mobile) {
-                                daiv.down().down('iframe').setStyle({
+                                daiv.down().down('iframe').setStyle(
+                                    {
                                     'height': (parseInt(daiv.down().getHeight()) - 60) + 'px'
-                                });
-                                daiv.setStyle({
+                                    }
+                                );
+                                daiv.setStyle(
+                                    {
                                     'height': (parseInt(daiv.down().getHeight()) + 57) + 'px'
-                                });
+                                    }
+                                );
                             }
                         }
                         else {
-                            daiv.down().down('iframe').setStyle({
+                            daiv.down().down('iframe').setStyle(
+                                {
                                 'height': (parseInt(daiv.down().getHeight()) + 116) + 'px'
-                            });
+                                }
+                            );
                         }
 
                     },
@@ -865,9 +896,11 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                         if ($('sage-pay-direct-ddada')) {
                             $('sage-pay-direct-ddada').remove();
                         }
+
                         $('sagepaydirectpro-dummy-link').writeAttribute('href', '');
                     }
-                });
+                    }
+                );
 
                 if (this._mobile) {
                     var offset_left = (Position.deltaX + Math.floor((document.viewport.getDimensions().width - parseInt(dtd.container.getDimensions().width)) / 2));
@@ -878,15 +911,13 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 dtd.container.insert(lcontdtd);
                 dtd.open();
             }
-
         }
         else if (this.isNitPaymentMethod()) {
-
-            new Ajax.Request(SuiteConfig.getConfig('nit', 'sgps_registertrn_url'), {
+            new Ajax.Request(
+                SuiteConfig.getConfig('nit', 'sgps_registertrn_url'), {
                 onSuccess: function (f) {
 
                     try {
-
                         var d = f.responseText.evalJSON();
 
                         if (d.response_status == "INVALID" || d.response_status == "MALFORMED" || d.response_status == "ERROR" || d.response_status == "FAIL") {
@@ -895,13 +926,13 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                         } else if (d.response_status == 'threed') {
                             $('sagepaydirectpro-dummy-link').writeAttribute('href', d.url);
                         }
-
                     } catch (alfaEr) {
                         this.growlError(f.responseText.toString());
                     }
 
                 }.bind(this)
-            });
+                }
+            );
         }
         else {
             this.getConfig('review').nextStep(transport);
@@ -912,12 +943,10 @@ EbizmartsSagePaySuite.Checkout.prototype = {
     nitGenerateCardToken: function (merchant_session_key, isOSC, isFireC, suite) {
 
         if (merchant_session_key) {
-
             //create token form
             var token_form = document.getElementById('sagepay_nit_token_form');
 
             if (!token_form) {
-
                 token_form = document.createElement("form");
                 token_form.setAttribute('id', "sagepay_nit_token_form");
                 token_form.setAttribute('method', "post");
@@ -958,9 +987,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 input_cc_cvc.setAttribute('data-sagepay', "securityCode");
                 token_form.appendChild(input_cc_cvc);
                 input_cc_cvc.setAttribute('value', document.getElementById("sagepaynit_cc_cid").value);
-
             } else {
-
                 token_form.elements[0].setAttribute('value', merchant_session_key);
                 token_form.elements[1].setAttribute('value', document.getElementById("sagepaynit_cc_owner").value);
                 token_form.elements[2].setAttribute('value', document.getElementById("sagepaynit_cc_number").value);
@@ -979,7 +1006,8 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                 //console.log(token_form);
 
                 //request token
-                Sagepay.tokeniseCardDetails(token_form, function (status, response) {
+                Sagepay.tokeniseCardDetails(
+                    token_form, function (status, response) {
                     //console.log(status, response);
                     if (status === 201) {
                         if (isOSC) {
@@ -1025,19 +1053,23 @@ EbizmartsSagePaySuite.Checkout.prototype = {
 
                             checkout.setLoadWaiting(true);
                             $('review-please-wait').show();
-                            new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
+                            new Ajax.Request(
+                                SuiteConfig.getConfig('global', 'sgps_saveorder_url'), {
                                 method: "post",
                                 parameters: Form.serialize(pmntForm),
                                 onSuccess: function (f) {
                                     checkout.setLoadWaiting(false);
                                     $('review-please-wait').hide();
-                                    var FirecheckoutSageServer = new EbizmartsSagePaySuite.Checkout({
+                                    var FirecheckoutSageServer = new EbizmartsSagePaySuite.Checkout(
+                                        {
                                         //'checkout'  : checkout
-                                    });
+                                        }
+                                    );
                                     FirecheckoutSageServer.code = "sagepaynit";
                                     FirecheckoutSageServer.reviewSave(f);
                                 }.bind(this)
-                            });
+                                }
+                            );
                         }
                     } else {
                         console.log(response);
@@ -1045,14 +1077,14 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                         checkout.setLoadWaiting(false);
                         document.getElementById("review-please-wait").innerHTML = old_message_html;
                     }
-                });
+                    }
+                );
             } catch (err) {
                 console.log(err);
                 alert("Unable to initialize SagePay payment method, please refresh the page and try again.");
                 if (isOSC) {
                     document.getElementsByClassName("onestepcheckout-place-order-loading")[0].innerHTML = old_message_html;
                 } else if (isFireC) {
-
                 } else {
                     checkout.setLoadWaiting(false);
                     document.getElementById("review-please-wait").innerHTML = old_message_html;
@@ -1069,6 +1101,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             aux.setAttribute("id", "sagepay-nit-aux-placeholder");
             document.getElementsByTagName('body')[0].appendChild(aux);
         }
+
         var old_review_message = document.getElementById("review-please-wait").innerHTML;
         var loader_gif = document.getElementById("review-please-wait").getElementsByTagName("img");
         aux.innerHTML = "";
@@ -1080,13 +1113,13 @@ EbizmartsSagePaySuite.Checkout.prototype = {
         var suite = this;
 
         //get merchant generated key
-        new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_nit_generate_merchant_key'), {
+        new Ajax.Request(
+            SuiteConfig.getConfig('global', 'sgps_nit_generate_merchant_key'), {
             method: "get",
             onSuccess: function (data) {
 
                 try {
                     if (data.status == 200) {
-
                         var response = data.responseText.evalJSON();
 
                         if (response.merchantSessionKey) {
@@ -1098,7 +1131,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                             document.getElementById("review-please-wait").innerHTML = old_review_message;
                             alert("Unable to initialize SagePay payment method:, please refresh the page and try again.");
                         }
-
                     } else {
                         console.log(data);
                         checkout.setLoadWaiting(false);
@@ -1112,7 +1144,8 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                     alert("Unable to initialize SagePay payment method, please refresh the page and try again.");
                 }
             }
-        });
+            }
+        );
     }
     ,
     nitGenerateMerchantKeyOSC: function () {
@@ -1124,6 +1157,7 @@ EbizmartsSagePaySuite.Checkout.prototype = {
             aux.setAttribute("id", "sagepay-nit-aux-placeholder");
             document.getElementsByTagName('body')[0].appendChild(aux);
         }
+
         var old_review_message = document.getElementsByClassName("onestepcheckout-place-order-loading")[0].innerHTML;
         aux.innerHTML = "";
         document.getElementsByClassName("onestepcheckout-place-order-loading")[0].innerHTML = aux.innerHTML + " Initializing payment gateway...";
@@ -1140,13 +1174,13 @@ EbizmartsSagePaySuite.Checkout.prototype = {
         var suite = this;
 
         //get merchant generated key
-        new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_nit_generate_merchant_key'), {
+        new Ajax.Request(
+            SuiteConfig.getConfig('global', 'sgps_nit_generate_merchant_key'), {
             method: "get",
             onSuccess: function (data) {
 
                 try {
                     if (data.status == 200) {
-
                         var response = data.responseText.evalJSON();
 
                         if (response.merchantSessionKey) {
@@ -1158,7 +1192,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                             document.getElementsByClassName("onestepcheckout-place-order-loading")[0].innerHTML = old_review_message;
                             alert("Unable to initialize SagePay payment method:, please refresh the page and try again.");
                         }
-
                     } else {
                         console.log(data);
                         document.getElementsByClassName("onestepcheckout-place-order-loading")[0].innerHTML = old_review_message;
@@ -1171,7 +1204,8 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                     alert("Unable to initialize SagePay payment method, please refresh the page and try again.");
                 }
             }
-        });
+            }
+        );
     }
     ,
     nitGenerateMerchantKeyFireCheckout: function () {
@@ -1186,13 +1220,13 @@ EbizmartsSagePaySuite.Checkout.prototype = {
         var suite = this;
 
         //get merchant generated key
-        new Ajax.Request(SuiteConfig.getConfig('global', 'sgps_nit_generate_merchant_key'), {
+        new Ajax.Request(
+            SuiteConfig.getConfig('global', 'sgps_nit_generate_merchant_key'), {
             method: "get",
             onSuccess: function (data) {
 
                 try {
                     if (data.status == 200) {
-
                         var response = data.responseText.evalJSON();
 
                         if (response.merchantSessionKey) {
@@ -1202,7 +1236,6 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                             console.log(response);
                             alert("Unable to initialize SagePay payment method:, please refresh the page and try again.");
                         }
-
                     } else {
                         console.log(data);
                         alert("Unable to initialize SagePay payment method, please refresh the page and try again.");
@@ -1212,25 +1245,35 @@ EbizmartsSagePaySuite.Checkout.prototype = {
                     alert("Unable to initialize SagePay payment method, please refresh the page and try again.");
                 }
             }
-        });
+            }
+        );
     }
 }
 
 try {
-    Event.observe(window, "load", function () {
+    Event.observe(
+        window, "load", function () {
         //document.observe('dom:loaded', function(){
         getOneStepCheckoutId();
 
-        $(document.body).insert(new Element('a', {
-            'id': 'sagepayserver-dummy-link',
-            'href': '#',
-            'style': 'display:none'
-        }).update('&nbsp;'));
-        $(document.body).insert(new Element('a', {
-            'id': 'sagepaydirectpro-dummy-link',
-            'href': '#',
-            'style': 'display:none'
-        }).update('&nbsp;'));
+        $(document.body).insert(
+            new Element(
+                'a', {
+                'id': 'sagepayserver-dummy-link',
+                'href': '#',
+                'style': 'display:none'
+                }
+            ).update('&nbsp;')
+        );
+        $(document.body).insert(
+            new Element(
+                'a', {
+                'id': 'sagepaydirectpro-dummy-link',
+                'href': '#',
+                'style': 'display:none'
+                }
+            ).update('&nbsp;')
+        );
 
         var msCont = $('suite_ms_payment_method');
 
@@ -1252,7 +1295,6 @@ try {
                     'oscFrm': $(window._sagepayonepageFormId)
                 }
             );
-
         } else if (msCont && (msCont.getValue() == 'sagepayserver')) {
             var SageServer = new EbizmartsSagePaySuite.Checkout(
                 {
@@ -1263,18 +1305,25 @@ try {
 
         if (parseInt(SuiteConfig.getConfig('global', 'valid')) === 0) {
             if (SuiteConfig.getConfig('direct', 'mode') == "live" || SuiteConfig.getConfig('server', 'mode') == "live") {
-                new PeriodicalExecuter(function () {
+                new PeriodicalExecuter(
+                    function () {
                     alert(SuiteConfig.getConfig('global', 'not_valid_message'));
-                }, 10);
+                    }, 10
+                );
             } else {
-                var invalidG = new k.Growler({
+                var invalidG = new k.Growler(
+                    {
                     location: "bl"
-                }).error('<strong>' + SuiteConfig.getConfig('global', 'not_valid_message') + '</strong>', {
+                    }
+                ).error(
+                    '<strong>' + SuiteConfig.getConfig('global', 'not_valid_message') + '</strong>', {
                         life: 14400
-                    });
+                        }
+                );
             }
         }
-    })
+        }
+    )
 }
 catch
     (er) {
@@ -1285,6 +1334,7 @@ addValidationClass = function (obj) {
     if (obj.hasClassName('validation-passed')) {
         obj.removeClassName('validation-passed');
     }
+
     obj.addClassName('validate-issue-number');
 }
 paypalClean = function (reverse) {
@@ -1295,11 +1345,13 @@ paypalClean = function (reverse) {
     if (reverse) {
         //sfls.invoke('enable');
         //Just hide items wose parent is visible, these prevents enabling hiden token card elements
-        sfls.each(function (item) {
+        sfls.each(
+            function (item) {
             if (item.up().visible() === true) {
                 item.enable();
             }
-        });
+            }
+        );
 
         sfls.invoke('show');
 
@@ -1338,6 +1390,7 @@ changecsvclass = function (obj) {
                 ccCVNContainer.removeClassName('required-entry');
             }
         }
+
         if (ccTypeContainer.value != 'LASER' && !ccCVNContainer.hasClassName('required-entry')) {
             if (ccCVNContainer) {
                 ccCVNContainer.addClassName('required-entry');
@@ -1357,6 +1410,7 @@ changecsvclass_nit = function (obj) {
                 ccCVNContainer.removeClassName('required-entry');
             }
         }
+
         if (ccTypeContainer.value != 'LASER' && !ccCVNContainer.hasClassName('required-entry')) {
             if (ccCVNContainer) {
                 ccCVNContainer.addClassName('required-entry');
@@ -1365,7 +1419,8 @@ changecsvclass_nit = function (obj) {
     }
 }
 
-Validation.addAllThese([
+Validation.addAllThese(
+    [
     ['validate-ccsgpdp-number', 'Please enter a valid credit card number.', function (v, elm) {
         // remove non-numerics
         try {
@@ -1398,6 +1453,7 @@ Validation.addAllThese([
                         ccCVNContainer.removeClassName('required-entry');
                     }
                 }
+
                 if (ccTypeContainer.value != 'LASER' && !ccCVNContainer.hasClassName('required-entry')) {
                     if (ccCVNContainer) {
                         ccCVNContainer.addClassName('required-entry');
@@ -1407,9 +1463,11 @@ Validation.addAllThese([
             else {
                 return true;
             }
+
             if (!ccTypeContainer && ccTypeContainer.value != 'LASER') {
                 return true;
             }
+
             var ccType = ccTypeContainer.value;
 
             switch (ccType) {
@@ -1449,12 +1507,14 @@ Validation.addAllThese([
             if (!ccTypeContainer) {
                 return true;
             }
+
             var ccType = ccTypeContainer.value;
 
             // Other card type or switch or solo card
             if (ccType == 'MCDEBIT' || ccType == 'OT' || ccType == 'UKE' || ccType == 'DELTA' || ccType == 'MAESTRO' || ccType == 'SOLO' || ccType == 'SWITCH' || ccType == 'LASER' || ccType == 'JCB' || ccType == 'DC') {
                 return true;
             }
+
             // Credit card type detecting regexp
             var ccTypeRegExp = {
                 'VISA': new RegExp('^4[0-9]{12}([0-9]{3})?$'),
@@ -1465,12 +1525,14 @@ Validation.addAllThese([
 
             // Matched credit card type
             var ccMatchedType = '';
-            $H(ccTypeRegExp).each(function (pair) {
+            $H(ccTypeRegExp).each(
+                function (pair) {
                 if (v.match(pair.value)) {
                     ccMatchedType = pair.key;
                     throw $break;
                 }
-            });
+                }
+            );
 
             if (ccMatchedType != ccType) {
                 return false;
@@ -1505,10 +1567,12 @@ Validation.addAllThese([
             if (isNaN(v)) {
                 return true;
             }
+
             return false;
         } catch (_error) {
             return true;
         }
     }]
-]);
+    ]
+);
 

@@ -6,9 +6,11 @@
  * Sagepay Curl SSL version Dropdown source
  *
  */
-class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Source_CurlSslVersion {
+class Ebizmarts_SagePaySuite_Model_Sagepaysuite_Source_CurlSslVersion
+{
 
-    public function toOptionArray() {
+    public function toOptionArray() 
+    {
         return array(
             array(
                 'value' => 'CURL_SSLVERSION_DEFAULT',
