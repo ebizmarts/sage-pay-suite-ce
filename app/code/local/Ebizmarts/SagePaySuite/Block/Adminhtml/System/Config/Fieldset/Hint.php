@@ -50,11 +50,9 @@ class Ebizmarts_SagePaySuite_Block_Adminhtml_System_Config_Fieldset_Hint extends
 
     public function getHelpDeskUrl() 
     {
-        $url = "https://tickets.ebizmarts.com/formsupport/sagepaysuite/index.php?";
+        $link = "https://ebizmarts.com/forums/view/2/";
 
-        $url .= "magever=" . Mage::getVersion() . "&modulever=PRO_" . $this->getModuleVersion() . "&email=" . $this->getAdminEmail();
-
-        return $url;
+        return $link;
     }
 
     public function isWebSessionConfigValid() 
