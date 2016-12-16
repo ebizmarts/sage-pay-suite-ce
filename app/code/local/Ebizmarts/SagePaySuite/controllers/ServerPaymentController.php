@@ -325,9 +325,8 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
     public function notifyAction()
     {
-        //@codingStandardsIgnoreStart
-        Sage_Log::log($_POST, null, 'SagePaySuite_POST_Requests.log');
-        //@codingStandardsIgnoreEnd
+
+        Sage_Log::log($this->getRequest()->getPost(), null, 'SagePaySuite_POST_Requests.log');
 
         if ($this->isPreSaveEnabled()) {
             return $this->notifyActionWhenOrderPreSaved();
@@ -350,7 +349,6 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
         //reset session flag
         $this->_getSagePayServerSession()->setEuroPaymentIsPending(false);
 
-        //$dbtrn->addData(Mage::helper('sagepaysuite')->arrayKeysToUnderscore($_POST))
         $dbtrn->setData("vps_protocol", $this->getRequest()->getPost('VPSProtocol'))
             ->setData("tx_type", $this->getRequest()->getPost('TxType'))
             ->setData("vendor_tx_code", $this->getRequest()->getPost('VendorTxCode'))
@@ -562,9 +560,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                             Mage::register('sagepay_create_invoice', 1, true);//For Magento 1.9+ when customer is Checkout=Register
                         }
 
-                        //@codingStandardsIgnoreStart
-                        $sageserverpost = new Varien_Object($_POST);
-                        //@codingStandardsIgnoreEnd
+                        $sageserverpost = new Varien_Object($this->getRequest()->getPost());
 
                         Mage::register('sageserverpost', $sageserverpost);
 
@@ -768,9 +764,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         $this->_getSagePayServerSession()->setInvoicePayment(false);
                         Mage::register('sagepay_create_invoice', 0, true);
 
-                        //@codingStandardsIgnoreStart
-                        $sageserverpost = new Varien_Object($_POST);
-                        //@codingStandardsIgnoreEnd
+                        $sageserverpost = new Varien_Object($this->getRequest()->getPost());
 
                         Mage::register('sageserverpost', $sageserverpost);
 
