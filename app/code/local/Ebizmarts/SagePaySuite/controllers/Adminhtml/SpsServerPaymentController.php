@@ -301,9 +301,7 @@ class Ebizmarts_SagePaySuite_Adminhtml_SpsServerPaymentController extends Mage_A
     public function notifyAction()
     {
 
-        //@codingStandardsIgnoreStart
-        Sage_Log::log($_POST, null, 'SagePaySuite_POST_Requests.log');
-        //@codingStandardsIgnoreEnd
+        Sage_Log::log($this->getRequest()->getPost(), null, 'SagePaySuite_POST_Requests.log');
 
         if (!file_exists(Mage:: getBaseDir('var') . '/tmp')) {
             mkdir(Mage:: getBaseDir('var') . '/tmp');
