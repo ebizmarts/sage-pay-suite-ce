@@ -1,3 +1,5 @@
+#This extension has been put in code freeze and will be deprecated as soon as Magento 1 support period finishes. If you need support please contact us.
+
 # SagePay OFFICIAL Extension for Magento - FREE
 
 __NEW: SagePay Protocol v3 with European Payments support (UK, Germany, Spain)__
