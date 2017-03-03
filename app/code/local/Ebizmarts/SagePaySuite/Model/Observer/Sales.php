@@ -120,9 +120,7 @@ class Ebizmarts_SagePaySuite_Model_Observer_Sales extends Ebizmarts_SagePaySuite
 
                 $logfileName = $order->getIncrementId() . '-' . time() . '_Payment_Failed.log';
 
-                //@codingStandardsIgnoreStart
-                $request_data = $_REQUEST;
-                //@codingStandardsIgnoreEnd
+                $request_data = Mage::app()->getRequest()->getParams();
 
                 if (isset($request_data['payment'])) {
                     $request_data['payment']['cc_number'] = 'XXXXXXXXXXXXX';
