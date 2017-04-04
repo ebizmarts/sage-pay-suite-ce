@@ -110,6 +110,13 @@ class Ebizmarts_SagePaySuite_PaymentController extends Mage_Core_Controller_Fron
 
                         $this->getOnepage()->getQuote()->setData('password_hash', Mage::getModel('customer/customer')->encryptPassword($password));
                     }
+                    //Fix for guest checkout assign firstname and lastname FDT 
+                    else
+                    {
+                        $this->getOnepage()->getQuote()->setData('customer_email', $billing_data['email']);
+                        $this->getOnepage()->getQuote()->setData('customer_firstname', $billing_data['firstname']);
+                        $this->getOnepage()->getQuote()->setData('customer_lastname', $billing_data['lastname']);
+                    }
                 }
 
                 if (!empty($billing_data['customer_password']) && !empty($billing_data['confirm_password'])) {
