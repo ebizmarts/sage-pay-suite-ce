@@ -1,4 +1,4 @@
-#This extension has been put in code freeze and will be deprecated as soon as Magento 1 support period finishes. If you need support please contact us.
+# This extension has been put in code freeze and will be deprecated as soon as Magento 1 support period finishes. If you need support please contact us.
 
 # SagePay OFFICIAL Extension for Magento - FREE
 
