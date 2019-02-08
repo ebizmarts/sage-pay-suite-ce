@@ -635,7 +635,6 @@ class Ebizmarts_SagePaySuite_Model_SagePayDirectPro extends Ebizmarts_SagePaySui
 
                 //billing state
                 $billing_state = $billing->getRegionCode();
-                Mage::log($billing_state);
                 if (!is_null($billing_state) && strlen($billing_state) > 2) {
                     $billing_state = substr($billing_state, 0, 2);
                 }

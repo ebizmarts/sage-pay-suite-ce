@@ -1,3 +1,5 @@
+# This extension has been put in code freeze and will be deprecated as soon as Magento 1 support period finishes. If you need support please contact us.
+
 # SagePay OFFICIAL Extension for Magento - FREE
 
 __NEW: SagePay Protocol v3 with European Payments support (UK, Germany, Spain)__
@@ -17,12 +19,8 @@ New FREE __Sage Pay approved__ extension from __ebizmarts__. Supports all [Sage 
 * Handy admin tools
 * Magento events (observers) have been used to avoid conflicts with other extensions
 
-The latest stable version of the extension can be installed via the [Magento Connect](http://www.magentocommerce.com/magento-connect/ebizmarts-sage-pay-suite-ce-europe-free-sagepay-official-extension.html).
-
 ----
 ## Support
-Need support? [Click here](http://ebizmarts.com/forums/view/2)
-
 To Install configure and see most common issues visit our [wiki](http://wiki.ebizmarts.com/)
 
 *Please note that this free extension only supports PAYMENT transactions, please contact ebizmarts for the fully featured commercial version.*

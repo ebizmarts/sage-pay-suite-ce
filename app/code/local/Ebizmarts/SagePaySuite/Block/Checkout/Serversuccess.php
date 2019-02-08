@@ -29,22 +29,24 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
             $successUrl = Mage::getModel('adminhtml/url')->getUrl('adminhtml/sales_order/view', array('order_id' => $orderId, '_secure' => true));
         }
         else {
-            if(!is_null($this->getRequest()->getParam('qide'))
-                && !is_null($this->getRequest()->getParam('incide'))
-                && !is_null($this->getRequest()->getParam('oide'))) {
+            $helper = Mage::helper('sagepaysuite');
+            $sanitizedParams = $helper->sanitizeParamsFromQuery($this->getRequest()->getParams());
+            if (isset($sanitizedParams['qide'])
+                && isset($sanitizedParams['incide'])
+                && isset($sanitizedParams['oide'])) {
                 $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                    ->loadByParent($this->getRequest()->getParam('oide'));
+                    ->loadByParent($sanitizedParams['oide']);
                 $first_arrive = $transaction->getData("server_success_arrived") == false;
                 Mage::getSingleton('core/session')->setData("sagepay_server_first_arrive", $first_arrive);
 
                 if(!$this->isPreSaveEnabled()){
                     //relogin user if just registered
-                    $quote = Mage::getModel('sales/quote')->load($this->getRequest()->getParam('qide'));
+                    $quote = Mage::getModel('sales/quote')->load($sanitizedParams['qide']);
                     $isRegister = ($quote->getData('checkout_method') == 'register');
                     $quote_customer_id = $quote->getData('customer_id');
                     $transaction = Mage::getModel('sagepaysuite2/sagepaysuite_transaction')
-                        ->loadByParent($this->getRequest()->getParam('oide'));
-                    if($isRegister && $quote_customer_id == $this->getRequest()->getParam('cusid')){
+                        ->loadByParent($sanitizedParams['oide']);
+                    if($isRegister && $quote_customer_id == $sanitizedParams['cusid']){
                         //check transaction flag
                         if($first_arrive){
                             Mage::getSingleton('customer/session')->loginById($this->getRequest()->getParam('cusid'));
@@ -85,18 +87,18 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
                 }
 
                 Mage::getSingleton('checkout/session')
-                    ->setLastSuccessQuoteId($this->getRequest()->getParam('qide'))
-                    ->setLastQuoteId($this->getRequest()->getParam('qide'))
-                    ->setLastOrderId($this->getRequest()->getParam('oide'))
-                    ->setLastRealOrderId(Mage::helper('sagepaysuite')->decodeParamFromQuery($this->getRequest()->getParam('incide')));
+                    ->setLastSuccessQuoteId($sanitizedParams['qide'])
+                    ->setLastQuoteId($sanitizedParams['qide'])
+                    ->setLastOrderId($sanitizedParams['oide'])
+                    ->setLastRealOrderId(Mage::helper('sagepaysuite')->decodeParamFromQuery($sanitizedParams['incide']));
 
                 //set invoice flag
-                $autoInvoice = (int)$this->getRequest()->getParam('inv');
+                $autoInvoice = (int)$sanitizedParams['inv'];
                 $preventInvoice = ((int)Mage::getStoreConfig('payment/sagepaysuite/prevent_invoicing') === 1);
                 Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice && !$preventInvoice);
 
                 if($this->isPreSaveEnabled()) {
-                    $order = Mage::getModel('sales/order')->load($this->getRequest()->getParam('oide'));
+                    $order = Mage::getModel('sales/order')->load($sanitizedParams['oide']);
 
                     //change status
                     $order->setStatus((string)Mage::getModel('sagepaysuite/sagePayServer')->getConfigData('order_status'))->save();
@@ -108,10 +110,10 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
 
             $_succuessParams = Mage::helper('sagepaysuite')->sanitizeParamsForQuery(
                 array('_secure' => true,
-                'oide' => $this->getRequest()->getParam('oide'),
-                'qide' => $this->getRequest()->getParam('qide'),
-                'incide' => $this->getRequest()->getParam('incide'),
-                'inv' => $this->getRequest()->getParam('inv'))
+                'oide' => $sanitizedParams['oide'],
+                'qide' => $sanitizedParams['qide'],
+                'incide' => $sanitizedParams['incide'],
+                'inv' => $sanitizedParams['inv'])
             );
 
             $successUrl = Mage::getModel('core/url')->getUrl('checkout/onepage/success', $_succuessParams);
@@ -119,7 +121,7 @@ class Ebizmarts_SagePaySuite_Block_Checkout_Serversuccess extends Mage_Core_Bloc
             //recover multishipping data
             if($this->getRequest()->getParam('multishipping')) {
                 //get multishipping ids data
-                $msorderids = $this->getRequest()->getParam('msorderids');
+                $msorderids = $sanitizedParams['msorderids'];
                 $msorderids = explode(",", $msorderids);
                 $msorderidsArray = array();
                 for($i = 0;$i<count($msorderids);$i++){

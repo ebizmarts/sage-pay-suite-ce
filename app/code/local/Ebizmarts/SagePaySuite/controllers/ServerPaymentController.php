@@ -169,10 +169,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
     {
         $url = Mage:: getUrl(
             'sgps/ServerPayment/abortredirect', array(
-            '_secure' => true,
-            '_current' => true,
-            '_store' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-            'storeid' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                '_secure' => true,
+                '_current' => true,
+                '_store' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                'storeid' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
             )
         );
 
@@ -181,30 +181,28 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
 
     protected function _getSuccessRedirectUrl($params = array())
     {
-        $encodedParams = Mage::helper('sagepaysuite')->sanitizeParamsForQuery($params);
-
-        $myParams = array_merge(
-            array(
+        $myParams = array(
             '_secure' => true,
             '_current' => true,
             '_store' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-            'storeid' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-            ), $encodedParams
+            'storeid' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId())
         );
 
         $url = Mage:: getUrl('sgps/ServerPayment/success', $myParams);
+        $helper = Mage::helper('sagepaysuite');
+        $finalUrl = $helper->addEncodedParamsToUrl($url, $params);
 
-        return $url;
+        return $finalUrl;
     }
 
     protected function _getFailedRedirectUrl()
     {
         $url = Mage:: getUrl(
             'sgps/ServerPayment/failure', array(
-            '_secure' => true,
-            '_current' => true,
-            '_store' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
-            'storeid' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                '_secure' => true,
+                '_current' => true,
+                '_store' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
+                'storeid' => $this->getRequest()->getParam('storeid', Mage::app()->getStore()->getId()),
             )
         );
 
@@ -568,7 +566,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         $customer_id = null;
                         $quote = $this->getOnepage()->getQuote();
                         if ($quote->getId() == null) {
-                            $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
+                            $sanitizedParams = Mage::helper('sagepaysuite')->sanitizeParamsFromQuery(Mage::app()->getRequest()->getParams());
+                            $paramQid = Mage::app()->getRequest()->getParam('qid');
+                            $rqQuoteId = (is_numeric($paramQid)) ? $paramQid : $sanitizedParams['qid'];
                             $quote = Mage::getModel('sales/quote')->loadActive($rqQuoteId);
                             $this->getOnepage()->setQuote($quote);
                             Mage::app()->getStore()->setCurrentCurrencyCode($quote->getQuoteCurrencyCode()); //Thanks to Ross Kinsman for his input on this.
@@ -771,7 +771,9 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         //1.9.1 ssl fix
                         $customer_id = null;
                         if ($this->getOnepage()->getQuote()->getId() == null) {
-                            $rqQuoteId = Mage::app()->getRequest()->getParam('qid');
+                            $sanitizedParams = Mage::helper('sagepaysuite')->sanitizeParamsFromQuery(Mage::app()->getRequest()->getParams());
+                            $paramQid = Mage::app()->getRequest()->getParam('qid');
+                            $rqQuoteId = (is_numeric($paramQid)) ? $paramQid : $sanitizedParams['qid'];
                             $quote = Mage::getModel('sales/quote')->loadActive($rqQuoteId);
                             $this->getOnepage()->setQuote($quote);
                             Mage::app()->getStore()->setCurrentCurrencyCode($quote->getQuoteCurrencyCode()); //Thanks to Ross Kinsman for his input on this.
@@ -846,10 +848,10 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         if (Mage::registry('sagepay_last_quote_id')) {
                             $this->_returnOk(
                                 array('inv' => (int)Mage::registry('sagepay_create_invoice'),
-                                'cusid' => is_null($customer_id) ? Mage::registry('sagepay_customer_id') : $customer_id,
-                                'qide' => Mage::registry('sagepay_last_quote_id'),
-                                'incide' => Mage::registry('sagepay_last_real_order_id'),
-                                'oide' => Mage::registry('sagepay_last_order_id'))
+                                    'cusid' => is_null($customer_id) ? Mage::registry('sagepay_customer_id') : $customer_id,
+                                    'qide' => Mage::registry('sagepay_last_quote_id'),
+                                    'incide' => Mage::registry('sagepay_last_real_order_id'),
+                                    'oide' => Mage::registry('sagepay_last_order_id'))
                             );
                         } else {
                             $this->_returnOk();
@@ -926,7 +928,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                 ->save();
 
             //cancel order
-            if($dbtrn->getOrderId()){
+            if ($dbtrn->getOrderId()) {
                 $order = Mage::getModel('sales/order')->load($dbtrn->getOrderId());
                 if ($order->canCancel()) {
                     try {
@@ -937,8 +939,7 @@ class Ebizmarts_SagePaySuite_ServerPaymentController extends Mage_Core_Controlle
                         //recover quote
                         $quote = Mage::getModel('sales/quote')
                             ->load($order->getQuoteId());
-                        if ($quote->getId())
-                        {
+                        if ($quote->getId()) {
                             $quote->setIsActive(1)
                                 ->setReservedOrderId(NULL)
                                 ->save();
