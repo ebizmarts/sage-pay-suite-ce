@@ -752,13 +752,13 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         $return = array();
 
         foreach ($parameters as $_key => $_param) {
-            $return [$_key] = $this->_encodeParamForQuery($_param);
+            $return [$_key] = $this->encodeParamForQuery($_param);
         }
 
         return $return;
     }
 
-    private function _encodeParamForQuery($string)
+    private function encodeParamForQuery($string)
     {
         return rawurlencode($string);
     }
@@ -768,4 +768,67 @@ class Ebizmarts_SagePaySuite_Helper_Data extends Mage_Core_Helper_Abstract
         return rawurldecode($string);
     }
 
+    public function sanitizeParamsFromQuery(array $parameters)
+    {
+        $return = array();
+        foreach ($parameters as $_key => $_param) {
+            if ($this->isEncryptedParam($_key)) {
+                $return[$_key] = $this->decodeParamFromQuery($_param);
+            } else {
+                $return[$_key] = $_param;
+            }
+        }
+        return $return;
+    }
+
+    protected function isEncryptedParam($key)
+    {
+        switch ($key) {
+            case 'inv':
+            case 'cusid':
+            case 'qide':
+            case 'incide':
+            case 'oide':
+            case 'qid':
+                return true;
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+    /**
+     * Add params with format key=value to void problems when encryption returns value with character /
+     *
+     * @param $url
+     * @param $params
+     * @return string
+     */
+    public function addEncodedParamsToUrl($url, $params)
+    {
+        $encodedParams = $this->sanitizeParamsForQuery($params);
+        if(strstr($url, '?') === false) {
+            $url .= '?' . $this->_getFormattedParams($encodedParams);
+        } else {
+            $url .= '&' . $this->_getFormattedParams($encodedParams);
+        }
+        return $url;
+    }
+    /**
+     * @param $encodedParams
+     * @return string
+     */
+    protected function _getFormattedParams($encodedParams)
+    {
+        $formattedString = '';
+        $count = 0;
+        foreach ($encodedParams as $key => $value) {
+            if ($count > 0) {
+                $formattedString .= '&';
+            }
+            $formattedString .= $key . '=' . $value;
+            $count++;
+        }
+        return $formattedString;
+    }
 }
