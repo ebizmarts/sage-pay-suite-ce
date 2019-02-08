@@ -89,28 +89,28 @@ class Ebizmarts_SagePaySuite_Model_Observer_Checkout extends Ebizmarts_SagePaySu
         $this->getSession()->clear();
     }
 
-    public function getOnepage() 
+    public function getOnepage()
     {
-
         return Mage::getSingleton('checkout/type_onepage');
     }
 
     public function controllerOnePageSuccess($o) 
     {
-
+        $helper = Mage::helper('sagepaysuite');
+        $sinitizedParams = $helper->sanitizeParamsFromQuery(Mage::app()->getRequest()->getParams());
         //check if session is there
         $sessionCheckout = $this->getOnepage()->getCheckout();
-        if(!$sessionCheckout->getLastSuccessQuoteId() && !is_null(Mage::app()->getRequest()->getParam('qide'))
-            && !is_null(Mage::app()->getRequest()->getParam('incide'))
-            && !is_null(Mage::app()->getRequest()->getParam('oide'))) {
+        if (!$sessionCheckout->getLastSuccessQuoteId() && isset($sinitizedParams['qide'])
+            && isset($sinitizedParams['incide'])
+            && isset($sinitizedParams['oide'])) {
             if(Mage::getSingleton('core/session')->getData("sagepay_server_first_arrive") == true){
                 $sessionCheckout
-                    ->setLastSuccessQuoteId(Mage::app()->getRequest()->getParam('qide'))
-                    ->setLastQuoteId(Mage::app()->getRequest()->getParam('qide'))
-                    ->setLastOrderId(Mage::app()->getRequest()->getParam('oide'))
-                    ->setLastRealOrderId(Mage::helper('sagepaysuite')->decodeParamFromQuery(Mage::app()->getRequest()->getParam('incide')));
+                    ->setLastSuccessQuoteId($sinitizedParams['qide'])
+                    ->setLastQuoteId($sinitizedParams['qide'])
+                    ->setLastOrderId($sinitizedParams['oide'])
+                    ->setLastRealOrderId($sinitizedParams['incide']);
 
-                $autoInvoice = (int)Mage::app()->getRequest()->getParam('inv');
+                $autoInvoice = (int)$sinitizedParams['inv'];
                 if($autoInvoice) {
                     Mage::getSingleton('sagepaysuite/session')->setCreateInvoicePayment($autoInvoice);
                 }
